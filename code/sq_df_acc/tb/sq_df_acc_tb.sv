@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+import hsi_mse_pkg::*;
+
 module sq_df_acc_tb;
 
   localparam DATA_WIDTH = HM_DATA_WIDTH; // 16 bits by default
