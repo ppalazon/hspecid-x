@@ -68,6 +68,9 @@
 
 # End of https://www.toptal.com/developers/gitignore/api/xilinxvivado
 
+# Add REAMDME file
+!README.md
+
 # DVT IDE
 !*.dvt/default.build
 !*.dvt/default.ls
