@@ -13,10 +13,8 @@ module vctr_fifo_strm_tb;
   reg rst_n;
   reg data_in_v1_en;
   reg [DATA_WIDTH-1:0] data_in_v1;
-  wire data_in_v1_full;
   reg data_in_v2_en;
   reg [DATA_WIDTH-1:0] data_in_v2;
-  wire data_in_v2_full;
   reg data_out_en;
   wire [DATA_WIDTH-1:0] data_out;
   wire data_out_empty;
@@ -35,10 +33,10 @@ module vctr_fifo_strm_tb;
     .rst_n(rst_n),
     .data_in_v1_en(data_in_v1_en),
     .data_in_v1(data_in_v1),
-    .data_in_v1_full(data_in_v1_full),
+    .data_in_v1_full(),
     .data_in_v2_en(data_in_v2_en),
     .data_in_v2(data_in_v2),
-    .data_in_v2_full(data_in_v2_full),
+    .data_in_v2_full(),
     .data_out_en(data_out_en),
     .data_out(data_out),
     .data_out_empty(data_out_empty),

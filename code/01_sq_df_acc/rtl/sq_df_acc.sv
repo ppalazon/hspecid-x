@@ -21,22 +21,19 @@ module sq_df_acc #(
     output logic [DATA_WIDTH_ACC-1:0] data_out // Output result
   );
 
-  logic en_1, en_2, en_3; // Enable signals for pipeline stages
+  logic en_1, en_2; // Enable signals for pipeline stages
 
   logic acc_1_en, acc_2_en; // Enable signals for accumulators
   logic [DATA_WIDTH_ACC-1:0] acc_1, acc_2; // Accumulators for pipeline stages
 
   logic signed [DATA_WIDTH:0] diff; // Difference between elements, using one extra bit for overflow
   logic [DATA_WIDTH_MUL-1:0] mult;
-  logic [DATA_WIDTH_ACC-1:0] acc; // Multipy and accumulator for the output
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       diff <= 0; // Reset difference
       en_1 <= 0; // Reset stage 1
       en_2 <= 0; // Reset enable signal
-      en_3 <= 0; // Reset stage 3
-      acc <= 0; // Reset accumulator to initial value
       mult <= 0; // Reset multiplication result
       acc_1 <= 0; // Reset stage 1 accumulator
       acc_2 <= 0; // Reset stage 2 accumulator
