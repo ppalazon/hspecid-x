@@ -1,0 +1,27 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Mon Jun 23 16:44:56 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/01_sq_df/wave.vcd"
+[dumpfile_mtime] "Mon Jun 23 16:44:22 2025"
+[dumpfile_size] 792
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/01_sq_df.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-11.781137 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sq_df_tb.
+[sst_width] 317
+[signals_width] 222
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+sq_df_tb.clk
+@22
+sq_df_tb.data_in_v1[15:0]
+sq_df_tb.data_in_v2[15:0]
+sq_df_tb.data_out[31:0]
+@28
+sq_df_tb.rst_n
+[pattern_trace] 1
+[pattern_trace] 0

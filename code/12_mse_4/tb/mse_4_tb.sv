@@ -26,8 +26,13 @@ module mse_4_tb;
     .data_sum_out(data_sum_out)
   );
 
-  initial
-  begin
+  // Waveform generation for debugging
+  initial begin
+    $dumpfile("wave.vcd");
+    $dumpvars(0, mse_4_tb);
+  end
+
+  initial begin
     clk = 1;
     rst_n = 1;
     data_vctr_1 = 0;

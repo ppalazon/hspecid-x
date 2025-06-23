@@ -22,8 +22,13 @@ module sq_df_tb;
     .data_out(data_out)
   );
 
-  initial
-  begin
+  // Waveform generation for debugging
+  initial begin
+    $dumpfile("wave.vcd");
+    $dumpvars(0, sq_df_tb);
+  end
+
+  initial begin
     clk = 1;
     rst_n = 1;
     data_in_v1 = 0;

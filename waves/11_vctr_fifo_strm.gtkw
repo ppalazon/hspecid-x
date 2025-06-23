@@ -1,0 +1,45 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Mon Jun 23 17:01:25 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/11_vctr_fifo_strm/wave.vcd"
+[dumpfile_mtime] "Mon Jun 23 17:00:09 2025"
+[dumpfile_size] 8173
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/11_vctr_fifo_strm.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-14.968539 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] vctr_fifo_strm_tb.
+[sst_width] 317
+[signals_width] 222
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+vctr_fifo_strm_tb.clk
+vctr_fifo_strm_tb.rst_n
+@24
+vctr_fifo_strm_tb.data_in_v1[15:0]
+@28
+vctr_fifo_strm_tb.data_in_v1_en
+vctr_fifo_strm_tb.data_in_v1_full
+@24
+vctr_fifo_strm_tb.data_in_v2[15:0]
+@28
+vctr_fifo_strm_tb.data_in_v2_en
+vctr_fifo_strm_tb.data_in_v2_full
+@24
+vctr_fifo_strm_tb.data_out[15:0]
+@28
+vctr_fifo_strm_tb.data_out_empty
+vctr_fifo_strm_tb.data_out_en
+@420
+vctr_fifo_strm_tb.inserted
+vctr_fifo_strm_tb.processed
+@28
+vctr_fifo_strm_tb.idle
+vctr_fifo_strm_tb.start
+vctr_fifo_strm_tb.ready
+vctr_fifo_strm_tb.done
+[pattern_trace] 1
+[pattern_trace] 0

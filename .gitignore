@@ -78,6 +78,9 @@
 # Add shell scripts
 !*.sh
 
+# Add gtkwave files
+!*.gtkw
+
 # Simulation dir
 sim/
 vivado/

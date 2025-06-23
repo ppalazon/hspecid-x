@@ -2,8 +2,16 @@
 set -e # Exit on error
 set -x # Enable verbose command output
 
-# Set vivado environment variables
-source $VIVADO_SETTINGS
+SHOW_WAVEFORM=false
+while getopts "w" opt; do
+  case $opt in
+    w) SHOW_WAVEFORM=true;;
+    \?) echo "Invalid option: -$OPTARG" >&2 ;;
+  esac
+done
+
+# Remove options from positional parameters
+shift $((OPTIND - 1))
 
 MODULE_NAME="$1"
 
@@ -14,7 +22,10 @@ if [ -z "$MODULE_NAME" ]; then
 fi
 
 # Get absolute path to the module directory
-CODE=$(realpath "code")
+BASE_DIR=$(pwd)
+CODE=${BASE_DIR}/code
+TCL=${BASE_DIR}/tcl
+WAVES=${BASE_DIR}/waves
 
 # Module configuration parameters
 # Set testbench module name based on module type
@@ -52,6 +63,15 @@ cd sim/$1
 SV_FILES=$(find "$CODE" -type f \( -name "*.sv" -o -name "*.vh" \) ! -path "*/tb/*" | sort)
 TB_FILES=$CODE/$MODULE_NAME/tb/*.sv # Get module testbench files
 
+# Set vivado environment variables
+source $VIVADO_SETTINGS
+
 xvlog --sv $SV_FILES $TB_FILES
 xelab $TESTBENCH_MODULE -s testbench_sim
-xsim testbench_sim --runall
+xsim testbench_sim -tclbatch $TCL/run_tb.tcl
+
+if [ "$SHOW_WAVEFORM" = true ]; then
+    gtkwave wave.vcd $WAVES/$MODULE_NAME.gtkw > /dev/null 2>&1 &
+else
+    echo "Simulation completed. Use -w option to view waveform."
+fi

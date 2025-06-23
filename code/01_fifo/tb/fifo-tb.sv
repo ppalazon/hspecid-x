@@ -39,6 +39,12 @@ module fifo_tb;
   // Clock generation
   always #5 clk = ~clk;
 
+  // Waveform generation for debugging
+  initial begin
+    $dumpfile("wave.vcd");     // Name of VCD file
+    $dumpvars(0, fifo_tb);   // Replace 'testbench' with your top module name
+  end
+
   // Testbench logic
   initial begin
     // Initialize signals

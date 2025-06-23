@@ -58,8 +58,13 @@ module vctr_fifo_strm_tb;
   integer processed = 0;
   integer inserted = 0;
 
-  initial
-  begin
+  // Waveform generation for debugging
+  initial begin
+    $dumpfile("wave.vcd");
+    $dumpvars(0, vctr_fifo_strm_tb);
+  end
+
+  initial begin
     clk = 1;
     rst_n = 0;
     data_in_v1_en = 0;

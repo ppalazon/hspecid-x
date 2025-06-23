@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Mon Jun 23 16:59:31 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/10_vctr_fifo_full/wave.vcd"
+[dumpfile_mtime] "Mon Jun 23 16:57:33 2025"
+[dumpfile_size] 13481
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/10_vctr_fifo_full.gtkw"
+[timestart] 505400
+[size] 2554 1366
+[pos] -1 -1
+*-15.581501 955000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] vctr_fifo_full_tb.
+[sst_width] 317
+[signals_width] 275
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+vctr_fifo_full_tb.clk
+@24
+vctr_fifo_full_tb.data_in[15:0]
+@28
+vctr_fifo_full_tb.data_in_en
+@25
+vctr_fifo_full_tb.data_out[15:0]
+@28
+vctr_fifo_full_tb.data_out_en
+vctr_fifo_full_tb.done
+vctr_fifo_full_tb.idle
+vctr_fifo_full_tb.ready
+vctr_fifo_full_tb.rst_n
+vctr_fifo_full_tb.start
+@24
+vctr_fifo_full_tb.vffg[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -49,8 +49,13 @@ module sq_df_acc_tb;
   integer pipeline_stages = 3; // Number of pipeline stages in the DUT
   integer cycle_count = VECTOR_LENGTH + pipeline_stages; // Number of cycles to run the test, vector length + pipeline stages
 
-  initial
-  begin
+  // Waveform generation for debugging
+  initial begin
+    $dumpfile("wave.vcd");
+    $dumpvars(0, sq_df_acc_tb);
+  end
+
+  initial begin
     clk = 1;
     rst_n = 1;
     data_in_valid = 0;

@@ -40,6 +40,12 @@ module vctr_fifo_full_tb;
   // Random class to generate test vectors
   VctrFifoFullGen vffg;
 
+  // Waveform generation for debugging
+  initial begin
+    $dumpfile("wave.vcd");
+    $dumpvars(0, vctr_fifo_full_tb);
+  end
+
   initial begin
     clk = 0;
     rst_n = 1;
