@@ -1,0 +1,80 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Tue Jun 24 19:56:43 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/20_hsi_mse/wave.vcd"
+[dumpfile_mtime] "Tue Jun 24 19:51:19 2025"
+[dumpfile_size] 110233
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/20_hsi_mse.gtkw"
+[timestart] 626920
+[size] 2554 1366
+[pos] -1 -1
+*-14.001522 712280 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsi_mse_tb.
+[treeopen] hsi_mse_tb.dut.
+[sst_width] 400
+[signals_width] 433
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsi_mse_tb.clk
+hsi_mse_tb.rst_n
+@22
+hsi_mse_tb.element_a[31:0]
+hsi_mse_tb.element_b[31:0]
+@28
+hsi_mse_tb.element_valid
+@24
+hsi_mse_tb.expected_mse[31:0]
+hsi_mse_tb.mse[31:0]
+@28
+hsi_mse_tb.mse_valid
+@200
+-DUT
+@28
+hsi_mse_tb.dut.element_valid
+hsi_mse_tb.start_vctr
+hsi_mse_tb.dut.initial_acc_en
+hsi_mse_tb.dut.sq_df_acc_en
+hsi_mse_tb.dut.sq_df_acc_finish
+@24
+hsi_mse_tb.dut.band_counter[6:0]
+hsi_mse_tb.dut.mse_acc[48:0]
+@28
+hsi_mse_tb.dut.mse_acc_valid
+@24
+hsi_mse_tb.dut.mse[31:0]
+@28
+hsi_mse_tb.dut.mse_valid
+@200
+-Channel 1
+@28
+hsi_mse_tb.dut.channel_1.acc_valid
+@24
+hsi_mse_tb.dut.channel_1.element[6:0]
+hsi_mse_tb.dut.channel_1.element_1[6:0]
+hsi_mse_tb.dut.channel_1.element_2[6:0]
+@28
+hsi_mse_tb.dut.channel_1.initial_acc_en
+@22
+hsi_mse_tb.dut.channel_1.data_in_v1[15:0]
+hsi_mse_tb.dut.channel_1.data_in_v2[15:0]
+@24
+hsi_mse_tb.dut.channel_1.acc_out[47:0]
+@200
+-Channel 2
+@28
+hsi_mse_tb.dut.channel_2.acc_valid
+@24
+hsi_mse_tb.dut.channel_2.element[6:0]
+hsi_mse_tb.dut.channel_2.element_1[6:0]
+hsi_mse_tb.dut.channel_2.element_2[6:0]
+@28
+hsi_mse_tb.dut.channel_2.initial_acc_en
+@22
+hsi_mse_tb.dut.channel_2.data_in_v1[15:0]
+hsi_mse_tb.dut.channel_2.data_in_v2[15:0]
+@25
+hsi_mse_tb.dut.channel_2.acc_out[47:0]
+[pattern_trace] 1
+[pattern_trace] 0

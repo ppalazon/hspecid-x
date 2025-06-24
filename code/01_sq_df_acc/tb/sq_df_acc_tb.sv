@@ -8,6 +8,7 @@ module sq_df_acc_tb;
   localparam DATA_WIDTH_MUL = HM_DATA_WIDTH_MUL;
   localparam DATA_WIDTH_ACC = HM_DATA_WIDTH_ACC;
   localparam VECTOR_LENGTH = HM_VECTOR_LENGTH_TB; // Length of the vector
+  localparam HSI_BANDS_ADDR = $clog2(HM_HSI_BANDS); // Address width for HSI bands
 
   reg clk;
   reg rst_n;
@@ -20,15 +21,18 @@ module sq_df_acc_tb;
   reg data_in_valid;
   reg [DATA_WIDTH-1:0] data_in_v1;
   reg [DATA_WIDTH-1:0] data_in_v2;
+  reg [HSI_BANDS_ADDR-1:0] element; // Band counter for HSI bands
 
   // Output signals
   wire data_out_valid;
   wire [DATA_WIDTH_ACC-1:0] data_out;
+  wire [HSI_BANDS_ADDR-1:0] element_out;
 
   sq_df_acc #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
-    .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
+    .HSI_BANDS(HM_HSI_BANDS)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -37,8 +41,10 @@ module sq_df_acc_tb;
     .initial_acc(initial_acc),
     .data_in_v1(data_in_v1),
     .data_in_v2(data_in_v2),
-    .data_out_valid(data_out_valid),
-    .data_out(data_out)
+    .acc_valid(data_out_valid),
+    .acc_out(data_out),
+    .element(element),
+    .element_out(element_out)
   );
 
   // Random class to generate test vectors
@@ -87,6 +93,7 @@ module sq_df_acc_tb;
             data_in_valid = 1; // Valid input values
             data_in_v1 = sq_df_acc_gen.vctr1[cycle];
             data_in_v2 = sq_df_acc_gen.vctr2[cycle];
+            element = cycle[HSI_BANDS_ADDR-1:0]; // Set band counter for HSI bands
           end else begin
             data_in_valid = 0; // No more valid input values
             data_in_v1 = 0;
@@ -97,6 +104,9 @@ module sq_df_acc_tb;
           if (cycle >= pipeline_stages) begin : output_check
             if (data_out_valid) begin
               // Check if the output matches the expected accumulated vector
+              if (element_out !== cycle - pipeline_stages) begin
+                $error("Test case %0d failed: expected element %0d, got %0d at cycle %0d", i, cycle - pipeline_stages, element_out, cycle);
+              end
               if (data_out !== acc_vctr[cycle - pipeline_stages]) begin
                 $error("Test case %0d failed: expected %0d, got %0d at cycle %0d", i, acc_vctr[cycle - pipeline_stages], data_out, cycle);
               end else begin

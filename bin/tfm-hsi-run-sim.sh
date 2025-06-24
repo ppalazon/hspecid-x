@@ -47,6 +47,9 @@ case "$MODULE_NAME" in
         ;;
     12_mse_4)
         TESTBENCH_MODULE="mse_4_tb"
+        ;;  
+    20_hsi_mse)
+        TESTBENCH_MODULE="hsi_mse_tb"
         ;;        
     *)
         echo "Module $MODULE_NAME is not supported for simulation."
