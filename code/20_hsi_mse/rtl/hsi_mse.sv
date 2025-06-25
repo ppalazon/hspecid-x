@@ -18,7 +18,6 @@ module hsi_mse #(
     input logic [WORD_WIDTH-1:0] element_b, // Input sample word data
     input logic element_valid,  // Enable input sample data
 
-
     output logic [WORD_WIDTH-1:0] mse,  // Output mean square error
     output logic mse_valid  // Enable input sample data
   );
