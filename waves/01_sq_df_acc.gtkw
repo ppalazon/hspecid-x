@@ -1,15 +1,16 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Tue Jun 24 18:03:25 2025
+[*] Thu Jun 26 10:56:00 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/01_sq_df_acc/wave.vcd"
-[dumpfile_mtime] "Tue Jun 24 17:58:04 2025"
-[dumpfile_size] 21620
+[dumpfile_mtime] "Thu Jun 26 10:55:31 2025"
+[dumpfile_size] 18604
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/01_sq_df_acc.gtkw"
-[timestart] 681340
+[timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-13.857805 261700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-13.400105 30970 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sq_df_acc_tb.
 [sst_width] 317
 [signals_width] 347
 [sst_expanded] 1
@@ -17,24 +18,30 @@
 @28
 sq_df_acc_tb.clk
 sq_df_acc_tb.rst_n
-@24
-sq_df_acc_tb.initial_acc[47:0]
-@29
-sq_df_acc_tb.initial_acc_en
-@24
-sq_df_acc_tb.data_in_v1[15:0]
-sq_df_acc_tb.data_in_v2[15:0]
-@22
-sq_df_acc_tb.element[6:0]
+@420
+sq_df_acc_tb.cycle_count
 @28
 sq_df_acc_tb.data_in_valid
 @24
-sq_df_acc_tb.data_out[47:0]
-@22
-sq_df_acc_tb.element_out[6:0]
-@28
-sq_df_acc_tb.data_out_valid
+sq_df_acc_tb.data_in_a[15:0]
+sq_df_acc_tb.data_in_b[15:0]
 @420
-sq_df_acc_tb.pipeline_stages
+sq_df_acc_tb.dut.diff[16:0]
+@24
+sq_df_acc_tb.dut.mult[31:0]
+@28
+sq_df_acc_tb.data_in_last
+@22
+sq_df_acc_tb.data_in_ref[7:0]
+@24
+sq_df_acc_tb.initial_acc[47:0]
+@28
+sq_df_acc_tb.initial_acc_en
+sq_df_acc_tb.acc_valid
+sq_df_acc_tb.acc_last
+@22
+sq_df_acc_tb.acc_ref[7:0]
+@25
+sq_df_acc_tb.acc_value[47:0]
 [pattern_trace] 1
 [pattern_trace] 0

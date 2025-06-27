@@ -2,7 +2,7 @@
 
 import hsi_mse_pkg::*;
 
-module hsi_mse_tb;
+module hsi_mse_reg_tb;
 
   localparam WORD_WIDTH = HM_WORD_WIDTH; // Width of the word in bits
   localparam DATA_WIDTH = HM_DATA_WIDTH; // 16 bits by default
@@ -26,7 +26,7 @@ module hsi_mse_tb;
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref; // Reference vector for MSE
   wire mse_valid;
 
-  hsi_mse #(
+  hsi_mse_reg #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
@@ -51,15 +51,14 @@ module hsi_mse_tb;
   logic [WORD_WIDTH-1:0] vctr1 [ELEMENTS];
   logic [WORD_WIDTH-1:0] vctr2 [ELEMENTS];
   logic [WORD_WIDTH-1:0] expected_mse [ELEMENTS];
-  logic [WORD_WIDTH-1:0] acc_in [HSI_LIBRARY_SIZE][HSI_BANDS];
 
   // Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
-    $dumpvars(0, hsi_mse_tb);
+    $dumpvars(0, hsi_mse_reg_tb);
   end
 
-  HsiMseGen hsi_mse_gen = new();
+  HsiMseRegGen hsi_mse_gen = new();
 
   initial begin
     clk = 1;
@@ -79,13 +78,6 @@ module hsi_mse_tb;
       if (hsi_mse_gen.randomize()) begin
         hsi_mse_gen.fusion_vctr(vctr1, vctr2);
         hsi_mse_gen.mse(expected_mse[i]);
-        hsi_mse_gen.acc_all(acc_in[i]);
-
-        $display("Test %0d: Vctr1: %p", i, hsi_mse_gen.vctr1);
-        $display("Test %0d: Vctr2: %p, ", i, hsi_mse_gen.vctr2);
-        $display("Test %0d: Expected MSE: %0d", i, expected_mse[i]);
-        $display("Test %0d: Accumulated: %p", i, acc_in[i]);
-
 
         // Start processing the vectors
         element_valid = 1;
@@ -106,6 +98,7 @@ module hsi_mse_tb;
           element_b = vctr2[j];
           #10; // Wait for a clock cycle
         end
+
         element_valid = 0;
       end else begin
         $display("Failed to randomize vectors");

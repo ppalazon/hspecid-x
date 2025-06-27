@@ -1,0 +1,125 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Fri Jun 27 12:14:56 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/21_hsi_mse_lib/wave.vcd"
+[dumpfile_mtime] "Fri Jun 27 12:13:25 2025"
+[dumpfile_size] 37581
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/21_hsi_mse_lib.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-17.049702 211580 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsi_mse_lib_tb.
+[treeopen] hsi_mse_lib_tb.dut.
+[treeopen] hsi_mse_lib_tb.dut.hsi_mse.
+[sst_width] 384
+[signals_width] 515
+[sst_expanded] 1
+[sst_vpaned_height] 667
+@28
+hsi_mse_lib_tb.clk
+hsi_mse_lib_tb.done
+@22
+hsi_mse_lib_tb.hsi_vctr_in[31:0]
+@28
+hsi_mse_lib_tb.hsi_vctr_in_valid
+hsi_mse_lib_tb.idle
+hsi_mse_lib_tb.ready
+hsi_mse_lib_tb.rst_n
+hsi_mse_lib_tb.start
+@24
+hsi_mse_lib_tb.mse_max_value[31:0]
+hsi_mse_lib_tb.mse_min_value[31:0]
+@200
+-DUT
+@24
+hsi_mse_lib_tb.dut.mse_out[31:0]
+@28
+hsi_mse_lib_tb.dut.mse_valid
+hsi_mse_lib_tb.dut.fifo_measure_write_en
+hsi_mse_lib_tb.dut.fifo_ref_write_en
+@200
+-DUT FSM
+@28
+hsi_mse_lib_tb.dut.fsm.current_state[2:0]
+hsi_mse_lib_tb.dut.fsm.vctr_last
+hsi_mse_lib_tb.dut.fsm.fifo_both_read_en
+hsi_mse_lib_tb.dut.fsm.element_start
+hsi_mse_lib_tb.dut.fsm.element_last
+hsi_mse_lib_tb.dut.fsm.fifo_measure_full
+hsi_mse_lib_tb.dut.fsm.fifo_ref_empty
+hsi_mse_lib_tb.dut.fsm.msi_comparison_valid
+hsi_mse_lib_tb.dut.fsm.msi_valid
+@200
+-Measure FIFO
+@22
+hsi_mse_lib_tb.dut.fifo_measure.fifo_count[3:0]
+hsi_mse_lib_tb.dut.fifo_measure.data_in[31:0]
+@28
+hsi_mse_lib_tb.dut.fifo_measure.rd_en
+hsi_mse_lib_tb.dut.fifo_measure.wr_en
+hsi_mse_lib_tb.dut.fifo_measure.full
+@200
+-Ref FIFO
+@28
+hsi_mse_lib_tb.dut.fifo_ref.fifo_count[2:0]
+@22
+hsi_mse_lib_tb.dut.fifo_ref.data_in[31:0]
+@29
+hsi_mse_lib_tb.dut.fifo_ref.rd_en
+@28
+hsi_mse_lib_tb.dut.fifo_ref.wr_en
+hsi_mse_lib_tb.dut.fifo_ref.full
+@200
+-MSE
+@22
+hsi_mse_lib_tb.dut.hsi_mse.element_a[31:0]
+hsi_mse_lib_tb.dut.hsi_mse.element_b[31:0]
+@28
+hsi_mse_lib_tb.dut.hsi_mse.element_start
+hsi_mse_lib_tb.dut.hsi_mse.element_last
+hsi_mse_lib_tb.dut.hsi_mse.element_valid
+hsi_mse_lib_tb.dut.hsi_mse.acc_sum_en
+@24
+hsi_mse_lib_tb.dut.hsi_mse.acc_value[48:0]
+@28
+hsi_mse_lib_tb.dut.hsi_mse.acc_valid
+hsi_mse_lib_tb.dut.hsi_mse.mse_valid
+@24
+hsi_mse_lib_tb.dut.hsi_mse.mse_value[31:0]
+@200
+-Channel 1
+@24
+hsi_mse_lib_tb.dut.hsi_mse.channel_1.data_in_a[15:0]
+hsi_mse_lib_tb.dut.hsi_mse.channel_1.data_in_b[15:0]
+@420
+hsi_mse_lib_tb.dut.hsi_mse.channel_1.diff[16:0]
+@24
+hsi_mse_lib_tb.dut.hsi_mse.channel_1.mult[31:0]
+hsi_mse_lib_tb.dut.hsi_mse.channel_1.acc_value[47:0]
+@28
+hsi_mse_lib_tb.dut.hsi_mse.channel_1.acc_valid
+@200
+-Channel 2
+@24
+hsi_mse_lib_tb.dut.hsi_mse.channel_2.data_in_a[31:16]
+hsi_mse_lib_tb.dut.hsi_mse.channel_2.data_in_b[31:16]
+@420
+hsi_mse_lib_tb.dut.hsi_mse.channel_2.diff[16:0]
+@24
+hsi_mse_lib_tb.dut.hsi_mse.channel_2.mult[31:0]
+hsi_mse_lib_tb.dut.hsi_mse.channel_2.acc_value[47:0]
+@28
+hsi_mse_lib_tb.dut.hsi_mse.channel_2.acc_valid
+@200
+-Comparison
+@28
+hsi_mse_lib_tb.dut.hsi_mse_comp.clear
+hsi_mse_lib_tb.dut.hsi_mse_comp.mse_in_valid
+@24
+hsi_mse_lib_tb.dut.hsi_mse_comp.mse_in_value[31:0]
+@28
+hsi_mse_lib_tb.dut.hsi_mse_comp.mse_out_valid
+[pattern_trace] 1
+[pattern_trace] 0

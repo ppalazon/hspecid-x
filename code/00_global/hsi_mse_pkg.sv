@@ -8,7 +8,7 @@ package hsi_mse_pkg;
   parameter int HM_VECTOR_LENGTH_TB = 24; // Length of the vector for testbench
   parameter int HM_LENGTH_BITS = 10; // Number of bits for length
   parameter int HM_BUFFER_LENGTH = 4; // Length of the buffer
-  parameter int HM_HSI_BANDS = 128; // Number of bands in HSI
+  parameter int HM_HSI_BANDS = 16; // Number of bands in HSI
   parameter int HM_HSI_LIBRARY_SIZE = 256; // Size of the HSI library
   parameter int HM_WORD_WIDTH = 32; // Width of the word in bits
   parameter int HM_DATA_PER_WORD = HM_WORD_WIDTH / HM_DATA_WIDTH; // Number of data elements per word

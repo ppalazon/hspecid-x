@@ -6,8 +6,8 @@ module sq_df_acc #(
     parameter DATA_WIDTH = HM_DATA_WIDTH,  // 16 bits by default
     parameter DATA_WIDTH_MUL = HM_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
     parameter DATA_WIDTH_ACC = HM_DATA_WIDTH_ACC, // Data width for accumulator, larger than DATA_WIDTH
-    parameter HSI_BANDS = HM_HSI_BANDS,  // Number of HSI bands
-    parameter HSI_BANDS_ADDR = $clog2(HSI_BANDS)
+    parameter HSI_LIBRARY_SIZE = HM_HSI_LIBRARY_SIZE, // Size of the HSI library
+    parameter HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE) // Address width for HSI library size
   ) (
     input logic clk,
     input logic rst_n,
@@ -16,20 +16,30 @@ module sq_df_acc #(
     input logic [DATA_WIDTH_ACC-1:0] initial_acc, // Initial accumulator value
 
     input logic data_in_valid, // Valid input values
-    input logic signed [DATA_WIDTH-1:0] data_in_v1, // Input vector 1
-    input logic signed [DATA_WIDTH-1:0] data_in_v2, // Input vector 2
-    input logic [HSI_BANDS_ADDR-1:0] element,
+    input logic signed [DATA_WIDTH-1:0] data_in_a, // Input vector 1
+    input logic signed [DATA_WIDTH-1:0] data_in_b, // Input vector 2
+    input logic data_in_last,
+    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] data_in_ref, // Reference vector for sum
 
     output logic acc_valid, // Output enable signal
-    output logic [DATA_WIDTH_ACC-1:0] acc_out, // Output result
-    output logic [HSI_BANDS_ADDR-1:0] element_out // Output band counter
+    output logic [DATA_WIDTH_ACC-1:0] acc_value, // Output result
+    output logic acc_last, // Output band counter
+    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] acc_ref // Reference vector for sum
   );
 
-  logic stage_1, stage_2; // Enable signals for pipeline stages
+  // logic signed [DATA_WIDTH-1:0] data_in_v1_reg, data_in_v2_reg; // Register for input vector 1
+  // logic stage_1_en, stage_2_en, stage_3_en; // Enable signals for pipeline stages
+  // logic acc_1_en, acc_2_en, acc_3_en; // Enable signals for accumulators
+  // logic [DATA_WIDTH_ACC-1:0] acc_1, acc_2, acc_3; // Accumulators for pipeline stages
+  // logic last_1, last_2, last_3; // Band counter for HSI bands, using one extra bit to avoid overflow
+  // logic [HSI_LIBRARY_SIZE_ADDR-1:0] ref_1, ref_2, ref_3; // Band counter output for HSI bands
 
-  logic acc_1_en, acc_2_en; // Enable signals for accumulators
-  logic [DATA_WIDTH_ACC-1:0] acc_1, acc_2; // Accumulators for pipeline stages
-  logic [HSI_BANDS_ADDR-1:0] element_1, element_2; // Band counter for HSI bands, using one extra bit to avoid overflow
+  logic stage_2_en, stage_3_en; // Enable signals for pipeline stages
+  logic acc_2_en, acc_3_en; // Enable signals for accumulators
+  logic [DATA_WIDTH_ACC-1:0] acc_2, acc_3; // Accumulators for pipeline stages
+  logic last_2, last_3; // Band counter for HSI bands, using one extra bit to avoid overflow
+  logic [HSI_LIBRARY_SIZE_ADDR-1:0] ref_2, ref_3; // Band counter output for HSI bands
+
 
   logic signed [DATA_WIDTH:0] diff; // Difference between elements, using one extra bit for overflow
   logic [DATA_WIDTH_MUL-1:0] mult;
@@ -37,68 +47,91 @@ module sq_df_acc #(
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       diff <= 0; // Reset difference
-      stage_1 <= 0; // Reset stage 1
-      stage_2 <= 0; // Reset enable signal
       mult <= 0; // Reset multiplication result
-      acc_1 <= 0; // Reset stage 1 accumulator
-      acc_2 <= 0; // Reset stage 2 accumulator
-      acc_1_en <= 0; // Disable initial accumulator value
-      acc_2_en <= 0; // Disable stage 2 accumulator
-      element_1 <= 0; // Reset band counter for stage 1
-      element_2 <= 0; // Reset band counter for stage 2
-      element_out <= 0; // Reset band counter output
-      acc_out <= 0; // Reset output data
+      // data_in_v1_reg <= 0; // Reset input vector 1 register
+      // data_in_v2_reg <= 0; // Reset input vector 2 register
+      // stage_1_en <= 0; // Reset stage 1
+      stage_2_en <= 0; // Reset stage 2
+      stage_3_en <= 0; // Reset stage 3
+      // acc_1 <= 0; // Reset stage 0 accumulator
+      acc_2 <= 0; // Reset stage 1 accumulator
+      acc_3 <= 0; // Reset stage 2 accumulator
+      // acc_1_en <= 0; // Disable stage 0 accumulator
+      acc_2_en <= 0; // Disable initial accumulator value
+      acc_3_en <= 0; // Disable stage 2 accumulator
+      // last_1 <= 0; // Reset band counter for stage 0
+      last_2 <= 0; // Reset band counter for stage 1
+      last_3 <= 0; // Reset band counter for stage 2
+      // ref_1 <= 0; // Reset reference vector for stage 0
+      ref_2 <= 0; // Reset reference vector for stage 1
+      ref_3 <= 0; // Reset reference vector for stage 2
+      acc_last <= 0; // Reset band counter output
+      acc_value <= 0; // Reset output data
       acc_valid <= 0; // Disable output
+      acc_ref <= 0; // Reset reference vector for sum
     end else begin
-      if (data_in_valid) begin : enable_stage_1
-        stage_1 <= 1;
-        acc_1_en <= initial_acc_en; // Enable initial accumulator value
-        acc_1 <= initial_acc; // Set initial accumulator value
-        diff <= data_in_v1 - data_in_v2; // Compute difference
-        element_1 <= element; // Set band counter for stage 1
-      end else begin : disable_stage_1
-        stage_1 <= 0; // Disable stage 1
-        acc_1_en <= 0; // Disable initial accumulator value
-      end
-      if (stage_1) begin : enable_stage_2
-        stage_2 <= 1;
-        acc_2_en <= acc_1_en; // Propagate enable signal for accumulator
-        acc_2 <= acc_1; // Propagate accumulator value
-        mult <= diff * diff; // Compute squared difference and accumulate
-        element_2 <= element_1; // Propagate band counter for stage 2
-      end else begin : disable_stage_2
-        stage_2 <= 0; // Disable stage 2
-        acc_2_en <= 0; // Disable accumulator
-      end
-      if (stage_2) begin : enable_stage_3
-        acc_valid <= 1; // Enable output when all stages are ready
-        element_out <= element_2; // Propagate band counter for output
-        if(acc_2_en) begin : use_initial_acc
-          acc_out <= acc_2 + mult; // Add to initial accumulator value
-        end else begin
-          acc_out <= acc_out + mult; // Add to initial accumulator value
-        end
-      end else begin : disable_stage_3
-        acc_valid <= 0;
-      end
-
-      // The folling code add a new stage to the pipeline, but I think it is not necessary
-      // if (en_2) begin : enable_stage_3
-      //   en_3 <= 1;
-      //   if(acc_2_en) begin : use_initial_acc
-      //     acc <= acc_2 + mult; // Add to initial accumulator value
-      //   end else begin
-      //     acc <= acc + mult; // Add to initial accumulator value
-      //   end
-      // end else begin : disable_stage_3
-      //   en_3 <= 0; // Disable stage 3
-      // end
-      // if (en_3) begin
-      //   data_out_valid <= 1; // Enable output when all stages are ready
-      //   data_out <= acc; // Output the final accumulated value
+      // if (data_in_valid) begin : read_stage
+      //   stage_1_en <= 1;
+      //   acc_1_en <= initial_acc_en; // Enable initial accumulator value
+      //   acc_1 <= initial_acc; // Set initial accumulator value
+      //   data_in_v1_reg <= data_in_a; // Capture input vector 1
+      //   data_in_v2_reg <= data_in_b; // Capture input vector 2
+      //   last_1 <= data_in_last; // Capture last flag for stage 1
+      //   ref_1 <= data_in_ref; // Capture reference vector for stage 1
       // end else begin
-      //   data_out_valid <= 0; // Disable output
+      //   stage_1_en <= 0; // Disable stage 1
+      //   acc_2_en <= 0; // Disable initial accumulator value
+      //   last_1 <= 0;
       // end
+      // if (stage_1_en) begin : diff_stage
+      //   stage_2_en <= 1;
+      //   acc_2_en <= acc_1_en; // Enable initial accumulator value
+      //   acc_2 <= acc_1; // Set initial accumulator value
+      //   diff <= data_in_v1_reg - data_in_v2_reg; // Compute difference
+      //   last_2 <= last_1; // Capture last flag for stage 1
+      //   ref_2 <= ref_1; // Capture reference vector for stage 1
+      // end else begin
+      //   stage_2_en <= 0; // Disable stage 1
+      //   acc_2_en <= 0; // Disable initial accumulator value
+      //   last_2 <= 0;
+      // end
+      if (data_in_valid) begin : diff_stage
+        stage_2_en <= 1;
+        acc_2_en <= initial_acc_en; // Enable initial accumulator value
+        acc_2 <= initial_acc; // Set initial accumulator value
+        diff <= data_in_a - data_in_b; // Compute difference
+        last_2 <= data_in_last; // Capture last flag for stage 1
+        ref_2 <= data_in_ref; // Capture reference vector for stage 1
+      end else begin
+        stage_2_en <= 0; // Disable stage 1
+        acc_2_en <= 0; // Disable initial accumulator value
+        last_2 <= 0;
+      end
+      if (stage_2_en) begin : square_diff_stage
+        stage_3_en <= 1;
+        acc_3_en <= acc_2_en; // Propagate enable signal for accumulator
+        acc_3 <= acc_2; // Propagate accumulator value
+        mult <= diff * diff; // Compute squared difference and accumulate
+        last_3 <= last_2; // Propagate last flag for stage 2
+        ref_3 <= ref_2; // Propagate reference vector for stage 2
+      end else begin
+        stage_3_en <= 0; // Disable stage 2
+        acc_3_en <= 0; // Disable accumulator
+        last_3 <= 0;
+      end
+      if (stage_3_en) begin : accumulate_stage
+        acc_valid <= 1; // Enable output when all stages are ready
+        acc_last <= last_3; // Propagate band counter for output
+        acc_ref <= ref_3; // Propagate reference vector for output
+        if(acc_3_en) begin
+          acc_value <= acc_3 + mult; // Add to initial accumulator value
+        end else begin
+          acc_value <= acc_value + mult; // Add to initial accumulator value
+        end
+      end else begin
+        acc_valid <= 0;
+        acc_last <= 0;
+      end
     end
   end
 endmodule

@@ -1,32 +1,56 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Wed Jun 25 18:42:32 2025
+[*] Thu Jun 26 15:12:23 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/20_hsi_mse_comp/wave.vcd"
-[dumpfile_mtime] "Wed Jun 25 18:42:12 2025"
-[dumpfile_size] 8167
+[dumpfile_mtime] "Thu Jun 26 15:11:58 2025"
+[dumpfile_size] 10046
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/20_hsi_mse_comp.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-15.815364 473100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.890248 92300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsi_mse_comp_tb.
 [sst_width] 317
-[signals_width] 234
+[signals_width] 334
 [sst_expanded] 1
 [sst_vpaned_height] 464
 @28
 hsi_mse_comp_tb.clk
+hsi_mse_comp_tb.rst_n
+hsi_mse_comp_tb.clear
 @22
 hsi_mse_comp_tb.mse_in[31:0]
+@25
+hsi_mse_comp_tb.mse_in_ref[7:0]
 @28
 hsi_mse_comp_tb.mse_in_valid
-@29
 hsi_mse_comp_tb.mse_out_valid
-@22
-hsi_mse_comp_tb.mse_out_min[31:0]
-hsi_mse_comp_tb.mse_out_max[31:0]
+@200
+-Max
 @28
-hsi_mse_comp_tb.rst_n
+hsi_mse_comp_tb.mse_max_changed
+@22
+hsi_mse_comp_tb.mse_max_ref[7:0]
+hsi_mse_comp_tb.mse_max_value[31:0]
+@200
+-Min
+@28
+hsi_mse_comp_tb.mse_min_changed
+@22
+hsi_mse_comp_tb.mse_min_ref[7:0]
+hsi_mse_comp_tb.mse_min_value[31:0]
+@200
+-Aux
+@28
+hsi_mse_comp_tb.aux_max_changed
+@22
+hsi_mse_comp_tb.aux_max_ref[7:0]
+hsi_mse_comp_tb.aux_max_value[31:0]
+@28
+hsi_mse_comp_tb.aux_min_changed
+@22
+hsi_mse_comp_tb.aux_min_ref[7:0]
+hsi_mse_comp_tb.aux_min_value[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

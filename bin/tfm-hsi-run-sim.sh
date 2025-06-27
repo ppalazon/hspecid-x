@@ -51,8 +51,14 @@ case "$MODULE_NAME" in
     20_hsi_mse)
         TESTBENCH_MODULE="hsi_mse_tb"
         ;;  
+    20_hsi_mse_reg)
+        TESTBENCH_MODULE="hsi_mse_reg_tb"
+        ;;  
     20_hsi_mse_comp)
         TESTBENCH_MODULE="hsi_mse_comp_tb"
+        ;; 
+    21_hsi_mse_lib)
+        TESTBENCH_MODULE="hsi_mse_lib_tb"
         ;;        
     *)
         echo "Module $MODULE_NAME is not supported for simulation."

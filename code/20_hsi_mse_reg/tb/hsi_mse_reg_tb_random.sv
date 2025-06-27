@@ -2,7 +2,7 @@
 
 import hsi_mse_pkg::*;
 
-class HsiMseGen;
+class HsiMseRegGen;
 
   localparam WORD_WIDTH = HM_WORD_WIDTH; // Width of the word in bits
   localparam DATA_WIDTH = HM_DATA_WIDTH; // 16 bits (only 14 bits used)
@@ -17,10 +17,8 @@ class HsiMseGen;
 
   // Generate random vectors
   constraint c_vctrs {
-    // foreach (vctr1[i]) vctr1[i] inside {[0:(1 << DATA_WIDTH-2)-1]}; // Use values of 14 bits or less
-    // foreach (vctr2[i]) vctr2[i] inside {[0:(1 << DATA_WIDTH-2)-1]};
-    foreach (vctr1[i]) vctr1[i] inside {[0:9]}; // Use values of 14 bits or less
-    foreach (vctr2[i]) vctr2[i] inside {[0:9]};
+    foreach (vctr1[i]) vctr1[i] inside {[0:(1 << DATA_WIDTH-2)-1]}; // Use values of 14 bits or less
+    foreach (vctr2[i]) vctr2[i] inside {[0:(1 << DATA_WIDTH-2)-1]};
   }
 
   function automatic void fusion_vctr(
@@ -45,20 +43,7 @@ class HsiMseGen;
       acc_aux += mult; // Accumulate the result
     end
     mse = acc_aux / HSI_BANDS; // Compute mean square error
-  endfunction
 
-  function automatic void acc_all(
-      output logic [WORD_WIDTH-1:0] acc_int [HSI_BANDS]
-    );
-    logic signed [DATA_WIDTH:0] diff; // Difference between elements
-    logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result
-    logic [DATA_WIDTH_ACC-1:0] acc_aux = 0; // Accumulator for the output
-    for (int i = 0; i < HSI_BANDS; i++) begin
-      diff = vctr1[i] - vctr2[i]; // Compute difference
-      mult = diff * diff; // Compute squared difference
-      acc_aux += mult; // Accumulate the result
-      acc_int[i] = acc_aux;
-    end
   endfunction
 
 endclass
