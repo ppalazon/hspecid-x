@@ -158,7 +158,20 @@ module hsi_mse_lib_tb;
     hsi_vctr_in_valid = 0;  // Disable input vector valid signal
     hsi_vctr_in = 0;  // Reset input vector
 
-    #200;
+    wait(done);  // Wait for the DUT to finish processing
+    $display("DUT is done processing");
+
+    // Check the results
+    assert (mse_min_value == min_mse_value_expected) else
+      $error(0, "Minimum MSE value is incorrect: expected %0d, got %0d", min_mse_value_expected, mse_min_value);
+    assert (mse_max_value == max_mse_value_expected) else
+      $error(0, "Maximum MSE value is incorrect: expected %0d, got %0d", max_mse_value_expected, mse_max_value);
+    assert (mse_min_ref == min_mse_ref_expected) else
+      $error(0, "Minimum MSE reference is incorrect: expected %0d, got %0d", min_mse_ref_expected, mse_min_ref);
+    assert (mse_max_ref == max_mse_ref_expected) else
+      $error(0, "Maximum MSE reference is incorrect: expected %0d, got %0d", max_mse_ref_expected, mse_max_ref);
+
+    #20;
 
     $finish;
   end
