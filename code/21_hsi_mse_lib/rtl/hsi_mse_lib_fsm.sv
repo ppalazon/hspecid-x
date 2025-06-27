@@ -1,8 +1,6 @@
 `timescale 1ns / 1ps
 
-typedef enum logic [2:0] {
-  IDLE, READ_MEASURE, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
-} hsi_mse_lib_state_t;
+import hsi_mse_pkg::*;  // Import the package for HSI MSE
 
 module hsi_mse_lib_fsm #(
     parameter HSI_BANDS = 128,  // Number of HSI bands
@@ -64,14 +62,14 @@ module hsi_mse_lib_fsm #(
       element_valid <= 0;  // Reset valid signal
     end else begin
       current_state <= next_state;  // Transition to next state
-    end
-    element_start <= (element_count == 0 && fifo_both_read_en);
-    element_last <= (element_count == ELEMENTS - 1);
-    element_valid <= fifo_both_read_en;
-    if (fifo_both_read_en) begin
-      element_count <= element_count + 1;
-      if (element_last) begin
-        vctr_count <= vctr_count + 1;
+      element_start <= (element_count == 0 && fifo_both_read_en);
+      element_last <= (element_count == ELEMENTS - 1);
+      element_valid <= fifo_both_read_en;
+      if (fifo_both_read_en) begin
+        element_count <= element_count + 1;
+        if (element_last) begin
+          vctr_count <= vctr_count + 1;
+        end
       end
     end
   end

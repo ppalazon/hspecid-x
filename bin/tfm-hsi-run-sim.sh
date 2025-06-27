@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e # Exit on error
-set -x # Enable verbose command output
+# set -x # Enable verbose command output
 
 SHOW_WAVEFORM=false
 while getopts "w" opt; do

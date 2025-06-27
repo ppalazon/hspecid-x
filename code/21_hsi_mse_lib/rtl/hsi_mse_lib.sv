@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+import hsi_mse_pkg::*;  // Import the package for HSI MSE
+
 module hsi_mse_lib #(
     parameter WORD_WIDTH = 32,  // Width of the word in bits
     parameter DATA_WIDTH = 16,  // 16 bits by default
