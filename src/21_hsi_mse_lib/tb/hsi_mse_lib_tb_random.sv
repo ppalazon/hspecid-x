@@ -2,14 +2,15 @@
 
 import hsi_mse_pkg::*;
 
-class HsiMseLibGen;
+class HsiMseLibGen #(
+    parameter int WORD_WIDTH = HM_WORD_WIDTH, // Width of the word in bits
+    parameter int DATA_WIDTH = HM_DATA_WIDTH, // 16 bits (only 14 bits used)
+    parameter int DATA_WIDTH_MUL = HM_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
+    parameter int DATA_WIDTH_ACC = HM_DATA_WIDTH_ACC, // Data width for accumulator, larger than DATA_WIDTH
+    parameter int HSI_BANDS = HM_HSI_BANDS, // Number of HSI bands
+    parameter int HSI_LIBRARY_SIZE = HM_HSI_LIBRARY_SIZE // Size of the HSI library
+  );
 
-  localparam WORD_WIDTH = HM_WORD_WIDTH; // Width of the word in bits
-  localparam DATA_WIDTH = HM_DATA_WIDTH; // 16 bits (only 14 bits used)
-  localparam DATA_WIDTH_MUL = HM_DATA_WIDTH_MUL; // Data width for multiplication, larger than DATA_WIDTH
-  localparam DATA_WIDTH_ACC = HM_DATA_WIDTH_ACC; // Data width for accumulator, larger than DATA_WIDTH
-  localparam HSI_BANDS = HM_HSI_BANDS; // Number of HSI bands
-  localparam HSI_LIBRARY_SIZE = HM_HSI_LIBRARY_SIZE; // Size of the HSI library
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
   localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
   localparam ELEMENTS = HSI_BANDS / DATA_PER_WORD; // Number of elements in the vector

@@ -1,0 +1,87 @@
+CAPI=2:
+name: uclm:tfm:hsi_mse_lib:1.0.0
+description: MSE accelerator for hyperspectral images
+
+filesets:
+  rtl:
+    files:
+      - src/00_hsi_mse_pkg/hsi_mse_pkg.sv
+      - src/01_fifo/rtl/fifo.sv
+      - src/01_sq_df_acc/rtl/sq_df_acc.sv
+      - src/20_hsi_mse/rtl/hsi_mse.sv
+      - src/20_hsi_mse_comp/rtl/hsi_mse_comp.sv
+      - src/21_hsi_mse_lib/rtl/hsi_mse_lib_fsm.sv
+      - src/21_hsi_mse_lib/rtl/hsi_mse_lib.sv
+    file_type: systemVerilogSource
+
+  tb:
+    files:
+      - src/21_hsi_mse_lib/tb/hsi_mse_lib_tb_random.sv
+      - src/21_hsi_mse_lib/tb/hsi_mse_lib_tb.sv
+    file_type: systemVerilogSource
+
+  nexys_a7_100t:
+    files:
+      - xdc/Nexys-A7-100T.xdc
+
+targets:
+
+  default: &default
+    filesets:
+      - rtl
+    toplevel: hsi_mse_lib
+    parameters:
+      - WORD_WIDTH
+      - DATA_WIDTH
+      - HSI_BANDS
+      - BUFFER_LENGTH
+      - HSI_LIBRARY_SIZE
+
+  sim:
+    <<: *default
+    description: Simulate hsi_mse_lib with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: hsi_mse_lib_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options: 
+        #xsim_options: 
+    parameters:
+      - HSI_BANDS=32
+      - HSI_LIBRARY_SIZE=10
+
+  # synth:
+  #   <<: *default
+  #   description: Synthesize hsi_mse_lib for Nexys A7-100T
+  #   default_tool: vivado
+  #   filesets_append:
+  #     - nexys_a7_100t
+  #   toplevel: hsi_mse_lib
+  #   tools:
+  #     vivado:
+  #       part: xc7a100tcsg324-1
+
+parameters:
+  WORD_WIDTH:
+    datatype    : int
+    description : Width of the word in bits
+    paramtype   : vlogparam
+  DATA_WIDTH:
+    datatype    : int
+    description : Pixel information
+    paramtype   : vlogparam
+  HSI_BANDS:
+    datatype    : int
+    description : Number of bands per pixel
+    paramtype   : vlogparam
+  BUFFER_LENGTH:
+    datatype    : int
+    description : FIFO default buffer size
+    paramtype   : vlogparam
+  HSI_LIBRARY_SIZE:
+    datatype    : int
+    description : Number of hsi refences in library
+    paramtype   : vlogparam

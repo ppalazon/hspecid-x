@@ -9,7 +9,7 @@ module hsi_mse_lib #(
     parameter BUFFER_LENGTH = 4,  // Number of entries in the FIFO buffer
     parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
     parameter HSI_LIBRARY_SIZE = 256,  // Size of the HSI library
-    parameter HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Number of bits to represent vector length
+    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI bands
   ) (
     input logic clk,
     input logic rst_n,

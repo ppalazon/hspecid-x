@@ -2,14 +2,17 @@
 
 import hsi_mse_pkg::*;
 
-module hsi_mse_lib_tb;
+module hsi_mse_lib_tb #(
+    parameter WORD_WIDTH = HM_WORD_WIDTH,  // Width of the word in bits
+    parameter DATA_WIDTH_MUL = HM_DATA_WIDTH_MUL,  // Data width for multiplication, larger than DATA_WIDTH
+    parameter DATA_WIDTH_ACC = HM_DATA_WIDTH_ACC,  // Data width for accumulator, larger than DATA_WIDTH
+    parameter DATA_WIDTH = HM_DATA_WIDTH,  // 16 bits by default
+    parameter HSI_BANDS = HM_HSI_BANDS,  // Number of HSI bands
+    parameter BUFFER_LENGTH = HM_BUFFER_LENGTH,  // Length of the buffer
+    parameter HSI_LIBRARY_SIZE = HM_HSI_LIBRARY_SIZE  // Size of the HSI library
+  ) ();
 
-  localparam WORD_WIDTH = HM_WORD_WIDTH; // Width of the word in bits
-  localparam DATA_WIDTH = HM_DATA_WIDTH; // 16 bits by default
-  localparam HSI_BANDS = HM_HSI_BANDS; // Number of HSI bands
-  localparam BUFFER_LENGTH = HM_BUFFER_LENGTH; // Length of the buffer
-  localparam ELEMENTS = HSI_BANDS/2;
-  localparam HSI_LIBRARY_SIZE = HM_HSI_LIBRARY_SIZE; // Size of the HSI library
+  localparam ELEMENTS = HSI_BANDS / 2;  // Number of elements in the vector
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
   reg clk;
@@ -51,7 +54,14 @@ module hsi_mse_lib_tb;
     .ready(ready)
   );
 
-  HsiMseLibGen hsi_mse_lib_gen = new();
+  HsiMseLibGen #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),  // Data width for multiplication, larger than DATA_WIDTH
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),  // Data width for accumulator, larger than DATA_WIDTH
+    .HSI_BANDS(HSI_BANDS),
+    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+  ) hsi_mse_lib_gen = new();
 
   // Test vectors
   logic signed [DATA_WIDTH-1:0] measure [HSI_BANDS];
@@ -80,7 +90,7 @@ module hsi_mse_lib_tb;
     library_size_in = 0;
     start = 0;
     clear = 0;
-    library_size_in = 10;
+    library_size_in = HSI_LIBRARY_SIZE % HSI_LIBRARY_SIZE_ADDR;  // Set library size to maximum
 
     // Generate a random vector as a measure
     if (hsi_mse_lib_gen.randomize()) begin : randomize_measure
@@ -90,7 +100,7 @@ module hsi_mse_lib_tb;
     $display("Measure vector:   %p", measure);
 
     // Generate random library vectors
-    for (int i = 0; i < library_size_in; i++) begin : generate_library
+    for (int i = 0; i < HSI_LIBRARY_SIZE; i++) begin : generate_library
       if (hsi_mse_lib_gen.randomize()) begin
         lib[i] = hsi_mse_lib_gen.measure;
         hsi_mse_lib_gen.mse(measure, lib[i], expected_mse[i]);
@@ -143,13 +153,13 @@ module hsi_mse_lib_tb;
     $display("Sending library vectors...");
 
     // Send the library vectors
-    for (int i = 0; i < library_size_in; i++) begin
+    for (int i = 0; i < HSI_LIBRARY_SIZE; i++) begin
       hsi_mse_lib_gen.fusion_vctr(lib[i], fusion_vctr);
       for (int j = 0; j < ELEMENTS; j++) begin
         hsi_vctr_in = fusion_vctr[j];
         hsi_vctr_in_valid = 1;
         #10;
-        if (!(i == library_size_in - 1 && j == ELEMENTS - 1)) begin
+        if (!(i == HSI_LIBRARY_SIZE - 1 && j == ELEMENTS - 1)) begin
           assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
         end
       end
