@@ -23,7 +23,7 @@ fi
 
 # Get absolute path to the module directory
 BASE_DIR=$(pwd)
-CODE=${BASE_DIR}/code
+SRC=${BASE_DIR}/src
 TCL=${BASE_DIR}/tcl
 WAVES=${BASE_DIR}/waves
 
@@ -72,8 +72,8 @@ mkdir -p sim/$1
 cd sim/$1
 
 # Find all SystemVerilog files, but not in the testbench directory
-SV_FILES=$(find "$CODE" -type f \( -name "*.sv" -o -name "*.vh" \) ! -path "*/tb/*" | sort)
-TB_FILES=$CODE/$MODULE_NAME/tb/*.sv # Get module testbench files
+SV_FILES=$(find "$SRC" -type f \( -name "*.sv" -o -name "*.vh" \) ! -path "*/tb/*" | sort)
+TB_FILES=$SRC/$MODULE_NAME/tb/*.sv # Get module testbench files
 
 # Set vivado environment variables
 source $VIVADO_SETTINGS

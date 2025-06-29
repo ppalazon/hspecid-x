@@ -1,4 +1,4 @@
 # Automatically identify and compile all the source files in the project directory.
 # DO NOT explicitly list files/directories in 'dvt_init_auto' sections. Use 'dvt_init' sections instead.
 +dvt_init_auto
-+dvt_compilation_root+code
++dvt_compilation_root+src
