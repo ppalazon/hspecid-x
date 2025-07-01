@@ -23,9 +23,9 @@ fi
 
 # Get absolute path to the module directory
 BASE_DIR=$(pwd)
-SRC=${BASE_DIR}/src
-TCL=${BASE_DIR}/tcl
-WAVES=${BASE_DIR}/waves
+SRC=${BASE_DIR}/hw/src
+TCL=${BASE_DIR}/hw/tcl
+WAVES=${BASE_DIR}/hw/waves
 
 # Module configuration parameters
 # Set testbench module name based on module type
@@ -67,9 +67,9 @@ case "$MODULE_NAME" in
         ;;
 esac
 
-rm -rf sim/$1
-mkdir -p sim/$1
-cd sim/$1
+rm -rf build/sim/$1
+mkdir -p build/sim/$1
+cd build/sim/$1
 
 # Find all SystemVerilog files, but not in the testbench directory
 SV_FILES=$(find "$SRC" -type f \( -name "*.sv" -o -name "*.vh" \) ! -path "*/tb/*" | sort)
