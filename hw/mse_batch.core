@@ -1,0 +1,39 @@
+CAPI=2:
+name: uclm:hspecidx:mse_batch:1.0.0
+description: 2-issue and 4-issue MSE processors for HSpecID-x accelerator
+
+filesets:
+  rtl:
+    files:
+      - src/hsid_pkg/hsid_pkg.sv
+      - src/mse_batch/rtl/mse_batch_2.sv
+      - src/mse_batch/rtl/mse_batch_4.sv      
+    file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:mse:1.0.0" # fifo.core
+      - ">=uclm:hspecidx:sq_df:1.0.0" # vctr_fifo_strm.core
+
+  tb:
+    files:
+      - src/mse_batch/tb/mse_batch_4_tb.sv
+    file_type: systemVerilogSource
+
+targets:
+
+  default: &default
+    filesets:
+      - rtl
+    toplevel: mse_batch_4
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: mse_batch_4_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options: 
+        #xsim_options: 

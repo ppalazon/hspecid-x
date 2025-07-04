@@ -1,0 +1,36 @@
+CAPI=2:
+name: uclm:hspecidx:sq_df_acc:1.0.0
+description: Squared Difference Accumulator for HSpecID-x accelerator
+
+filesets:
+  rtl:
+    files:
+      - src/hsid_pkg/hsid_pkg.sv
+      - src/sq_df_acc/rtl/sq_df_acc.sv
+    file_type: systemVerilogSource
+
+  tb:
+    files:
+      - src/sq_df_acc/tb/sq_df_acc_tb_random.sv
+      - src/sq_df_acc/tb/sq_df_acc_tb.sv
+    file_type: systemVerilogSource
+
+targets:
+
+  default: &default
+    filesets:
+      - rtl
+    toplevel: sq_df_acc
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: sq_df_acc_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options: 
+        #xsim_options: 

@@ -1,0 +1,38 @@
+CAPI=2:
+name: uclm:hspecidx:vctr_fifo_full:1.0.0
+description: Testing vector sum using fulling FIFOs
+
+filesets:
+  rtl:
+    files:
+      - src/hsid_pkg/hsid_pkg.sv
+      - src/vctr_fifo_full/rtl/vctr_fifo_full.sv
+    file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:fifo:1.0.0" # fifo.core
+
+  tb:
+    files:
+      - src/vctr_fifo_full/tb/vctr_fifo_full_tb_random.sv
+      - src/vctr_fifo_full/tb/vctr_fifo_full_tb.sv
+    file_type: systemVerilogSource
+
+targets:
+
+  default: &default
+    filesets:
+      - rtl
+    toplevel: vctr_fifo_full
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: vctr_fifo_full_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options: 
+        #xsim_options: 
