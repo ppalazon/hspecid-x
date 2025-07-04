@@ -1,0 +1,27 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Mon Jun 23 17:14:02 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/sim/12_mse_batch/wave.vcd"
+[dumpfile_mtime] "Mon Jun 23 17:12:56 2025"
+[dumpfile_size] 2900
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/waves/12_mse_batch.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-12.450713 53290 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 317
+[signals_width] 246
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+mse_batch_4_tb.clk
+@23
+mse_batch_4_tb.data_sum_out[31:0]
+@22
+mse_batch_4_tb.data_vctr_1[63:0]
+mse_batch_4_tb.data_vctr_2[63:0]
+@28
+mse_batch_4_tb.rst_n
+[pattern_trace] 1
+[pattern_trace] 0

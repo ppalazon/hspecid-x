@@ -14,3 +14,7 @@ sim/
 vivado/
 .Xil
 .venv
+
+# Avoid including hardware vendor directories
+hw/vendor/*
+!*.vendor.hjson
