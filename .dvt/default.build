@@ -2,6 +2,6 @@
 # DO NOT explicitly list files/directories in 'dvt_init_auto' sections. Use 'dvt_init' sections instead.
 # +dvt_init_auto
 +dvt_init_auto
-+dvt_compilation_root+hw/src
++dvt_compilation_root+hw
 // +dvt_skip_compile+*/deprecated/*.sv
-// +dvt_skip_compile+*/register-interface/src/test/*
++dvt_skip_compile+*/deps/*/test/*

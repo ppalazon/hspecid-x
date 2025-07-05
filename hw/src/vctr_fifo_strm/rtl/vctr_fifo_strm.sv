@@ -97,7 +97,7 @@ module vctr_fifo_strm #(
     endcase
   end
 
-  fifo #(
+  hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_DEPTH(BUFFER_LENGTH)
   ) vctr_in_1 (
@@ -112,7 +112,7 @@ module vctr_fifo_strm #(
     .empty(vctr_in_1_empty)
   );
 
-  fifo #(
+  hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_DEPTH(BUFFER_LENGTH)
   ) vctr_in_2 (
@@ -127,7 +127,7 @@ module vctr_fifo_strm #(
     .empty(vctr_in_2_empty)
   );
 
-  fifo #(
+  hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_DEPTH(BUFFER_LENGTH),
     .FIFO_ALMOST_FULL_THRESHOLD(BUFFER_LENGTH - 2)  // Almost full threshold taking account of pipeline stages

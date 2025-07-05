@@ -1,0 +1,75 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Fri Jul  4 17:07:43 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_mse_1.0.0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Fri Jul  4 17:02:41 2025"
+[dumpfile_size] 14979
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_mse.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-15.041087 43800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_mse_tb.
+[treeopen] hsid_mse_tb.dut.
+[sst_width] 317
+[signals_width] 234
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsid_mse_tb.clk
+@22
+hsid_mse_tb.element_a[31:0]
+hsid_mse_tb.element_b[31:0]
+@28
+hsid_mse_tb.element_last
+hsid_mse_tb.element_start
+hsid_mse_tb.element_valid
+@24
+hsid_mse_tb.hsid_mse_ref[7:0]
+@28
+hsid_mse_tb.hsid_mse_valid
+@24
+hsid_mse_tb.hsid_mse_value[31:0]
+@28
+hsid_mse_tb.rst_n
+@24
+hsid_mse_tb.vctr_ref[7:0]
+@200
+-Channel 1
+@24
+hsid_mse_tb.dut.channel_1.initial_acc[47:0]
+@28
+hsid_mse_tb.dut.channel_1.initial_acc_en
+@24
+hsid_mse_tb.dut.channel_1.data_in_a[15:0]
+hsid_mse_tb.dut.channel_1.data_in_b[15:0]
+@420
+hsid_mse_tb.dut.channel_1.diff[16:0]
+@24
+hsid_mse_tb.dut.channel_1.mult[31:0]
+hsid_mse_tb.dut.channel_1.acc_value[47:0]
+@22
+hsid_mse_tb.dut.channel_1.acc_ref[7:0]
+@28
+hsid_mse_tb.dut.channel_1.acc_valid
+@200
+-Channel 2
+@22
+hsid_mse_tb.dut.channel_2.initial_acc[47:0]
+@28
+hsid_mse_tb.dut.channel_2.initial_acc_en
+@24
+hsid_mse_tb.dut.channel_2.data_in_a[31:16]
+hsid_mse_tb.dut.channel_2.data_in_b[31:16]
+@420
+hsid_mse_tb.dut.channel_2.diff[16:0]
+@24
+hsid_mse_tb.dut.channel_2.mult[31:0]
+hsid_mse_tb.dut.channel_2.acc_value[47:0]
+@25
+hsid_mse_tb.dut.channel_2.acc_ref[7:0]
+@28
+hsid_mse_tb.dut.channel_2.acc_valid
+[pattern_trace] 1
+[pattern_trace] 0

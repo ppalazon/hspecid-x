@@ -90,7 +90,7 @@ module vctr_fifo_full #(
     endcase
   end
 
-  fifo #(
+  hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_DEPTH(VECTOR_LENGTH)
   ) vctr_in_1 (
@@ -105,7 +105,7 @@ module vctr_fifo_full #(
     .empty(vctr_in_1_empty)
   );
 
-  fifo #(
+  hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_DEPTH(VECTOR_LENGTH)
   ) vctr_in_2 (
@@ -120,7 +120,7 @@ module vctr_fifo_full #(
     .empty(vctr_in_2_empty)
   );
 
-  fifo #(
+  hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_DEPTH(VECTOR_LENGTH)
   ) vctr_out (

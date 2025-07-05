@@ -1,27 +1,26 @@
 CAPI=2:
-name: uclm:hspecidx:vctr_fifo_full:1.0.0
-description: Testing vector sum using fulling FIFOs
+name: uclm:hspecidx:hsid_mse_comp:1.0.0
+description: MSE Comparator module to get min and max values and pixel references for HSpecID-x accelerator
 
 filesets:
   rtl:
     files:
       - src/hsid_pkg.sv
-      - src/vctr_fifo_full/rtl/vctr_fifo_full.sv
+      - src/hsid_mse_comp/rtl/hsid_mse_comp.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_fifo:1.0.0" # fifo.core
+      - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
 
   tb:
     files:
-      - src/vctr_fifo_full/tb/vctr_fifo_full_tb_random.sv
-      - src/vctr_fifo_full/tb/vctr_fifo_full_tb.sv
+      - src/hsid_mse_comp/tb/hsid_mse_comp_tb.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
     filesets:
       - rtl
-    toplevel: vctr_fifo_full
+    toplevel: hsid_mse_comp
 
   sim:
     <<: *default
@@ -29,7 +28,7 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
-    toplevel: vctr_fifo_full_tb
+    toplevel: hsid_mse_comp_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common

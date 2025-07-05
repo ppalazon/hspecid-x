@@ -1,9 +1,9 @@
 .envrc
 
 # DVT IDE
-.dvt/
-!*.dvt/default.build
-!*.dvt/default.ls
+.dvt/*
+!.dvt/default.build
+!.dvt/default.ls
 
 # Avoid logs
 *.log
@@ -18,3 +18,7 @@ vivado/
 # Avoid including hardware vendor directories
 hw/vendor/*
 !*.vendor.hjson
+
+# Exclude bender files
+.bender/
+hw/deps/
