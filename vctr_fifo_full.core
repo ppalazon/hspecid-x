@@ -1,27 +1,27 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_mse_reg:1.0.0
-description: Registered Mean Squared Error module for HSpecID-x accelerator
+name: uclm:hspecidx:vctr_fifo_full:1.0.0
+description: Testing vector sum using fulling FIFOs
 
 filesets:
   rtl:
     files:
-      - src/hsid_pkg.sv
-      - src/hsid_mse_reg/rtl/hsid_mse_reg.sv
+      - hw/src/hsid_pkg.sv
+      - hw/src/vctr_fifo_full/rtl/vctr_fifo_full.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
+      - ">=uclm:hspecidx:hsid_fifo:1.0.0" # fifo.core
 
   tb:
     files:
-      - src/hsid_mse_reg/tb/hsid_mse_reg_tb_random.sv
-      - src/hsid_mse_reg/tb/hsid_mse_reg_tb.sv
+      - hw/src/vctr_fifo_full/tb/vctr_fifo_full_tb_random.sv
+      - hw/src/vctr_fifo_full/tb/vctr_fifo_full_tb.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
     filesets:
       - rtl
-    toplevel: hsid_mse_reg
+    toplevel: vctr_fifo_full
 
   sim:
     <<: *default
@@ -29,7 +29,7 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
-    toplevel: hsid_mse_reg_tb
+    toplevel: vctr_fifo_full_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common

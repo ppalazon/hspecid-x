@@ -1,27 +1,25 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_mse:1.0.0
-description: Mean Squared Error module for HSpecID-x accelerator
+name: uclm:hspecidx:hsid_sq_df_acc:1.0.0
+description: Squared Difference Accumulator for HSpecID-x accelerator
 
 filesets:
   rtl:
     files:
-      - src/hsid_pkg.sv
-      - src/hsid_mse/rtl/hsid_mse.sv
+      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_sq_df_acc/rtl/hsid_sq_df_acc.sv
     file_type: systemVerilogSource
-    depend:
-      - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
 
   tb:
     files:
-      - src/hsid_mse/tb/hsid_mse_tb_random.sv
-      - src/hsid_mse/tb/hsid_mse_tb.sv
+      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_tb_random.sv
+      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_tb.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
     filesets:
       - rtl
-    toplevel: hsid_mse
+    toplevel: hsid_sq_df_acc
 
   sim:
     <<: *default
@@ -29,7 +27,7 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
-    toplevel: hsid_mse_tb
+    toplevel: hsid_sq_df_acc_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common

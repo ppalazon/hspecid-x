@@ -5,9 +5,9 @@ description: Hyperspectral pixel identification for HSpecID-x accelerator
 filesets:
   rtl:
     files:
-      - src/hsid_pkg.sv
-      - src/hsid_main/rtl/hsid_main_fsm.sv
-      - src/hsid_main/rtl/hsid_main.sv
+      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_main/rtl/hsid_main_fsm.sv
+      - hw/src/hsid_main/rtl/hsid_main.sv
     file_type: systemVerilogSource
     depend:
       - ">=uclm:hspecidx:hsid_fifo:1.0.0" # fifo.core
@@ -17,8 +17,8 @@ filesets:
 
   tb:
     files:
-      - src/hsid_main/tb/hsid_main_tb_random.sv
-      - src/hsid_main/tb/hsid_main_tb.sv
+      - hw/src/hsid_main/tb/hsid_main_tb_random.sv
+      - hw/src/hsid_main/tb/hsid_main_tb.sv
     file_type: systemVerilogSource
 
   nexys_a7_100t:

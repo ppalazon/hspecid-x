@@ -1,24 +1,27 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_fifo:1.0.0
-description: FIFO for HSpecID-x accelerator accelerator
+name: uclm:hspecidx:hsid_mse_reg:1.0.0
+description: Registered Mean Squared Error module for HSpecID-x accelerator
 
 filesets:
   rtl:
     files:
-      - src/hsid_pkg.sv
-      - src/hsid_fifo/rtl/hsid_fifo.sv
+      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_mse_reg/rtl/hsid_mse_reg.sv
     file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
 
   tb:
     files:
-      - src/hsid_fifo/tb/hsid_fifo_tb.sv
+      - hw/src/hsid_mse_reg/tb/hsid_mse_reg_tb_random.sv
+      - hw/src/hsid_mse_reg/tb/hsid_mse_reg_tb.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
     filesets:
       - rtl
-    toplevel: hsid_fifo
+    toplevel: hsid_mse_reg
 
   sim:
     <<: *default
@@ -26,7 +29,7 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
-    toplevel: hsid_fifo_tb
+    toplevel: hsid_mse_reg_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common

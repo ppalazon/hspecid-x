@@ -1,26 +1,28 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_mse_comp:1.0.0
-description: MSE Comparator module to get min and max values and pixel references for HSpecID-x accelerator
+name: uclm:hspecidx:hsid_mse_batch:1.0.0
+description: 2-issue and 4-issue MSE processors for HSpecID-x accelerator
 
 filesets:
   rtl:
     files:
-      - src/hsid_pkg.sv
-      - src/hsid_mse_comp/rtl/hsid_mse_comp.sv
+      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_mse_batch/rtl/hsid_mse_batch_2.sv
+      - hw/src/hsid_mse_batch/rtl/hsid_mse_batch_4.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
+      - ">=uclm:hspecidx:hsid_mse:1.0.0" # fifo.core
+      - ">=uclm:hspecidx:hsid_sq_df:1.0.0" # vctr_fifo_strm.core
 
   tb:
     files:
-      - src/hsid_mse_comp/tb/hsid_mse_comp_tb.sv
+      - hw/src/hsid_mse_batch/tb/hsid_mse_batch_4_tb.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
     filesets:
       - rtl
-    toplevel: hsid_mse_comp
+    toplevel: hsid_mse_batch_4
 
   sim:
     <<: *default
@@ -28,7 +30,7 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
-    toplevel: hsid_mse_comp_tb
+    toplevel: hsid_mse_batch_4_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common
