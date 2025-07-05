@@ -7,25 +7,25 @@
 
 `include "common_cells/assertions.svh"
 
-module hsid_x_ctrl_reg_reg_top #(
+module hsid_x_reg_top #(
   parameter type reg_req_t = logic,
   parameter type reg_rsp_t = logic,
-  parameter int AW = 4
+  parameter int AW = 6
 ) (
   input logic clk_i,
   input logic rst_ni,
   input  reg_req_t reg_req_i,
   output reg_rsp_t reg_rsp_o,
   // To HW
-  output hsid_x_ctrl_reg_reg_pkg::hsid_x_ctrl_reg_reg2hw_t reg2hw, // Write
-  input  hsid_x_ctrl_reg_reg_pkg::hsid_x_ctrl_reg_hw2reg_t hw2reg, // Read
+  output hsid_x_reg_pkg::hsid_x_reg2hw_t reg2hw, // Write
+  input  hsid_x_reg_pkg::hsid_x_hw2reg_t hw2reg, // Read
 
 
   // Config
   input devmode_i // If 1, explicit error return for unmapped register access
 );
 
-  import hsid_x_ctrl_reg_reg_pkg::* ;
+  import hsid_x_reg_pkg::* ;
 
   localparam int DW = 32;
   localparam int DBW = DW/8;                    // Byte Width
@@ -73,15 +73,24 @@ module hsid_x_ctrl_reg_reg_top #(
   logic control_idle_qs;
   logic control_ready_qs;
   logic control_done_qs;
-  logic control_clear_qs;
   logic control_clear_wd;
   logic control_clear_we;
-  logic status_qs;
-  logic status_wd;
-  logic status_we;
-  logic [31:0] threshold_qs;
-  logic [31:0] threshold_wd;
-  logic threshold_we;
+  logic [31:0] library_size_qs;
+  logic [31:0] library_size_wd;
+  logic library_size_we;
+  logic [31:0] pixel_bands_qs;
+  logic [31:0] pixel_bands_wd;
+  logic pixel_bands_we;
+  logic [31:0] captured_pixel_addr_qs;
+  logic [31:0] captured_pixel_addr_wd;
+  logic captured_pixel_addr_we;
+  logic [31:0] library_pixel_addr_qs;
+  logic [31:0] library_pixel_addr_wd;
+  logic library_pixel_addr_we;
+  logic [31:0] mse_min_ref_qs;
+  logic [31:0] mse_max_ref_qs;
+  logic [31:0] mse_min_value_qs;
+  logic [31:0] mse_max_value_qs;
 
   // Register instances
   // R[control]: V(False)
@@ -105,7 +114,7 @@ module hsid_x_ctrl_reg_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (),
+    .q      (reg2hw.control.start.q ),
 
     .qs     ()
   );
@@ -189,7 +198,7 @@ module hsid_x_ctrl_reg_reg_top #(
   //   F[clear]: 4:4
   prim_subreg #(
     .DW      (1),
-    .SWACCESS("RW"),
+    .SWACCESS("W1C"),
     .RESVAL  (1'h0)
   ) u_control_clear (
     .clk_i   (clk_i    ),
@@ -207,51 +216,23 @@ module hsid_x_ctrl_reg_reg_top #(
     .qe     (),
     .q      (reg2hw.control.clear.q ),
 
-    // to register interface (read)
-    .qs     (control_clear_qs)
+    .qs     ()
   );
 
 
-  // R[status]: V(False)
-
-  prim_subreg #(
-    .DW      (1),
-    .SWACCESS("W1C"),
-    .RESVAL  (1'h0)
-  ) u_status (
-    .clk_i   (clk_i    ),
-    .rst_ni  (rst_ni  ),
-
-    // from register interface
-    .we     (status_we),
-    .wd     (status_wd),
-
-    // from internal hardware
-    .de     (hw2reg.status.de),
-    .d      (hw2reg.status.d ),
-
-    // to internal hardware
-    .qe     (),
-    .q      (),
-
-    // to register interface (read)
-    .qs     (status_qs)
-  );
-
-
-  // R[threshold]: V(False)
+  // R[library_size]: V(False)
 
   prim_subreg #(
     .DW      (32),
     .SWACCESS("RW"),
-    .RESVAL  (32'hffffffff)
-  ) u_threshold (
+    .RESVAL  (32'h0)
+  ) u_library_size (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
 
     // from register interface
-    .we     (threshold_we),
-    .wd     (threshold_wd),
+    .we     (library_size_we),
+    .wd     (library_size_wd),
 
     // from internal hardware
     .de     (1'b0),
@@ -259,21 +240,212 @@ module hsid_x_ctrl_reg_reg_top #(
 
     // to internal hardware
     .qe     (),
-    .q      (reg2hw.threshold.q ),
+    .q      (reg2hw.library_size.q ),
 
     // to register interface (read)
-    .qs     (threshold_qs)
+    .qs     (library_size_qs)
+  );
+
+
+  // R[pixel_bands]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RW"),
+    .RESVAL  (32'h0)
+  ) u_pixel_bands (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (pixel_bands_we),
+    .wd     (pixel_bands_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.pixel_bands.q ),
+
+    // to register interface (read)
+    .qs     (pixel_bands_qs)
+  );
+
+
+  // R[captured_pixel_addr]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RW"),
+    .RESVAL  (32'h0)
+  ) u_captured_pixel_addr (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (captured_pixel_addr_we),
+    .wd     (captured_pixel_addr_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.captured_pixel_addr.q ),
+
+    // to register interface (read)
+    .qs     (captured_pixel_addr_qs)
+  );
+
+
+  // R[library_pixel_addr]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RW"),
+    .RESVAL  (32'h0)
+  ) u_library_pixel_addr (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    // from register interface
+    .we     (library_pixel_addr_we),
+    .wd     (library_pixel_addr_wd),
+
+    // from internal hardware
+    .de     (1'b0),
+    .d      ('0  ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.library_pixel_addr.q ),
+
+    // to register interface (read)
+    .qs     (library_pixel_addr_qs)
+  );
+
+
+  // R[mse_min_ref]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RO"),
+    .RESVAL  (32'h0)
+  ) u_mse_min_ref (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.mse_min_ref.de),
+    .d      (hw2reg.mse_min_ref.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.mse_min_ref.q ),
+
+    // to register interface (read)
+    .qs     (mse_min_ref_qs)
+  );
+
+
+  // R[mse_max_ref]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RO"),
+    .RESVAL  (32'h0)
+  ) u_mse_max_ref (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.mse_max_ref.de),
+    .d      (hw2reg.mse_max_ref.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.mse_max_ref.q ),
+
+    // to register interface (read)
+    .qs     (mse_max_ref_qs)
+  );
+
+
+  // R[mse_min_value]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RO"),
+    .RESVAL  (32'h0)
+  ) u_mse_min_value (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.mse_min_value.de),
+    .d      (hw2reg.mse_min_value.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.mse_min_value.q ),
+
+    // to register interface (read)
+    .qs     (mse_min_value_qs)
+  );
+
+
+  // R[mse_max_value]: V(False)
+
+  prim_subreg #(
+    .DW      (32),
+    .SWACCESS("RO"),
+    .RESVAL  (32'h0)
+  ) u_mse_max_value (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.mse_max_value.de),
+    .d      (hw2reg.mse_max_value.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.mse_max_value.q ),
+
+    // to register interface (read)
+    .qs     (mse_max_value_qs)
   );
 
 
 
 
-  logic [2:0] addr_hit;
+  logic [8:0] addr_hit;
   always_comb begin
     addr_hit = '0;
-    addr_hit[0] = (reg_addr == HSID_X_CTRL_REG_CONTROL_OFFSET);
-    addr_hit[1] = (reg_addr == HSID_X_CTRL_REG_STATUS_OFFSET);
-    addr_hit[2] = (reg_addr == HSID_X_CTRL_REG_THRESHOLD_OFFSET);
+    addr_hit[0] = (reg_addr == HSID_X_CONTROL_OFFSET);
+    addr_hit[1] = (reg_addr == HSID_X_LIBRARY_SIZE_OFFSET);
+    addr_hit[2] = (reg_addr == HSID_X_PIXEL_BANDS_OFFSET);
+    addr_hit[3] = (reg_addr == HSID_X_CAPTURED_PIXEL_ADDR_OFFSET);
+    addr_hit[4] = (reg_addr == HSID_X_LIBRARY_PIXEL_ADDR_OFFSET);
+    addr_hit[5] = (reg_addr == HSID_X_MSE_MIN_REF_OFFSET);
+    addr_hit[6] = (reg_addr == HSID_X_MSE_MAX_REF_OFFSET);
+    addr_hit[7] = (reg_addr == HSID_X_MSE_MIN_VALUE_OFFSET);
+    addr_hit[8] = (reg_addr == HSID_X_MSE_MAX_VALUE_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0 ;
@@ -281,9 +453,15 @@ module hsid_x_ctrl_reg_reg_top #(
   // Check sub-word write is permitted
   always_comb begin
     wr_err = (reg_we &
-              ((addr_hit[0] & (|(HSID_X_CTRL_REG_PERMIT[0] & ~reg_be))) |
-               (addr_hit[1] & (|(HSID_X_CTRL_REG_PERMIT[1] & ~reg_be))) |
-               (addr_hit[2] & (|(HSID_X_CTRL_REG_PERMIT[2] & ~reg_be)))));
+              ((addr_hit[0] & (|(HSID_X_PERMIT[0] & ~reg_be))) |
+               (addr_hit[1] & (|(HSID_X_PERMIT[1] & ~reg_be))) |
+               (addr_hit[2] & (|(HSID_X_PERMIT[2] & ~reg_be))) |
+               (addr_hit[3] & (|(HSID_X_PERMIT[3] & ~reg_be))) |
+               (addr_hit[4] & (|(HSID_X_PERMIT[4] & ~reg_be))) |
+               (addr_hit[5] & (|(HSID_X_PERMIT[5] & ~reg_be))) |
+               (addr_hit[6] & (|(HSID_X_PERMIT[6] & ~reg_be))) |
+               (addr_hit[7] & (|(HSID_X_PERMIT[7] & ~reg_be))) |
+               (addr_hit[8] & (|(HSID_X_PERMIT[8] & ~reg_be)))));
   end
 
   assign control_start_we = addr_hit[0] & reg_we & !reg_error;
@@ -292,11 +470,17 @@ module hsid_x_ctrl_reg_reg_top #(
   assign control_clear_we = addr_hit[0] & reg_we & !reg_error;
   assign control_clear_wd = reg_wdata[4];
 
-  assign status_we = addr_hit[1] & reg_we & !reg_error;
-  assign status_wd = reg_wdata[0];
+  assign library_size_we = addr_hit[1] & reg_we & !reg_error;
+  assign library_size_wd = reg_wdata[31:0];
 
-  assign threshold_we = addr_hit[2] & reg_we & !reg_error;
-  assign threshold_wd = reg_wdata[31:0];
+  assign pixel_bands_we = addr_hit[2] & reg_we & !reg_error;
+  assign pixel_bands_wd = reg_wdata[31:0];
+
+  assign captured_pixel_addr_we = addr_hit[3] & reg_we & !reg_error;
+  assign captured_pixel_addr_wd = reg_wdata[31:0];
+
+  assign library_pixel_addr_we = addr_hit[4] & reg_we & !reg_error;
+  assign library_pixel_addr_wd = reg_wdata[31:0];
 
   // Read data return
   always_comb begin
@@ -307,15 +491,39 @@ module hsid_x_ctrl_reg_reg_top #(
         reg_rdata_next[1] = control_idle_qs;
         reg_rdata_next[2] = control_ready_qs;
         reg_rdata_next[3] = control_done_qs;
-        reg_rdata_next[4] = control_clear_qs;
+        reg_rdata_next[4] = '0;
       end
 
       addr_hit[1]: begin
-        reg_rdata_next[0] = status_qs;
+        reg_rdata_next[31:0] = library_size_qs;
       end
 
       addr_hit[2]: begin
-        reg_rdata_next[31:0] = threshold_qs;
+        reg_rdata_next[31:0] = pixel_bands_qs;
+      end
+
+      addr_hit[3]: begin
+        reg_rdata_next[31:0] = captured_pixel_addr_qs;
+      end
+
+      addr_hit[4]: begin
+        reg_rdata_next[31:0] = library_pixel_addr_qs;
+      end
+
+      addr_hit[5]: begin
+        reg_rdata_next[31:0] = mse_min_ref_qs;
+      end
+
+      addr_hit[6]: begin
+        reg_rdata_next[31:0] = mse_max_ref_qs;
+      end
+
+      addr_hit[7]: begin
+        reg_rdata_next[31:0] = mse_min_value_qs;
+      end
+
+      addr_hit[8]: begin
+        reg_rdata_next[31:0] = mse_max_value_qs;
       end
 
       default: begin
@@ -338,17 +546,17 @@ module hsid_x_ctrl_reg_reg_top #(
 
 endmodule
 
-module hsid_x_ctrl_reg_reg_top_intf
+module hsid_x_reg_top_intf
 #(
-  parameter int AW = 4,
+  parameter int AW = 6,
   localparam int DW = 32
 ) (
   input logic clk_i,
   input logic rst_ni,
   REG_BUS.in  regbus_slave,
   // To HW
-  output hsid_x_ctrl_reg_reg_pkg::hsid_x_ctrl_reg_reg2hw_t reg2hw, // Write
-  input  hsid_x_ctrl_reg_reg_pkg::hsid_x_ctrl_reg_hw2reg_t hw2reg, // Read
+  output hsid_x_reg_pkg::hsid_x_reg2hw_t reg2hw, // Write
+  input  hsid_x_reg_pkg::hsid_x_hw2reg_t hw2reg, // Read
   // Config
   input devmode_i // If 1, explicit error return for unmapped register access
 );
@@ -372,7 +580,7 @@ module hsid_x_ctrl_reg_reg_top_intf
 
   
 
-  hsid_x_ctrl_reg_reg_top #(
+  hsid_x_reg_top #(
     .reg_req_t(reg_bus_req_t),
     .reg_rsp_t(reg_bus_rsp_t),
     .AW(AW)

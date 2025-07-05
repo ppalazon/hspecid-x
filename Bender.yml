@@ -1,0 +1,23 @@
+package:
+  name: HSpecID-X
+  authors: ["Pablo Palazon <pablo.palazon@alu.uclm.es>"]
+
+dependencies:
+  common_cells:
+    { git: "git@github.com:pulp-platform/common_cells.git", version: "1.38.0" }
+
+  register_interface:
+    {
+      git: "https://github.com/pulp-platform/register_interface.git",
+      version: "0.4.5",
+    }
+
+# Set to true to avoid updating the dependencies automatically
+frozen: false
+
+sources:
+  - hw/src/hsid_pkg/hsid_pkg.sv
+  - hw/src/**/rtl/*.sv
+
+workspace:
+  checkout_dir: hw/deps

@@ -1,0 +1,176 @@
+{
+  "name": "hsid_x",
+  "clock_primary": "clk",
+  "reset_primary": "rst_n",
+  "bus_interfaces": [
+    {
+      "protocol": "reg_iface",
+      "direction": "device"
+    }
+  ],
+  "regwidth": "32",
+  "registers": [
+    # Control and status register
+    {
+      "name": "CONTROL",
+      "desc": "HSpecID-X main control and status register",
+      "fields": [
+        {
+          "bits": "0",
+          "name": "START",
+          "desc": "When this bit is set to 1 by software, HSpecID-X is enabled and starts reading captured pixel and comparing with all reference pixels in memory. It will set to 0 once it's detected by the module and starts the process. Default: 0.",
+          "swaccess": "r0w1c", # Reads always return 0, but writing '1' clears the bit (and writes don't set). Use as a one-shot trigger, invisible to SW post-write.
+          "hwaccess": "hrw",
+          "resval": "0"
+        },
+        {
+          "bits": "1",
+          "name": "IDLE",
+          "desc": "When this bit is set to one, HSpecID-X is idle and it waits for start command. Default: 0.",
+          "swaccess": "ro",
+          "hwaccess": "hrw"
+        },
+        {
+          "bits": "2",
+          "name": "READY",
+          "desc": "When this bit is set to one, HSpecID-X is ready and working. Default: 0.",
+          "swaccess": "ro",
+          "hwaccess": "hrw"
+        },
+        {
+          "bits": "3",
+          "name": "DONE",
+          "desc": "When this bit is set to one, HSpecID-X is done and software can read output registers to know the results of the HSpecID-X operations. Default: 0.",
+          "swaccess": "ro",
+          "hwaccess": "hrw"
+        },
+        {
+          "bits": "4",
+          "name": "CLEAR",
+          "desc": "When this bit is set to one, HSpecID-X finishes its operations and abort the result. It will be set to 0 after aborting process. Default: 0.",
+          "swaccess": "r0w1c",
+          "hwaccess": "hrw"
+        }
+      ],
+      "swaccess": "ro",
+      "hwaccess": "hrw",
+      "resval": "0"
+    },
+
+    # Software inputs
+    {
+      "name": "LIBRARY_SIZE",
+      "desc": "Amount of reference pixels in memory to compare with captured pixel",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "LIBRARY_SIZE",
+          "desc": "Amount of reference pixels in memory to compare with captured pixel."
+        }
+      ],
+      "swaccess": "rw",
+      "hwaccess": "hro",
+      "resval": "0"
+    },
+    {
+      "name": "PIXEL_BANDS",
+      "desc": "Number of bands in each pixel",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "PIXEL_BANDS",
+          "desc": "Number of bands in each pixel."
+        }
+      ],
+      "swaccess": "rw",
+      "hwaccess": "hro",
+      "resval": "0"
+    },
+    {
+      "name": "CAPTURED_PIXEL_ADDR",
+      "desc": "Address of the captured pixel in main memory",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "CAPTURED_PIXEL_ADDR",
+          "desc": "Address of the captured pixel in main memory."
+        }
+      ],
+      "swaccess": "rw",
+      "hwaccess": "hro",
+      "resval": "0"
+    },
+    {
+      "name": "LIBRARY_PIXEL_ADDR",
+      "desc": "Address of the first reference pixel in main memory",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "LIBRARY_PIXEL_ADDR",
+          "desc": "Address of the first reference pixel in main memory."
+        }
+      ],
+      "swaccess": "rw",
+      "hwaccess": "hro",
+      "resval": "0"
+    },
+
+    # Outputs
+    {
+      "name": "MSE_MIN_REF",
+      "desc": "Reference pixel id from the library with minimum MSE compared to captured pixel",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "MSE_MIN_REF",
+          "desc": "Reference pixel id from the library with minimum MSE compared to captured pixel."
+        }
+      ],
+      "swaccess": "ro",
+      "hwaccess": "hrw",
+      "resval": "0"
+    },
+    {
+      "name": "MSE_MAX_REF",
+      "desc": "Reference pixel id from the library with maximum MSE compared to captured pixel",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "MSE_MAX_REF",
+          "desc": "Reference pixel id from the library with maximum MSE compared to captured pixel."
+        }
+      ],
+      "swaccess": "ro",
+      "hwaccess": "hrw",
+      "resval": "0"
+    },
+    {
+      "name": "MSE_MIN_VALUE",
+      "desc": "Minimum MSE value compared to captured pixel",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "MSE_MIN_VALUE",
+          "desc": "Minimum MSE value compared to captured pixel."
+        }
+      ],
+      "swaccess": "ro",
+      "hwaccess": "hrw",
+      "resval": "0"
+    },
+    {
+      "name": "MSE_MAX_VALUE",
+      "desc": "Maximum MSE value compared to captured pixel",
+      "fields": [
+        {
+          "bits": "31:0", # Check whether there are parameters
+          "name": "MSE_MAX_VALUE",
+          "desc": "Maximum MSE value compared to captured pixel."
+        }
+      ],
+      "swaccess": "ro",
+      "hwaccess": "hrw",
+      "resval": "0"
+    }
+  ]
+}
