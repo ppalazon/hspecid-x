@@ -6,8 +6,8 @@ module hsid_mse_reg #(
     parameter DATA_WIDTH_MUL = 32,  // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = 48,  // Data width for accumulator, larger than WORD
     parameter HSI_BANDS = 128,  // Number of HSI bands
-    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     parameter HSI_LIBRARY_SIZE = 256,  // Size of the HSI library
+    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     localparam  HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)
   ) (
     input logic clk,

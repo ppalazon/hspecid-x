@@ -9,6 +9,8 @@ module hsid_main #(
     parameter BUFFER_LENGTH = 4,  // Number of entries in the FIFO buffer
     parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
     parameter HSI_LIBRARY_SIZE = 256,  // Size of the HSI library
+    parameter HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
+    localparam ELEMENTS_ADDR = $clog2(ELEMENTS),  // Address width for elements
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI bands
   ) (
     input logic clk,
@@ -18,8 +20,9 @@ module hsid_main #(
     input logic hsi_vctr_in_valid,  // Enable input sample data
     input logic [WORD_WIDTH-1:0] hsi_vctr_in, // Input sample word data
 
-    // Input parameters for the HSI library
+    // Input parameters for library size and pixel bands
     input logic [HSI_LIBRARY_SIZE_ADDR:0] library_size_in,  // Amount of HSI library vectors to process
+    input logic [HSI_BANDS_ADDR:0] hsi_bands_in,  // HSI bands to process
 
     // Output parameters with the MSE result
     output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref,
@@ -56,6 +59,9 @@ module hsid_main #(
   wire [WORD_WIDTH-1:0] mse_out;  // Mean Squared Error
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref;  // Reference vector for MSE
 
+  // Assigns statements
+  wire [ELEMENTS_ADDR:0] element_threshold; // Threshold for element count to restart the element count and check almost full condition
+  assign element_threshold = (hsi_bands_in / 2) - 1;
 
   // Assigns statements
   assign fifo_measure_data_in = (state == READ_MEASURE) ? hsi_vctr_in : (state == COMPUTE_MSE ? fifo_measure_data_out : '0);
@@ -70,7 +76,7 @@ module hsid_main #(
     .clk(clk),
     .rst_n(rst_n),
     .hsi_library_size(library_size_in),
-    .fifo_measure_full(fifo_measure_full),
+    .fifo_measure_complete(fifo_measure_full),
     .fifo_measure_empty(fifo_measure_empty),
     .fifo_ref_empty(fifo_ref_empty),
     .fifo_ref_full(fifo_ref_full),
@@ -78,6 +84,7 @@ module hsid_main #(
     .msi_comparison_valid(mse_comparison_valid),  // MSE comparison valid signal
     .state(state),
     .vctr_count(vctr_ref),  // Not used in this module
+    .element_threshold(element_threshold),
     .element_start(element_start),  // Start vector processing signal
     .element_last(element_last),
     .element_valid(element_valid),
@@ -103,6 +110,7 @@ module hsid_main #(
     .element_a(fifo_measure_data_out),
     .element_b(fifo_ref_data_out),
     .element_valid(element_valid),
+    .hsi_bands(hsi_bands_in),
     .mse_value(mse_out),
     .mse_ref(mse_ref),
     .mse_valid(mse_valid)
@@ -136,6 +144,7 @@ module hsid_main #(
     .wr_en(fifo_measure_write_en),
     .rd_en(fifo_both_read_en),
     .data_in(fifo_measure_data_in),
+    .almost_full_threshold(element_threshold),  // Threshold for almost full condition
     .data_out(fifo_measure_data_out),
     .full(fifo_measure_full),
     .almost_full(),
@@ -151,6 +160,7 @@ module hsid_main #(
     .wr_en(fifo_ref_write_en),
     .rd_en(fifo_both_read_en),
     .data_in(hsi_vctr_in),
+    .almost_full_threshold(BUFFER_LENGTH - 1),  // Threshold for almost full condition
     .data_out(fifo_ref_data_out),
     .full(fifo_ref_full),
     .almost_full(),

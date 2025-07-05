@@ -13,6 +13,7 @@ module hsid_main_tb #(
   ) ();
 
   localparam ELEMENTS = HSI_BANDS / 2;  // Number of elements in the vector
+  localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS);  // Address width for HSI bands
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
   reg clk;
@@ -20,10 +21,13 @@ module hsid_main_tb #(
   reg hsi_vctr_in_valid;
   reg [WORD_WIDTH-1:0] hsi_vctr_in;
   reg [HSI_LIBRARY_SIZE_ADDR:0] library_size_in;
+  reg [HSI_BANDS_ADDR:0] hsi_bands_in;  // HSI bands to process
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref;
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;
   wire [WORD_WIDTH-1:0] mse_min_value;
   wire [WORD_WIDTH-1:0] mse_max_value;
+
+  // Block interface for handshake signals
   reg start;
   reg clear;  // Clear signal to reset MSE values
   wire done;
@@ -43,6 +47,7 @@ module hsid_main_tb #(
     .hsi_vctr_in_valid(hsi_vctr_in_valid),
     .hsi_vctr_in(hsi_vctr_in),
     .library_size_in(library_size_in),
+    .hsi_bands_in(hsi_bands_in),
     .mse_min_ref(mse_min_ref),
     .mse_max_ref(mse_max_ref),
     .mse_min_value(mse_min_value),
@@ -90,6 +95,7 @@ module hsid_main_tb #(
     library_size_in = 0;
     start = 0;
     clear = 0;
+    hsi_bands_in = HSI_BANDS;  // Set HSI bands to maximum
     library_size_in = 10;  // Set library size to maximum
 
     // Generate a random vector as a measure

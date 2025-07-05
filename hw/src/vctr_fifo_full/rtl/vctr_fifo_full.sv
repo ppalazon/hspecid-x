@@ -99,6 +99,7 @@ module vctr_fifo_full #(
     .wr_en(data_in_en && current_state == READING),
     .rd_en(current_state == OPERATION),
     .data_in(data_in),
+    .almost_full_threshold(VECTOR_LENGTH - 1),
     .data_out(vctr_in_1_data),
     .full(vctr_in_1_full),
     .almost_full(),
@@ -114,6 +115,7 @@ module vctr_fifo_full #(
     .wr_en(data_in_en && vctr_in_1_full && current_state == READING),
     .rd_en(current_state == OPERATION),
     .data_in(data_in),
+    .almost_full_threshold(VECTOR_LENGTH - 1),
     .data_out(vctr_in_2_data),
     .full(vctr_in_2_full),
     .almost_full(),
@@ -129,6 +131,7 @@ module vctr_fifo_full #(
     .wr_en(vctr_out_en),
     .rd_en(current_state == DONE && data_out_en),  // Read enable signal for output FIFO
     .data_in(vctr_out_data),
+    .almost_full_threshold(VECTOR_LENGTH - 1),
     .data_out(data_out),
     .full(vctr_out_full),
     .almost_full(),

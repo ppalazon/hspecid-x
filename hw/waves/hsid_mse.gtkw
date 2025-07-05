@@ -1,19 +1,19 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul  4 17:07:43 2025
+[*] Sat Jul  5 18:44:48 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_mse_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul  4 17:02:41 2025"
-[dumpfile_size] 14979
+[dumpfile_mtime] "Sat Jul  5 18:44:04 2025"
+[dumpfile_size] 15069
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_mse.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-15.041087 43800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.845666 43800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_mse_tb.
 [treeopen] hsid_mse_tb.dut.
 [sst_width] 317
-[signals_width] 234
+[signals_width] 360
 [sst_expanded] 1
 [sst_vpaned_height] 464
 @28
@@ -25,16 +25,15 @@ hsid_mse_tb.element_b[31:0]
 hsid_mse_tb.element_last
 hsid_mse_tb.element_start
 hsid_mse_tb.element_valid
-@24
-hsid_mse_tb.hsid_mse_ref[7:0]
-@28
-hsid_mse_tb.hsid_mse_valid
-@24
-hsid_mse_tb.hsid_mse_value[31:0]
-@28
 hsid_mse_tb.rst_n
 @24
 hsid_mse_tb.vctr_ref[7:0]
+@25
+hsid_mse_tb.mse_ref[7:0]
+@28
+hsid_mse_tb.mse_valid
+@24
+hsid_mse_tb.mse_value[31:0]
 @200
 -Channel 1
 @24
@@ -67,7 +66,6 @@ hsid_mse_tb.dut.channel_2.diff[16:0]
 @24
 hsid_mse_tb.dut.channel_2.mult[31:0]
 hsid_mse_tb.dut.channel_2.acc_value[47:0]
-@25
 hsid_mse_tb.dut.channel_2.acc_ref[7:0]
 @28
 hsid_mse_tb.dut.channel_2.acc_valid

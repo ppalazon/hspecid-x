@@ -106,6 +106,7 @@ module vctr_fifo_strm #(
     .wr_en(current_state == COMPUTE && data_in_v1_en && !vctr_out_almost_full),
     .rd_en(current_state == COMPUTE && !vctr_in_1_empty && !vctr_in_2_empty),
     .data_in(data_in_v1),
+    .almost_full_threshold(BUFFER_LENGTH - 1),
     .data_out(read_v1_data),
     .full(data_in_v1_full),
     .almost_full(),
@@ -121,6 +122,7 @@ module vctr_fifo_strm #(
     .wr_en(current_state == COMPUTE && data_in_v2_en && !vctr_out_almost_full),
     .rd_en(current_state == COMPUTE && !vctr_in_1_empty && !vctr_in_2_empty),
     .data_in(data_in_v2),
+    .almost_full_threshold(BUFFER_LENGTH - 1),
     .data_out(read_v2_data),
     .full(data_in_v2_full),
     .almost_full(),
@@ -129,14 +131,14 @@ module vctr_fifo_strm #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(BUFFER_LENGTH),
-    .FIFO_ALMOST_FULL_THRESHOLD(BUFFER_LENGTH - 2)  // Almost full threshold taking account of pipeline stages
+    .FIFO_DEPTH(BUFFER_LENGTH)
   ) vctr_out (
     .clk(clk),
     .rst_n(rst_n),
     .wr_en(vctr_out_en),
     .rd_en(current_state != IDLE && data_out_en),
     .data_in(vctr_out_data),
+    .almost_full_threshold(BUFFER_LENGTH - 2),
     .data_out(data_out),
     .full(vctr_out_full),
     .almost_full(vctr_out_almost_full),

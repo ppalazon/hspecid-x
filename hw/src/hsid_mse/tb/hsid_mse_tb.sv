@@ -9,6 +9,7 @@ module hsid_mse_tb;
   localparam DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL; // Data width for multiplication, larger than WORD_WIDTH
   localparam DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC; // Data width for accumulator, larger than WORD_WIDTH
   localparam HSI_BANDS = HSID_HSI_BANDS; // Number of HSI bands
+  localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS); // Address width for HSI bands
   localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
   localparam ELEMENTS = HSI_BANDS / DATA_PER_WORD; // Number of elements in the vector
   localparam HSI_LIBRARY_SIZE = HSID_HSI_LIBRARY_SIZE; // Size of the HSI library
@@ -22,6 +23,7 @@ module hsid_mse_tb;
   reg [WORD_WIDTH-1:0] element_b;
   reg element_valid;
   reg [HSI_LIBRARY_SIZE_ADDR-1:0] vctr_ref; // Reference vector for MSE
+  reg [HSI_BANDS_ADDR:0] hsi_bands; // HSI bands to process
   wire [WORD_WIDTH-1:0] mse_value;
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref; // Reference vector for MSE
   wire mse_valid;
@@ -42,6 +44,7 @@ module hsid_mse_tb;
     .element_a(element_a),
     .element_b(element_b),
     .element_valid(element_valid),
+    .hsi_bands(hsi_bands),
     .mse_value(mse_value),
     .mse_ref(mse_ref),
     .mse_valid(mse_valid)
@@ -70,6 +73,7 @@ module hsid_mse_tb;
     element_b = 0;
     element_valid = 0;
     vctr_ref = 0;
+    hsi_bands = HSI_BANDS; // Set the number of HSI bands to process
 
     #5 rst_n = 0;  // Reset the DUT
     #5 rst_n = 1;  // Release reset

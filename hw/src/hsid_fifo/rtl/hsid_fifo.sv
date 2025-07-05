@@ -1,23 +1,8 @@
 `timescale 1ns/1ps
 
-/*
- @WAVEDROM_START
- { signal: [
- { name: "clk",      wave: "P........." },
- { name: "rst_n",    wave: "L........." },
- { name: "wr_en",    wave: "L........." },
- { name: "rd_en",    wave: "L........." },
- { name: "data_in",  wave: "L........." },
- { name: "data_out", wave: "L........." },
- { name: "full",     wave: "L........." },
- { name: "empty",    wave: "L........." },
- ]}
- @WAVEDROM_END
- */
 module hsid_fifo #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
     parameter FIFO_DEPTH = 8,  // 8 entries by default
-    parameter FIFO_ALMOST_FULL_THRESHOLD = FIFO_DEPTH - 1, // Optional threshold for almost full
     localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH) // Address width for FIFO depth
   ) (
     input logic clk,
@@ -25,6 +10,7 @@ module hsid_fifo #(
     input logic wr_en,
     input logic rd_en,
     input logic [DATA_WIDTH-1:0] data_in,
+    input logic [FIFO_ADDR_WIDTH:0] almost_full_threshold, // Element to process
     output logic [DATA_WIDTH-1:0] data_out,
     output logic full,
     output logic almost_full,
@@ -42,7 +28,7 @@ module hsid_fifo #(
   // FIFO status signals
   assign full  = (fifo_count == FIFO_DEPTH); // FIFO is full when count reaches depth - 1
   assign empty = (fifo_count == 0);
-  assign almost_full = (fifo_count >= FIFO_ALMOST_FULL_THRESHOLD); // Optional signal for almost full
+  assign almost_full = (fifo_count >= almost_full_threshold); // Optional signal for almost full
 
   // FIFO count update sequentially
   always_ff @(posedge clk or negedge rst_n) begin

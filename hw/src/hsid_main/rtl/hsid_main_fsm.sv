@@ -14,9 +14,10 @@ module hsid_main_fsm #(
 
     // Library size input
     input logic [HSI_LIBRARY_SIZE_ADDR:0] hsi_library_size,  // Length of the vectors
+    input logic [ELEMENTS_ADDR:0] element_threshold,  // HSI bands to process
 
     // Fifo status signals
-    input logic fifo_measure_full,  // Full signal for measure vector FIFO
+    input logic fifo_measure_complete,  // Full signal for measure vector FIFO
     input logic fifo_measure_empty,  // Empty signal for measure vector FIFO
     input logic fifo_ref_empty,  // Empty signal for output data FIFO
     input logic fifo_ref_full,  // Full signal for output data FIFO
@@ -52,6 +53,8 @@ module hsid_main_fsm #(
 
   assign state = current_state;
 
+  // Check measure vector FIFO status
+
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= IDLE;  // Reset to IDLE state
@@ -66,7 +69,11 @@ module hsid_main_fsm #(
       element_last <= (element_count == ELEMENTS - 1);
       element_valid <= fifo_both_read_en;
       if (fifo_both_read_en) begin
-        element_count <= element_count + 1;
+        if (element_count == element_threshold) begin
+          element_count <= 0;  // Reset element count when threshold is reached
+        end else begin
+          element_count <= element_count + 1;
+        end
         if (element_last) begin
           vctr_count <= vctr_count + 1;
         end
@@ -82,7 +89,7 @@ module hsid_main_fsm #(
       end
       READ_MEASURE: begin
         idle = 0; ready = 1; done = 0;
-        next_state = fifo_measure_full ? COMPUTE_MSE : READ_MEASURE;
+        next_state = fifo_measure_complete ? COMPUTE_MSE : READ_MEASURE;
       end
       COMPUTE_MSE: begin
         idle = 0; ready = !fifo_ref_full; done = 0;

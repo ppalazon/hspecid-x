@@ -5,9 +5,10 @@ import hsid_pkg::*;
 module hsid_fifo_tb;
 
   // Parameters
-  parameter DATA_WIDTH = 8;
-  parameter FIFO_DEPTH = 16;
-  parameter FIFO_ALMOST_FULL_THRESHOLD = FIFO_DEPTH - 2; // Optional threshold for almost full
+  localparam DATA_WIDTH = 8;
+  localparam FIFO_DEPTH = 16;
+  localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH); // Address width for FIFO depth
+  localparam FIFO_ALMOST_FULL_THRESHOLD = 10; // Optional threshold for almost full
 
   // Signals
   reg clk;
@@ -15,6 +16,7 @@ module hsid_fifo_tb;
   reg wr_en;
   reg rd_en;
   reg [DATA_WIDTH-1:0] write_data;
+  reg [FIFO_ADDR_WIDTH:0] almost_full_threshold = FIFO_ALMOST_FULL_THRESHOLD; // Element to process
   wire [DATA_WIDTH-1:0] read_data;
   wire full;
   wire almost_full;
@@ -30,6 +32,7 @@ module hsid_fifo_tb;
     .wr_en(wr_en),
     .rd_en(rd_en),
     .data_in(write_data),
+    .almost_full_threshold(almost_full_threshold),
     .data_out(read_data),
     .full(full),
     .almost_full(almost_full),
@@ -48,7 +51,7 @@ module hsid_fifo_tb;
   // Testbench logic
   initial begin
     // Initialize signals
-    clk = 0;
+    clk = 1;
     rst_n = 1;
     wr_en = 0;
     rd_en = 0;
@@ -76,6 +79,7 @@ module hsid_fifo_tb;
     rd_en = 0;
 
     // Test case 1: Write 16 values and check it's full
+    $display("Test case 1: Write 16 values and check it's full");
     for (int i=0; i<FIFO_DEPTH; i++) begin
       // Empty check
       if (i==0) begin
@@ -86,7 +90,7 @@ module hsid_fifo_tb;
       write_data = i[DATA_WIDTH-1:0]; // Truncate to DATA_WIDTH bits
       wr_en = 1;
       #10;
-      if(i >= FIFO_ALMOST_FULL_THRESHOLD) begin
+      if(i >= (FIFO_ALMOST_FULL_THRESHOLD - 1)) begin // at this point, counter is equal to (i - 1)
         if (!almost_full) $error("Error: FIFO should be almost full but it is not.");
       end else begin
         if (almost_full) $error("FIFO is almost full when it should not be.");
@@ -110,14 +114,15 @@ module hsid_fifo_tb;
       end else begin
         if (full) $error("Error: FIFO should not be full but it is.");
       end
+
+      rd_en = 1;
+      #10;
       // Almost full check
-      if(i >= 2) begin
+      if(i >= (FIFO_DEPTH - FIFO_ALMOST_FULL_THRESHOLD)) begin
         if (almost_full) $error("Error: FIFO should not be almost full but it is.");
       end else begin
         if (!almost_full) $error("FIFO is not almost full as expected");
       end
-      rd_en = 1;
-      #10;
       if (read_data !== i[DATA_WIDTH-1:0]) begin
         $error("Error: Read data does not match expected data!. Read data: %d , expected: %d", read_data, i[DATA_WIDTH-1:0]);
       end
