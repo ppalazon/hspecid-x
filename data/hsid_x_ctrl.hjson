@@ -1,5 +1,5 @@
 {
-  "name": "hsid_x",
+  "name": "hsid_x_ctrl",
   "clock_primary": "clk",
   "reset_primary": "rst_n",
   "bus_interfaces": [
@@ -12,14 +12,14 @@
   "registers": [
     # Control and status register
     {
-      "name": "CONTROL",
+      "name": "STATUS",
       "desc": "HSpecID-X main control and status register",
       "fields": [
         {
           "bits": "0",
           "name": "START",
           "desc": "When this bit is set to 1 by software, HSpecID-X is enabled and starts reading captured pixel and comparing with all reference pixels in memory. It will set to 0 once it's detected by the module and starts the process. Default: 0.",
-          "swaccess": "r0w1c", # Reads always return 0, but writing '1' clears the bit (and writes don't set). Use as a one-shot trigger, invisible to SW post-write.
+          "swaccess": "rw1s", # Reads always return 0, but writing '1' clears the bit (and writes don't set). Use as a one-shot trigger, invisible to SW post-write.
           "hwaccess": "hrw",
           "resval": "0"
         },
@@ -48,7 +48,14 @@
           "bits": "4",
           "name": "CLEAR",
           "desc": "When this bit is set to one, HSpecID-X finishes its operations and abort the result. It will be set to 0 after aborting process. Default: 0.",
-          "swaccess": "r0w1c",
+          "swaccess": "rw1s",
+          "hwaccess": "hrw"
+        },
+        {
+          "bits": "5",
+          "name": "ERROR",
+          "desc": "When this bit is set to one, HSpecID-X has detected an error during its operations. It will be set to 0 after software reads the register. Default: 0.",
+          "swaccess": "ro",
           "hwaccess": "hrw"
         }
       ],
@@ -63,7 +70,7 @@
       "desc": "Amount of reference pixels in memory to compare with captured pixel",
       "fields": [
         {
-          "bits": "31:0", # Check whether there are parameters
+          "bits": "11:0", # Check whether there are parameters
           "name": "LIBRARY_SIZE",
           "desc": "Amount of reference pixels in memory to compare with captured pixel."
         }
@@ -77,7 +84,7 @@
       "desc": "Number of bands in each pixel",
       "fields": [
         {
-          "bits": "31:0", # Check whether there are parameters
+          "bits": "7:0", # Check whether there are parameters
           "name": "PIXEL_BANDS",
           "desc": "Number of bands in each pixel."
         }

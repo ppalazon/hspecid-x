@@ -8,7 +8,7 @@ module hsid_sq_df_acc_tb;
   localparam DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL;
   localparam DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC;
   localparam VECTOR_LENGTH = HSID_VECTOR_LENGTH_TB; // Length of the vector
-  localparam HSI_LIBRARY_SIZE = HSID_HSI_LIBRARY_SIZE; // Size of the HSI library
+  localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY; // Size of the HSI library
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
   reg clk;

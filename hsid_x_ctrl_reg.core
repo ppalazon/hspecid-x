@@ -1,0 +1,43 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_x_ctrl_reg:1.0.0
+description: Control register module for HSpecID-x accelerator
+
+filesets:
+  rtl:
+    files:
+      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_pkg.sv
+      - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_top.sv
+      - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg.sv
+    file_type: systemVerilogSource
+    depend:
+      - "pulp-platform.org::common_cells" # common_cells.core from deps
+      - "uclm:hspecidx:register_interface" # register_interface.core in root
+
+  tb:
+    files:
+      - hw/src/hsid_x_ctrl_reg/tb/hsid_x_ctrl_reg_tb.sv
+    file_type: systemVerilogSource
+
+  nexys_a7_100t:
+    files:
+      - xdc/Nexys-A7-100T.xdc
+
+targets:
+  default: &default
+    filesets:
+      - rtl
+    toplevel: hsid_x_ctrl_reg
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: hsid_x_ctrl_reg_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options:
+        #xsim_options:

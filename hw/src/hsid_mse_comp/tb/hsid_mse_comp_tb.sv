@@ -5,7 +5,7 @@ import hsid_pkg::*;
 module hsid_mse_comp_tb;
 
   localparam WORD_WIDTH = HSID_WORD_WIDTH;  // Width of the word in bits
-  localparam HSI_LIBRARY_SIZE = HSID_HSI_LIBRARY_SIZE;  // Size of the HSI library
+  localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY;  // Size of the HSI library
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
   reg clk;

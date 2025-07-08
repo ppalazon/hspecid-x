@@ -19,7 +19,7 @@ packages:
     revision: 9afda9abb565971649c2aa0985639c096f351171
     version: 1.38.0
     source:
-      Git: git@github.com:pulp-platform/common_cells.git
+      Git: https://github.com/pulp-platform/common_cells.git
     dependencies:
     - common_verification
     - tech_cells_generic

@@ -8,7 +8,7 @@ class HsidMseRegGen;
   localparam DATA_WIDTH = HSID_DATA_WIDTH; // 16 bits (only 14 bits used)
   localparam DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL; // Data width for multiplication, larger than DATA_WIDTH
   localparam DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC; // Data width for accumulator, larger than DATA_WIDTH
-  localparam HSI_BANDS = HSID_HSI_BANDS; // Number of HSI bands
+  localparam HSI_BANDS = HSID_MAX_HSP_BANDS; // Number of HSI bands
   localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
   localparam ELEMENTS = HSI_BANDS / DATA_PER_WORD; // Number of elements in the vector
 

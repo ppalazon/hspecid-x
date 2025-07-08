@@ -1,0 +1,36 @@
+CAPI=2:
+
+name: uclm:hspecidx:register_interface
+
+# Copyright 2021 OpenHW Group
+# Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
+
+filesets:
+  files_rtl:
+    files:
+      - hw/deps/register_interface/include/register_interface/assign.svh:
+          {
+            is_include_file: true,
+            include_path: hw/deps/register_interface/include,
+          }
+      - hw/deps/register_interface/include/register_interface/typedef.svh:
+          {
+            is_include_file: true,
+            include_path: hw/deps/register_interface/include,
+          }
+      - hw/deps/register_interface/vendor/lowrisc_opentitan/src/prim_subreg_arb.sv
+      - hw/deps/register_interface/vendor/lowrisc_opentitan/src/prim_subreg_ext.sv
+      - hw/deps/register_interface/vendor/lowrisc_opentitan/src/prim_subreg_shadow.sv
+      - hw/deps/register_interface/vendor/lowrisc_opentitan/src/prim_subreg.sv
+      - hw/deps/register_interface/src/reg_intf.sv
+      - hw/deps/register_interface/src/periph_to_reg.sv
+      - hw/deps/register_interface/src/reg_demux.sv
+      - hw/deps/register_interface/src/reg_mux.sv
+      - hw/deps/register_interface/src/reg_to_tlul.sv
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets:
+      - files_rtl

@@ -4,13 +4,18 @@ package:
 
 dependencies:
   common_cells:
-    { git: "git@github.com:pulp-platform/common_cells.git", version: "1.38.0" }
+    {
+      git: "https://github.com/pulp-platform/common_cells.git",
+      version: "1.38.0",
+    }
 
   register_interface:
     {
       git: "https://github.com/pulp-platform/register_interface.git",
       version: "0.4.5",
     }
+
+  # obi: { git: "https://github.com/pulp-platform/obi.git", version: "0.1.7" }
 
 # Set to true to avoid updating the dependencies automatically
 frozen: false

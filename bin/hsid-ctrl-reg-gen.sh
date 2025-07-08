@@ -5,7 +5,7 @@ set -e # Exit on error
 # Get absolute path to the module directory
 BASE_DIR=$(pwd)
 
-NAME=hsid_x
+NAME=hsid_x_ctrl
 
 #REGTOOL=$BASE_DIR/hw/vendor/pulp_platform_register_interface/vendor/lowrisc_opentitan/util/regtool.py
 REGTOOL=$BASE_DIR/hw/deps/register_interface/vendor/lowrisc_opentitan/util/regtool.py

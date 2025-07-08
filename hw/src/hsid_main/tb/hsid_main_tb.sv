@@ -7,9 +7,9 @@ module hsid_main_tb #(
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL,  // Data width for multiplication, larger than DATA_WIDTH
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC,  // Data width for accumulator, larger than DATA_WIDTH
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
-    parameter HSI_BANDS = HSID_HSI_BANDS,  // Number of HSI bands
+    parameter HSI_BANDS = HSID_MAX_HSP_BANDS,  // Number of HSI bands
     parameter BUFFER_LENGTH = HSID_BUFFER_LENGTH,  // Length of the buffer
-    parameter HSI_LIBRARY_SIZE = HSID_HSI_LIBRARY_SIZE  // Size of the HSI library
+    parameter HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY  // Size of the HSI library
   ) ();
 
   localparam ELEMENTS = HSI_BANDS / 2;  // Number of elements in the vector

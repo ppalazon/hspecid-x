@@ -8,10 +8,10 @@ module hsid_mse_reg_tb;
   localparam DATA_WIDTH = HSID_DATA_WIDTH; // 16 bits by default
   localparam DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL; // Data width for multiplication, larger than WORD_WIDTH
   localparam DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC; // Data width for accumulator, larger than WORD_WIDTH
-  localparam HSI_BANDS = HSID_HSI_BANDS; // Number of HSI bands
+  localparam HSI_BANDS = HSID_MAX_HSP_BANDS; // Number of HSI bands
   localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
   localparam ELEMENTS = HSI_BANDS / DATA_PER_WORD; // Number of elements in the vector
-  localparam HSI_LIBRARY_SIZE = HSID_HSI_LIBRARY_SIZE; // Size of the HSI library
+  localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY; // Size of the HSI library
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
   reg clk;

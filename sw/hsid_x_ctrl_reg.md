@@ -1,69 +1,72 @@
 ## Summary
 
-| Name                                                 | Offset   |   Length | Description                                                                     |
-|:-----------------------------------------------------|:---------|---------:|:--------------------------------------------------------------------------------|
-| hsid_x.[`CONTROL`](#control)                         | 0x0      |        4 | HSpecID-X main control and status register                                      |
-| hsid_x.[`LIBRARY_SIZE`](#library_size)               | 0x4      |        4 | Amount of reference pixels in memory to compare with captured pixel             |
-| hsid_x.[`PIXEL_BANDS`](#pixel_bands)                 | 0x8      |        4 | Number of bands in each pixel                                                   |
-| hsid_x.[`CAPTURED_PIXEL_ADDR`](#captured_pixel_addr) | 0xc      |        4 | Address of the captured pixel in main memory                                    |
-| hsid_x.[`LIBRARY_PIXEL_ADDR`](#library_pixel_addr)   | 0x10     |        4 | Address of the first reference pixel in main memory                             |
-| hsid_x.[`MSE_MIN_REF`](#mse_min_ref)                 | 0x14     |        4 | Reference pixel id from the library with minimum MSE compared to captured pixel |
-| hsid_x.[`MSE_MAX_REF`](#mse_max_ref)                 | 0x18     |        4 | Reference pixel id from the library with maximum MSE compared to captured pixel |
-| hsid_x.[`MSE_MIN_VALUE`](#mse_min_value)             | 0x1c     |        4 | Minimum MSE value compared to captured pixel                                    |
-| hsid_x.[`MSE_MAX_VALUE`](#mse_max_value)             | 0x20     |        4 | Maximum MSE value compared to captured pixel                                    |
+| Name                                                      | Offset   |   Length | Description                                                                     |
+|:----------------------------------------------------------|:---------|---------:|:--------------------------------------------------------------------------------|
+| hsid_x_ctrl.[`STATUS`](#status)                           | 0x0      |        4 | HSpecID-X main control and status register                                      |
+| hsid_x_ctrl.[`LIBRARY_SIZE`](#library_size)               | 0x4      |        4 | Amount of reference pixels in memory to compare with captured pixel             |
+| hsid_x_ctrl.[`PIXEL_BANDS`](#pixel_bands)                 | 0x8      |        4 | Number of bands in each pixel                                                   |
+| hsid_x_ctrl.[`CAPTURED_PIXEL_ADDR`](#captured_pixel_addr) | 0xc      |        4 | Address of the captured pixel in main memory                                    |
+| hsid_x_ctrl.[`LIBRARY_PIXEL_ADDR`](#library_pixel_addr)   | 0x10     |        4 | Address of the first reference pixel in main memory                             |
+| hsid_x_ctrl.[`MSE_MIN_REF`](#mse_min_ref)                 | 0x14     |        4 | Reference pixel id from the library with minimum MSE compared to captured pixel |
+| hsid_x_ctrl.[`MSE_MAX_REF`](#mse_max_ref)                 | 0x18     |        4 | Reference pixel id from the library with maximum MSE compared to captured pixel |
+| hsid_x_ctrl.[`MSE_MIN_VALUE`](#mse_min_value)             | 0x1c     |        4 | Minimum MSE value compared to captured pixel                                    |
+| hsid_x_ctrl.[`MSE_MAX_VALUE`](#mse_max_value)             | 0x20     |        4 | Maximum MSE value compared to captured pixel                                    |
 
-## CONTROL
+## STATUS
 HSpecID-X main control and status register
 - Offset: `0x0`
 - Reset default: `0x0`
-- Reset mask: `0x1f`
+- Reset mask: `0x3f`
 
 ### Fields
 
 ```wavejson
-{"reg": [{"name": "START", "bits": 1, "attr": ["r0w1c"], "rotate": -90}, {"name": "IDLE", "bits": 1, "attr": ["ro"], "rotate": -90}, {"name": "READY", "bits": 1, "attr": ["ro"], "rotate": -90}, {"name": "DONE", "bits": 1, "attr": ["ro"], "rotate": -90}, {"name": "CLEAR", "bits": 1, "attr": ["r0w1c"], "rotate": -90}, {"bits": 27}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
+{"reg": [{"name": "START", "bits": 1, "attr": ["rw1s"], "rotate": -90}, {"name": "IDLE", "bits": 1, "attr": ["ro"], "rotate": -90}, {"name": "READY", "bits": 1, "attr": ["ro"], "rotate": -90}, {"name": "DONE", "bits": 1, "attr": ["ro"], "rotate": -90}, {"name": "CLEAR", "bits": 1, "attr": ["rw1s"], "rotate": -90}, {"name": "ERROR", "bits": 1, "attr": ["ro"], "rotate": -90}, {"bits": 26}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
 ```
 
 |  Bits  |  Type  |  Reset  | Name   | Description                                                                                                                                                                                                                            |
 |:------:|:------:|:-------:|:-------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|  31:5  |        |         |        | Reserved                                                                                                                                                                                                                               |
-|   4    | r0w1c  |   0x0   | CLEAR  | When this bit is set to one, HSpecID-X finishes its operations and abort the result. It will be set to 0 after aborting process. Default: 0.                                                                                           |
+|  31:6  |        |         |        | Reserved                                                                                                                                                                                                                               |
+|   5    |   ro   |   0x0   | ERROR  | When this bit is set to one, HSpecID-X has detected an error during its operations. It will be set to 0 after software reads the register. Default: 0.                                                                                 |
+|   4    |  rw1s  |   0x0   | CLEAR  | When this bit is set to one, HSpecID-X finishes its operations and abort the result. It will be set to 0 after aborting process. Default: 0.                                                                                           |
 |   3    |   ro   |   0x0   | DONE   | When this bit is set to one, HSpecID-X is done and software can read output registers to know the results of the HSpecID-X operations. Default: 0.                                                                                     |
 |   2    |   ro   |   0x0   | READY  | When this bit is set to one, HSpecID-X is ready and working. Default: 0.                                                                                                                                                               |
 |   1    |   ro   |   0x0   | IDLE   | When this bit is set to one, HSpecID-X is idle and it waits for start command. Default: 0.                                                                                                                                             |
-|   0    | r0w1c  |   0x0   | START  | When this bit is set to 1 by software, HSpecID-X is enabled and starts reading captured pixel and comparing with all reference pixels in memory. It will set to 0 once it's detected by the module and starts the process. Default: 0. |
+|   0    |  rw1s  |   0x0   | START  | When this bit is set to 1 by software, HSpecID-X is enabled and starts reading captured pixel and comparing with all reference pixels in memory. It will set to 0 once it's detected by the module and starts the process. Default: 0. |
 
 ## LIBRARY_SIZE
 Amount of reference pixels in memory to compare with captured pixel
 - Offset: `0x4`
 - Reset default: `0x0`
-- Reset mask: `0xffffffff`
+- Reset mask: `0xfff`
 
 ### Fields
 
 ```wavejson
-{"reg": [{"name": "LIBRARY_SIZE", "bits": 32, "attr": ["rw"], "rotate": 0}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
+{"reg": [{"name": "LIBRARY_SIZE", "bits": 12, "attr": ["rw"], "rotate": 0}, {"bits": 20}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
 ```
 
 |  Bits  |  Type  |  Reset  | Name         | Description                                                          |
 |:------:|:------:|:-------:|:-------------|:---------------------------------------------------------------------|
-|  31:0  |   rw   |   0x0   | LIBRARY_SIZE | Amount of reference pixels in memory to compare with captured pixel. |
+| 31:12  |        |         |              | Reserved                                                             |
+|  11:0  |   rw   |   0x0   | LIBRARY_SIZE | Amount of reference pixels in memory to compare with captured pixel. |
 
 ## PIXEL_BANDS
 Number of bands in each pixel
 - Offset: `0x8`
 - Reset default: `0x0`
-- Reset mask: `0xffffffff`
+- Reset mask: `0xff`
 
 ### Fields
 
 ```wavejson
-{"reg": [{"name": "PIXEL_BANDS", "bits": 32, "attr": ["rw"], "rotate": 0}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
+{"reg": [{"name": "PIXEL_BANDS", "bits": 8, "attr": ["rw"], "rotate": 0}, {"bits": 24}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
 ```
 
 |  Bits  |  Type  |  Reset  | Name        | Description                    |
 |:------:|:------:|:-------:|:------------|:-------------------------------|
-|  31:0  |   rw   |   0x0   | PIXEL_BANDS | Number of bands in each pixel. |
+|  31:8  |        |         |             | Reserved                       |
+|  7:0   |   rw   |   0x0   | PIXEL_BANDS | Number of bands in each pixel. |
 
 ## CAPTURED_PIXEL_ADDR
 Address of the captured pixel in main memory
