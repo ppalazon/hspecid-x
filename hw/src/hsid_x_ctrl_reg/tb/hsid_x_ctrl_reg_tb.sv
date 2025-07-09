@@ -49,7 +49,9 @@ module hsid_x_ctrl_reg_tb;
   assign mse_min_ref_w = {{(32-HSI_LIBRARY_SIZE_ADDR){1'b0}}, mse_min_ref};
 
 
-  REG_BUS #(.ADDR_WIDTH(32), .DATA_WIDTH(32)) regbus_slave(clk);
+  // REG_BUS #(.ADDR_WIDTH(32), .DATA_WIDTH(32)) regbus_slave(clk);
+  hsid_x_reg_pkg::reg_req_t reg_req;
+  hsid_x_reg_pkg::reg_rsp_t reg_rsp;
 
   hsid_x_ctrl_reg #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -58,7 +60,9 @@ module hsid_x_ctrl_reg_tb;
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
-    .regbus_slave(regbus_slave.in),
+    // .regbus_slave(regbus_slave.in),
+    .reg_req(reg_req),
+    .reg_rsp(reg_rsp),
     .start(start),
     .clear(clear),
     .idle(idle),
@@ -94,10 +98,11 @@ module hsid_x_ctrl_reg_tb;
     mse_max_value = 0;
 
     // Initialize the register interface request
-    regbus_slave.valid = 0;
-    regbus_slave.write = 0;
-    regbus_slave.addr = 0;
-    regbus_slave.wdata = 0;
+    // regbus_slave.valid = 0;
+    // regbus_slave.write = 0;
+    // regbus_slave.addr = 0;
+    // regbus_slave.wdata = 0;
+    reg_req = '0; // Initialize register request
 
     #3 rst_n = 0;  // Reset the DUT
     #5 rst_n = 1; // Release reset
@@ -213,21 +218,19 @@ module hsid_x_ctrl_reg_tb;
   always
     #5 clk = ! clk;
 
-
-
   task write_reg(input logic [BlockAw-1:0] addr, input logic [3:0] wstrb, input logic [31:0] data);
     begin
-      regbus_slave.addr = {{(WORD_WIDTH-BlockAw){1'b0}}, addr};
-      regbus_slave.wdata = data;
-      regbus_slave.wstrb = wstrb; // Write operation
-      regbus_slave.write = 1;
-      regbus_slave.valid = 1; // Indicate valid request
+      reg_req.addr = {{(WORD_WIDTH-BlockAw){1'b0}}, addr};
+      reg_req.wdata = data;
+      reg_req.wstrb = wstrb; // Write operation
+      reg_req.write = 1;
+      reg_req.valid = 1; // Indicate valid request
       #10;
-      while (!regbus_slave.ready) begin
+      while (!reg_rsp.ready) begin
         #1; // Wait for the register interface to be ready
       end
-      regbus_slave.write = 0; // Clear write signal
-      regbus_slave.valid = 0; // Clear valid signal
+      reg_req.write = 0; // Clear write signal
+      reg_req.valid = 0; // Clear valid signal
     end
   endtask
 
@@ -241,25 +244,74 @@ module hsid_x_ctrl_reg_tb;
 
   task assert_read_reg(input logic [BlockAw-1:0] addr, input logic [31:0] expected);
     begin
-      regbus_slave.addr = {{(WORD_WIDTH-BlockAw){1'b0}}, addr};
-      regbus_slave.wdata = 32'h0; // No write data for read operation
-      regbus_slave.wstrb = 4'b0000; // No write strobe for read operation
-      regbus_slave.write = 0; // Read operation
-      regbus_slave.valid = 1; // Indicate valid request
+      reg_req.addr = {{(WORD_WIDTH-BlockAw){1'b0}}, addr};
+      reg_req.wdata = 32'h0; // No write data for read operation
+      reg_req.wstrb = 4'b0000; // No write strobe for read operation
+      reg_req.write = 0; // Read operation
+      reg_req.valid = 1; // Indicate valid request
       #10;
-      while (!regbus_slave.ready) begin
+      while (!reg_rsp.ready) begin
         #1; // Wait for the register interface to be ready
       end
-      data_out = regbus_slave.rdata; // Read data from the register interface
-      regbus_slave.valid = 0; // Clear valid signal
+      data_out = reg_rsp.rdata; // Read data from the register interface
+      reg_req.valid = 0; // Clear valid signal
       #10;
 
       if (data_out !== expected) begin
-        $error("ERROR: Bus rdata - 0x%h: expected 0x%0h, got 0x%0h", regbus_slave.addr, expected, data_out);
+        $error("ERROR: Bus rdata - 0x%h: expected 0x%0h, got 0x%0h", reg_req.addr, expected, data_out);
       end else begin
-        $display("PASS: Bus rdata - 0x%h: passed: got %0d (0x%h)", regbus_slave.addr, data_out, data_out);
+        $display("PASS: Bus rdata - 0x%h: passed: got %0d (0x%h)", reg_req.addr, data_out, data_out);
       end
     end
   endtask
+
+
+
+  // task write_reg(input logic [BlockAw-1:0] addr, input logic [3:0] wstrb, input logic [31:0] data);
+  //   begin
+  //     regbus_slave.addr = {{(WORD_WIDTH-BlockAw){1'b0}}, addr};
+  //     regbus_slave.wdata = data;
+  //     regbus_slave.wstrb = wstrb; // Write operation
+  //     regbus_slave.write = 1;
+  //     regbus_slave.valid = 1; // Indicate valid request
+  //     #10;
+  //     while (!regbus_slave.ready) begin
+  //       #1; // Wait for the register interface to be ready
+  //     end
+  //     regbus_slave.write = 0; // Clear write signal
+  //     regbus_slave.valid = 0; // Clear valid signal
+  //   end
+  // endtask
+
+  // task assert_value(input logic [31:0] actual, input logic [31:0] expected, string message);
+  //   if (expected !== actual) begin
+  //     $error("ERROR: %s: expected 0x%0h, got 0x%0h", message, expected, actual);
+  //   end else begin
+  //     $display("PASS: %s passed: got %0d (0x%h)", message, actual, actual);
+  //   end
+  // endtask
+
+  // task assert_read_reg(input logic [BlockAw-1:0] addr, input logic [31:0] expected);
+  //   begin
+  //     regbus_slave.addr = {{(WORD_WIDTH-BlockAw){1'b0}}, addr};
+  //     regbus_slave.wdata = 32'h0; // No write data for read operation
+  //     regbus_slave.wstrb = 4'b0000; // No write strobe for read operation
+  //     regbus_slave.write = 0; // Read operation
+  //     regbus_slave.valid = 1; // Indicate valid request
+  //     #10;
+  //     while (!regbus_slave.ready) begin
+  //       #1; // Wait for the register interface to be ready
+  //     end
+  //     data_out = regbus_slave.rdata; // Read data from the register interface
+  //     regbus_slave.valid = 0; // Clear valid signal
+  //     #10;
+
+  //     if (data_out !== expected) begin
+  //       $error("ERROR: Bus rdata - 0x%h: expected 0x%0h, got 0x%0h", regbus_slave.addr, expected, data_out);
+  //     end else begin
+  //       $display("PASS: Bus rdata - 0x%h: passed: got %0d (0x%h)", regbus_slave.addr, data_out, data_out);
+  //     end
+  //   end
+  // endtask
 
 endmodule

@@ -1,0 +1,41 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_x_obi_mem:1.0.0
+description: OBI Manager to request pixels from memory for HSpecID-x accelerator
+
+filesets:
+  rtl:
+    files:
+      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_x_obi_mem/rtl/hsid_x_obi_inf_pkg.sv
+      - hw/src/hsid_x_obi_mem/rtl/hsid_x_obi_mem.sv
+    file_type: systemVerilogSource
+
+  tb:
+    files:
+      - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
+      - hw/src/hsid_x_obi_mem/tb/test_obi_mem.sv
+      - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_tb.sv
+    file_type: systemVerilogSource
+
+  nexys_a7_100t:
+    files:
+      - xdc/Nexys-A7-100T.xdc
+
+targets:
+  default: &default
+    filesets:
+      - rtl
+    toplevel: hsid_x_obi_mem
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: hsid_x_obi_mem_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options:
+        #xsim_options:

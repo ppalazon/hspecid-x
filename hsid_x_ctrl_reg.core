@@ -6,6 +6,7 @@ filesets:
   rtl:
     files:
       - hw/src/hsid_pkg.sv
+      - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_reg_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_top.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg.sv

@@ -4,10 +4,11 @@
 /*
  *
  * Description: OBI package, contains common system definitions.
+ * This file has been copied from X-HEEP repository (hw/core-v-mini-mcu/include/obi_pkg.sv)
  *
  */
 
-package hsid_x_obi_pkg;
+package hsid_x_obi_inf_pkg;
 
   typedef struct packed {
     logic        req;

@@ -11,7 +11,9 @@ module hsid_x_ctrl_reg #(
     input logic rst_n,
 
     // Register interface
-    REG_BUS.in  regbus_slave,
+    // REG_BUS.in  regbus_slave,
+    input hsid_x_reg_pkg::reg_req_t reg_req,  // Register interface request
+    output hsid_x_reg_pkg::reg_rsp_t reg_rsp,  // Register interface response
 
     // HSpecID-X register for block interface for handshake
     output logic start,
@@ -42,12 +44,16 @@ module hsid_x_ctrl_reg #(
 
   //
 
-  hsid_x_ctrl_reg_top_intf hsid_x_ctrl_reg_top_inst (
+  hsid_x_ctrl_reg_top #(
+    .reg_req_t(hsid_x_reg_pkg::reg_req_t),
+    .reg_rsp_t(hsid_x_reg_pkg::reg_rsp_t)
+  ) hsid_x_ctrl_reg_top (
     .clk_i(clk),
     .rst_ni(rst_n),
 
     // Register interface (Request and response)
-    .regbus_slave(regbus_slave),
+    .reg_req_i(reg_req),
+    .reg_rsp_o(reg_rsp),
 
     // Register to HW interface
     .reg2hw(reg2hw),
@@ -57,6 +63,24 @@ module hsid_x_ctrl_reg #(
 
     .devmode_i(1'b0)  // Device mode, not used in this module
   );
+
+
+  // Using interface
+  // hsid_x_ctrl_reg_top_intf hsid_x_ctrl_reg_top_inst (
+  //   .clk_i(clk),
+  //   .rst_ni(rst_n),
+
+  //   // Register interface (Request and response)
+  //   .regbus_slave(regbus_slave),
+
+  //   // Register to HW interface
+  //   .reg2hw(reg2hw),
+
+  //   // HW to register interface
+  //   .hw2reg(hw2reg),
+
+  //   .devmode_i(1'b0)  // Device mode, not used in this module
+  // );
 
   // Register to HW interface (Output)
   assign start = reg2hw.status.start.q;

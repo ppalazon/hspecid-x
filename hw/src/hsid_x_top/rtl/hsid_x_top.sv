@@ -18,8 +18,8 @@ module hsid_x_top #(
     output hsid_x_ri_pkg::reg_rsp_t reg_rsp_o,
 
     // OBI interface (Master)
-    input hsid_x_obi_pkg::obi_resp_t obi_rsp_i,
-    output hsid_x_obi_pkg::obi_req_t obi_req_o,
+    input hsid_x_obi_inf_pkg::obi_resp_t obi_rsp_i,
+    output hsid_x_obi_inf_pkg::obi_req_t obi_req_o,
 
     // Interrupt interface
     output logic hsid_x_int_o
