@@ -2,8 +2,8 @@
 
 module hsid_x_ctrl_reg #(
     parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter HSI_BANDS = 128,  // Number of HSI bands
-    parameter HSI_LIBRARY_SIZE = 256,  // Size of the HSI library
+    parameter HSI_BANDS = 254,  // Number of HSI bands
+    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
     localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)
   ) (

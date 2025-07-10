@@ -70,7 +70,7 @@
       "desc": "Amount of reference pixels in memory to compare with captured pixel",
       "fields": [
         {
-          "bits": "11:0", # Check whether there are parameters
+          "bits": "11:0", # Max size is 4095 (11 bits)
           "name": "LIBRARY_SIZE",
           "desc": "Amount of reference pixels in memory to compare with captured pixel."
         }
@@ -84,7 +84,7 @@
       "desc": "Number of bands in each pixel",
       "fields": [
         {
-          "bits": "7:0", # Check whether there are parameters
+          "bits": "7:0", # Max bands is 255 (8 bits)
           "name": "PIXEL_BANDS",
           "desc": "Number of bands in each pixel."
         }

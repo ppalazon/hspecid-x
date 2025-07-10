@@ -70,7 +70,7 @@ module hsid_mse_comp_tb;
     // First value: medium
     mse_in_valid = 1;
     mse_in = 32'h0000FFFF;  // Input MSE value
-    mse_in_ref = 8'h1;
+    mse_in_ref = 12'h1;
     #10;
     mse_in_valid = 0;  // Disable input MSE valid signal
 
@@ -83,7 +83,7 @@ module hsid_mse_comp_tb;
     // Second value: bigger
     mse_in_valid = 1;
     mse_in = 32'h000FFFFF;  // Input MSE value
-    mse_in_ref = 8'h2;
+    mse_in_ref = 12'h2;
     #10;
     mse_in_valid = 0;  // Disable input MSE valid signal
 
@@ -96,7 +96,7 @@ module hsid_mse_comp_tb;
     // Second value: smaller
     mse_in_valid = 1;
     mse_in = 32'h00000FFF;  // Input MSE value
-    mse_in_ref = 8'h3;
+    mse_in_ref = 12'h3;
     #10;
     mse_in_valid = 0;  // Disable input MSE valid signal
 
@@ -111,6 +111,13 @@ module hsid_mse_comp_tb;
     #10;
     clear = 0;
     #10;
+
+    assert (mse_out_valid == 0) else $error("Output MSE valid signal should be low after clear");
+    assert (mse_min_value == 32'hFFFFFFFF) else $error("Output MSE min value should be reset to max value");
+    assert (mse_max_value == 32'h0) else $error("Output MSE max value should be reset to min value");
+    assert (mse_min_ref == 0) else $error("Output MSE min reference should be reset to 0");
+    assert (mse_max_ref == 0) else $error("Output MSE max reference should be reset to 0");
+    assert (mse_min_changed == 0) else $error("Output MSE min changed flag should be reset to 0");
 
     for (int i = 0; i < 50; i++) begin
       mse_in_valid = $urandom % 2;

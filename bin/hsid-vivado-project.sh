@@ -12,7 +12,7 @@ fi
 
 # Get absolute path to the module directory
 VIVADO_DIR=./vivado
-TCL_DIR=./tcl/vivado-project
+TCL_DIR=./hw/tcl/vivado-project
 
 # Set vivado environment variables
 source $VIVADO_SETTINGS

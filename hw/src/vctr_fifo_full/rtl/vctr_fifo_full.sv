@@ -96,6 +96,7 @@ module vctr_fifo_full #(
   ) vctr_in_1 (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en('0),
     .wr_en(data_in_en && current_state == READING),
     .rd_en(current_state == OPERATION),
     .data_in(data_in),
@@ -103,7 +104,8 @@ module vctr_fifo_full #(
     .data_out(vctr_in_1_data),
     .full(vctr_in_1_full),
     .almost_full(),
-    .empty(vctr_in_1_empty)
+    .empty(vctr_in_1_empty),
+    .clear('0)
   );
 
   hsid_fifo #(
@@ -112,6 +114,7 @@ module vctr_fifo_full #(
   ) vctr_in_2 (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en('0),
     .wr_en(data_in_en && vctr_in_1_full && current_state == READING),
     .rd_en(current_state == OPERATION),
     .data_in(data_in),
@@ -119,7 +122,8 @@ module vctr_fifo_full #(
     .data_out(vctr_in_2_data),
     .full(vctr_in_2_full),
     .almost_full(),
-    .empty(vctr_in_2_empty)
+    .empty(vctr_in_2_empty),
+    .clear('0)
   );
 
   hsid_fifo #(
@@ -128,6 +132,7 @@ module vctr_fifo_full #(
   ) vctr_out (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en('0),
     .wr_en(vctr_out_en),
     .rd_en(current_state == DONE && data_out_en),  // Read enable signal for output FIFO
     .data_in(vctr_out_data),
@@ -135,7 +140,8 @@ module vctr_fifo_full #(
     .data_out(data_out),
     .full(vctr_out_full),
     .almost_full(),
-    .empty(vctr_out_empty)
+    .empty(vctr_out_empty),
+    .clear('0)
   );
 
 

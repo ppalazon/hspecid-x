@@ -5,8 +5,8 @@ module hsid_mse #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
     parameter DATA_WIDTH_MUL = 32,  // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = 48,  // Data width for accumulator, larger than WORD
-    parameter HSI_BANDS = 256,  // Number of HSI bands
-    parameter HSI_LIBRARY_SIZE = 4096,  // Size of the HSI library
+    parameter HSI_BANDS = 255,  // Number of HSI bands
+    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
     localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI library size
   ) (
@@ -19,7 +19,7 @@ module hsid_mse #(
     input logic [WORD_WIDTH-1:0] element_a, // Input sample word data
     input logic [WORD_WIDTH-1:0] element_b, // Input sample word data
     input logic element_valid,  // Enable input sample data
-    input logic [HSI_BANDS_ADDR:0] hsi_bands,  // HSI bands to process
+    input logic [HSI_BANDS_ADDR-1:0] hsi_bands,  // HSI bands to process
 
     output logic [WORD_WIDTH-1:0] mse_value,  // Output mean square error
     output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref,  // Reference vector for sum

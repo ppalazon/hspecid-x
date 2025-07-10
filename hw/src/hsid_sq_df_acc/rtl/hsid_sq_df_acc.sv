@@ -6,7 +6,7 @@ module hsid_sq_df_acc #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
     parameter DATA_WIDTH_MUL = 32, // Data width for multiplication, larger than DATA_WIDTH
     parameter DATA_WIDTH_ACC = 48, // Data width for accumulator, larger than DATA_WIDTH
-    parameter HSI_LIBRARY_SIZE = 256, // Size of the HSI library
+    parameter HSI_LIBRARY_SIZE = 4095, // Size of the HSI library
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE) // Address width for HSI library size
   ) (
     input logic clk,

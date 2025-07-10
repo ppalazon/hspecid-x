@@ -49,9 +49,9 @@ targets:
         compilation_mode: common
         #xelab_options:
         #xsim_options:
-    parameters:
-      - HSI_BANDS=32
-      - HSI_LIBRARY_SIZE=256
+    # parameters:
+    # - HSI_BANDS=10
+    # - HSI_LIBRARY_SIZE=255
 
   # synth:
   #   <<: *default

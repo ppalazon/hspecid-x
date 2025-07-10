@@ -16,12 +16,16 @@ module hsid_main_tb #(
   localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS);  // Address width for HSI bands
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
+  localparam TEST_BANDS = HSID_TEST_BANDS; // Number of HSI bands to test
+  localparam TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE; // Size of the HSI library to test
+  localparam TEST_ELEMENTS = TEST_BANDS / 2; // Number of elements in the vector for testbench
+
   reg clk;
   reg rst_n;
   reg hsi_vctr_in_valid;
   reg [WORD_WIDTH-1:0] hsi_vctr_in;
-  reg [HSI_LIBRARY_SIZE_ADDR:0] library_size_in;
-  reg [HSI_BANDS_ADDR:0] hsi_bands_in;  // HSI bands to process
+  reg [HSI_LIBRARY_SIZE_ADDR-1:0] library_size_in;
+  reg [HSI_BANDS_ADDR-1:0] hsi_bands_in;  // HSI bands to process
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref;
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;
   wire [WORD_WIDTH-1:0] mse_min_value;
@@ -64,22 +68,22 @@ module hsid_main_tb #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),  // Data width for multiplication, larger than DATA_WIDTH
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),  // Data width for accumulator, larger than DATA_WIDTH
-    .HSI_BANDS(HSI_BANDS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .TEST_BANDS(TEST_BANDS),
+    .TEST_LIBRARY_SIZE(TEST_LIBRARY_SIZE)
   ) hsid_gen = new();
 
   // Test vectors
-  logic signed [DATA_WIDTH-1:0] measure [HSI_BANDS];
-  logic signed [DATA_WIDTH-1:0] lib [HSI_LIBRARY_SIZE][HSI_BANDS];
-  logic [WORD_WIDTH-1:0] acc_in [HSI_LIBRARY_SIZE][HSI_BANDS];
-  logic [WORD_WIDTH-1:0] expected_mse [HSI_LIBRARY_SIZE];
+  logic signed [DATA_WIDTH-1:0] captured [TEST_BANDS];
+  logic signed [DATA_WIDTH-1:0] lib [TEST_LIBRARY_SIZE][TEST_BANDS];
+  logic [WORD_WIDTH-1:0] acc_in [TEST_LIBRARY_SIZE][TEST_BANDS];
+  logic [WORD_WIDTH-1:0] expected_mse [TEST_LIBRARY_SIZE];
 
   logic [WORD_WIDTH-1:0] min_mse_value_expected;
   logic [WORD_WIDTH-1:0] max_mse_value_expected;
   logic [HSI_LIBRARY_SIZE_ADDR-1:0] min_mse_ref_expected;
   logic [HSI_LIBRARY_SIZE_ADDR-1:0] max_mse_ref_expected;
 
-  logic [WORD_WIDTH-1:0] fusion_vctr [ELEMENTS];
+  logic [WORD_WIDTH-1:0] fusion_vctr [TEST_ELEMENTS];
 
   // Waveform generation for debugging
   initial begin
@@ -95,24 +99,24 @@ module hsid_main_tb #(
     library_size_in = 0;
     start = 0;
     clear = 0;
-    hsi_bands_in = HSI_BANDS;  // Set HSI bands to maximum
-    library_size_in = 10;  // Set library size to maximum
+    hsi_bands_in = TEST_BANDS;  // Set HSI bands to maximum
+    library_size_in = TEST_LIBRARY_SIZE;  // Set library size to maximum
 
     // Generate a random vector as a measure
     if (hsid_gen.randomize()) begin : randomize_measure
-      measure = hsid_gen.measure;
+      captured = hsid_gen.measure;
     end
 
-    $display("Measure vector:   %p", measure);
+    $display("Captured vector: %p", captured[0:TEST_BANDS-1]);
 
     // Generate random library vectors
-    for (int i = 0; i < library_size_in; i++) begin : generate_library
+    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin : generate_library
       if (hsid_gen.randomize()) begin
         lib[i] = hsid_gen.measure;
-        hsid_gen.mse(measure, lib[i], expected_mse[i]);
-        hsid_gen.acc_all(measure, lib[i], acc_in[i]);
-        $display("Library vector %0d: %p, MSE: %d", i, lib[i], expected_mse[i]);
-        $display("Accumulated %0d:    %p,", i, acc_in[i]);
+        hsid_gen.mse(captured, lib[i], expected_mse[i]);
+        hsid_gen.acc_all(captured, lib[i], acc_in[i]);
+        $display("Library vector %0d: %p, MSE: %d", i, lib[i][0:TEST_BANDS-1], expected_mse[i]);
+        $display("Accumulated %0d:    %p,", i, acc_in[i][0:TEST_BANDS-1]);
       end
     end
 
@@ -125,7 +129,7 @@ module hsid_main_tb #(
     $display("Expected max MSE: %0d, ref: %0d", max_mse_value_expected, max_mse_ref_expected);
 
     // Reset the DUT
-    #5 rst_n = 0;
+    #3 rst_n = 0;
     #5 rst_n = 1;  // Release reset
 
     // Start the DUT
@@ -144,8 +148,8 @@ module hsid_main_tb #(
     assert (ready == 1) else $fatal(0, "DUT is not ready after starting");
 
     // Send the measure vector
-    hsid_gen.fusion_vctr(measure, fusion_vctr);
-    for (int i = 0; i < ELEMENTS; i++) begin
+    hsid_gen.fusion_vctr(captured, fusion_vctr);
+    for (int i = 0; i < TEST_ELEMENTS; i++) begin
       hsi_vctr_in = fusion_vctr[i];
       hsi_vctr_in_valid = 1;
       #10;
@@ -159,13 +163,13 @@ module hsid_main_tb #(
     $display("Sending library vectors...");
 
     // Send the library vectors
-    for (int i = 0; i < library_size_in; i++) begin
+    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
       hsid_gen.fusion_vctr(lib[i], fusion_vctr);
-      for (int j = 0; j < ELEMENTS; j++) begin
+      for (int j = 0; j < TEST_ELEMENTS; j++) begin
         hsi_vctr_in = fusion_vctr[j];
         hsi_vctr_in_valid = 1;
         #10;
-        if (!(i == library_size_in - 1 && j == ELEMENTS - 1)) begin
+        if (!(i == TEST_LIBRARY_SIZE - 1 && j == TEST_ELEMENTS - 1)) begin
           assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
         end
       end
@@ -190,6 +194,10 @@ module hsid_main_tb #(
     #20;
 
     $finish;
+  end
+
+  initial begin
+    #1000; $finish;  // Timeout to prevent infinite simulation
   end
 
   always

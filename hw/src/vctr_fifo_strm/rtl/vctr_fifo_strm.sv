@@ -103,6 +103,7 @@ module vctr_fifo_strm #(
   ) vctr_in_1 (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en('0),
     .wr_en(current_state == COMPUTE && data_in_v1_en && !vctr_out_almost_full),
     .rd_en(current_state == COMPUTE && !vctr_in_1_empty && !vctr_in_2_empty),
     .data_in(data_in_v1),
@@ -110,7 +111,8 @@ module vctr_fifo_strm #(
     .data_out(read_v1_data),
     .full(data_in_v1_full),
     .almost_full(),
-    .empty(vctr_in_1_empty)
+    .empty(vctr_in_1_empty),
+    .clear(1'b0)  // No clear signal in this FIFO
   );
 
   hsid_fifo #(
@@ -119,6 +121,7 @@ module vctr_fifo_strm #(
   ) vctr_in_2 (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en('0),
     .wr_en(current_state == COMPUTE && data_in_v2_en && !vctr_out_almost_full),
     .rd_en(current_state == COMPUTE && !vctr_in_1_empty && !vctr_in_2_empty),
     .data_in(data_in_v2),
@@ -126,7 +129,8 @@ module vctr_fifo_strm #(
     .data_out(read_v2_data),
     .full(data_in_v2_full),
     .almost_full(),
-    .empty(vctr_in_2_empty)
+    .empty(vctr_in_2_empty),
+    .clear('0)
   );
 
   hsid_fifo #(
@@ -135,6 +139,7 @@ module vctr_fifo_strm #(
   ) vctr_out (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en('0),
     .wr_en(vctr_out_en),
     .rd_en(current_state != IDLE && data_out_en),
     .data_in(vctr_out_data),
@@ -142,7 +147,8 @@ module vctr_fifo_strm #(
     .data_out(data_out),
     .full(vctr_out_full),
     .almost_full(vctr_out_almost_full),
-    .empty(data_out_empty)
+    .empty(data_out_empty),
+    .clear('0)
   );
 
 

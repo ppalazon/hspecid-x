@@ -5,7 +5,7 @@ import hsid_pkg::*;
 module hsid_fifo_tb;
 
   // Parameters
-  localparam DATA_WIDTH = 8;
+  localparam DATA_WIDTH = 32;
   localparam FIFO_DEPTH = 16;
   localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH); // Address width for FIFO depth
   localparam FIFO_ALMOST_FULL_THRESHOLD = 10; // Optional threshold for almost full
@@ -15,12 +15,14 @@ module hsid_fifo_tb;
   reg rst_n;
   reg wr_en;
   reg rd_en;
-  reg [DATA_WIDTH-1:0] write_data;
-  reg [FIFO_ADDR_WIDTH:0] almost_full_threshold = FIFO_ALMOST_FULL_THRESHOLD; // Element to process
-  wire [DATA_WIDTH-1:0] read_data;
+  reg loop_en = 0;
+  reg [DATA_WIDTH-1:0] fifo_data_in;
+  reg [FIFO_ADDR_WIDTH-1:0] almost_full_threshold = FIFO_ALMOST_FULL_THRESHOLD; // Element to process
+  wire [DATA_WIDTH-1:0] fifo_data_out;
   wire full;
   wire almost_full;
   wire empty;
+  reg clear;
 
   // Instantiate the FIFO module
   hsid_fifo #(
@@ -29,15 +31,19 @@ module hsid_fifo_tb;
   ) uut (
     .clk(clk),
     .rst_n(rst_n),
+    .loop_en(loop_en),
     .wr_en(wr_en),
     .rd_en(rd_en),
-    .data_in(write_data),
+    .data_in(fifo_data_in),
     .almost_full_threshold(almost_full_threshold),
-    .data_out(read_data),
+    .data_out(fifo_data_out),
     .full(full),
     .almost_full(almost_full),
-    .empty(empty)
+    .empty(empty),
+    .clear(clear)
   );
+
+  logic [DATA_WIDTH-1:0] random_values [0:FIFO_DEPTH-1];
 
   // Clock generation
   always #5 clk = ~clk;
@@ -50,12 +56,18 @@ module hsid_fifo_tb;
 
   // Testbench logic
   initial begin
+    foreach (random_values[i]) begin
+      random_values[i] = $urandom(); // Generate random values between 0 and 255
+    end
+
     // Initialize signals
     clk = 1;
     rst_n = 1;
     wr_en = 0;
     rd_en = 0;
-    write_data = 0;
+    fifo_data_in = 0;
+    clear = 0;
+    loop_en = 0;
 
     // Reset the FIFO
     #10 rst_n = 0;
@@ -64,17 +76,17 @@ module hsid_fifo_tb;
     // Test case 0: Write and read
     $display("Test case 0: Write and read");
     wr_en = 1;
-    write_data = 8'hA;
+    fifo_data_in = 32'hA;
     #10;
     wr_en = 0;
     rd_en = 1;
     #10;
-    if (read_data !== 8'ha)
-      $error("Error reading value %h", read_data);
+    if (fifo_data_out !== 32'ha)
+      $error("Error reading value %h", fifo_data_out);
     // else $display("Reading value: %h", read_data);
 
     // Reset values
-    write_data = 0;
+    fifo_data_in = 0;
     wr_en = 0;
     rd_en = 0;
 
@@ -87,7 +99,7 @@ module hsid_fifo_tb;
       end else begin
         if (empty) $error("Error: FIFO should not be empty but it is.");
       end
-      write_data = i[DATA_WIDTH-1:0]; // Truncate to DATA_WIDTH bits
+      fifo_data_in = i[DATA_WIDTH-1:0]; // Truncate to DATA_WIDTH bits
       wr_en = 1;
       #10;
       if(i >= (FIFO_ALMOST_FULL_THRESHOLD - 1)) begin // at this point, counter is equal to (i - 1)
@@ -101,7 +113,7 @@ module hsid_fifo_tb;
     // Test case 2: Write on full
     $display("Test Case 2: Write on full");
     wr_en = 1;
-    write_data = 20;
+    fifo_data_in = 20;
     #10;
     wr_en = 0;
 
@@ -123,8 +135,8 @@ module hsid_fifo_tb;
       end else begin
         if (!almost_full) $error("FIFO is not almost full as expected");
       end
-      if (read_data !== i[DATA_WIDTH-1:0]) begin
-        $error("Error: Read data does not match expected data!. Read data: %d , expected: %d", read_data, i[DATA_WIDTH-1:0]);
+      if (fifo_data_out !== i[DATA_WIDTH-1:0]) begin
+        $error("Error: Read data does not match expected data!. Read data: %d , expected: %d", fifo_data_out, i[DATA_WIDTH-1:0]);
       end
     end
     if (!empty) $error("Error setting empty after reading all values");
@@ -137,8 +149,8 @@ module hsid_fifo_tb;
     if (!empty) begin
       $error("Error: FIFO should be empty but it is not.");
     end
-    if (read_data !== FIFO_DEPTH-1) begin
-      $error("Error: Read data should be %d but it is %d", FIFO_DEPTH-1, read_data);
+    if (fifo_data_out !== FIFO_DEPTH-1) begin
+      $error("Error: Read data should be %d but it is %d", FIFO_DEPTH-1, fifo_data_out);
     end
     rd_en = 0;
 
@@ -148,16 +160,42 @@ module hsid_fifo_tb;
     rd_en = 1;
     // TODO: Possibility of write-through FIFO??
     // Write and read 5 values at the same time, it would be a delay of one clock cycle
-    write_data = 8'h10; // Last read values is 8'h0F, so we start writing from 8'h10
+    fifo_data_in = 32'h10; // Last read values is 8'h0F, so we start writing from 8'h10
     for (int i=0; i<5; i++) begin
       #10;
-      if (read_data !== write_data-1) begin // 15/16, 16/17, 17/18, 18/19, 19/20
-        $error("Error: Read data does not match written data. Read data: %d, Written data: %d", read_data, write_data);
+      if (fifo_data_out !== fifo_data_in-1) begin // 15/16, 16/17, 17/18, 18/19, 19/20
+        $error("Error: Read data does not match written data. Read data: %d, Written data: %d", fifo_data_out, fifo_data_in);
       end
-      write_data = write_data + 1;
+      fifo_data_in = fifo_data_in + 1;
     end
     wr_en = 0;
     rd_en = 0;
+
+    // Test case 7: Clean FIFO
+    $display("Test Case 6: Clean FIFO");
+    clear = 1; // Clear FIFO before starting the loop
+    #10;
+    clear = 0; // Clear signal is deasserted
+    assert(fifo_data_out === 0) else begin
+      $error("Error: FIFO should be cleared but it is not.");
+    end
+
+    $display("Test Case 7: Create a loop in FIFO");
+    for(int i=0; i<5; i++) begin // Write the fifo with 5 values
+      fifo_data_in = i;
+      wr_en = 1;
+      #10;
+    end
+
+    for(int i=0; i<50; i++) begin // Read the fifo with 5 values
+      wr_en = $random % 2;
+      rd_en = $random % 2;
+      loop_en = 1; // Enable loop
+      #10;
+      assert (fifo_data_out === (i % 5)) else begin
+        $error("Error: Read data does not match written data. Read data: %d, Written data: %d", fifo_data_out, i % 5);
+      end
+    end
 
     // End simulation
     $display("Testbench completed");

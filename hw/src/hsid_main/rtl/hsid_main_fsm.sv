@@ -3,22 +3,23 @@
 import hsid_pkg::*;  // Import the package for HSI MSE
 
 module hsid_main_fsm #(
-    parameter HSI_BANDS = 128,  // Number of HSI bands
+    parameter HSI_BANDS = 254,  // Number of HSI bands
     parameter ELEMENTS = HSI_BANDS / 2,  // Number of elements in the vector
     parameter ELEMENTS_ADDR = $clog2(ELEMENTS),  // Address width for HSI bands
-    parameter HSI_LIBRARY_SIZE = 256,  // Size of the HSI library
+    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
     parameter HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Number of bits to represent vector length
   ) (
     input logic clk,
     input logic rst_n,
 
     // Library size input
-    input logic [HSI_LIBRARY_SIZE_ADDR:0] hsi_library_size,  // Length of the vectors
-    input logic [ELEMENTS_ADDR:0] element_threshold,  // HSI bands to process
+    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] hsi_library_size,  // Length of the vectors
+    input logic [ELEMENTS_ADDR-1:0] element_threshold,  // HSI bands to process
 
     // Fifo status signals
     input logic fifo_measure_complete,  // Full signal for measure vector FIFO
     input logic fifo_measure_empty,  // Empty signal for measure vector FIFO
+    output logic fifo_measure_loop,  // Loop signal for measure vector FIFO
     input logic fifo_ref_empty,  // Empty signal for output data FIFO
     input logic fifo_ref_full,  // Full signal for output data FIFO
 
@@ -43,7 +44,7 @@ module hsid_main_fsm #(
   );
 
   // Assigns statements
-  logic [ELEMENTS_ADDR-1:0] element_count;
+  logic [ELEMENTS_ADDR:0] element_count;
   assign fifo_both_read_en = (state == COMPUTE_MSE && !fifo_ref_empty && !fifo_measure_empty);
   // assign element_last = (element_count == ELEMENTS - 1);
   // assign element_start = (element_count == 0); // && fifo_both_read_en
@@ -63,13 +64,15 @@ module hsid_main_fsm #(
       element_start <= 0;  // Reset start signal
       element_last <= 0;  // Reset last signal
       element_valid <= 0;  // Reset valid signal
+      fifo_measure_loop <= 0;  // Reset measure loop signal
     end else begin
       current_state <= next_state;  // Transition to next state
       element_start <= (element_count == 0 && fifo_both_read_en);
-      element_last <= (element_count == ELEMENTS - 1);
+      element_last <= (element_count == element_threshold - 1);
       element_valid <= fifo_both_read_en;
       if (fifo_both_read_en) begin
-        if (element_count == element_threshold) begin
+        fifo_measure_loop <= 1'b1;
+        if (element_count == element_threshold - 1) begin
           element_count <= 0;  // Reset element count when threshold is reached
         end else begin
           element_count <= element_count + 1;
@@ -77,6 +80,8 @@ module hsid_main_fsm #(
         if (element_last) begin
           vctr_count <= vctr_count + 1;
         end
+      end else begin
+        fifo_measure_loop <= 1'b0;
       end
     end
   end

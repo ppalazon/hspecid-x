@@ -2,7 +2,7 @@
 
 module hsid_mse_comp #(
     parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter HSI_LIBRARY_SIZE = 256,
+    parameter HSI_LIBRARY_SIZE = 4095,
     parameter HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Number of bits for HSI library size
   ) (
     input logic clk,

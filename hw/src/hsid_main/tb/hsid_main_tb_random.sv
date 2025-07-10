@@ -7,15 +7,15 @@ class HsidMainGen #(
     parameter int DATA_WIDTH = HSID_DATA_WIDTH, // 16 bits (only 14 bits used)
     parameter int DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
     parameter int DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than DATA_WIDTH
-    parameter int HSI_BANDS = HSID_MAX_HSP_BANDS, // Number of HSI bands
-    parameter int HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY // Size of the HSI library
+    parameter int TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands
+    parameter int TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE // Size of the HSI library
   );
 
-  localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
+  localparam TEST_LIBRARY_SIZE_ADDR = $clog2(TEST_LIBRARY_SIZE);
   localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
-  localparam ELEMENTS = HSI_BANDS / DATA_PER_WORD; // Number of elements in the vector
+  localparam TEST_ELEMENTS = TEST_BANDS / DATA_PER_WORD; // Number of elements in the vector
 
-  rand logic signed [DATA_WIDTH-1:0] measure [HSI_BANDS];
+  rand logic signed [DATA_WIDTH-1:0] measure [TEST_BANDS];
 
   // Generate random vectors
   constraint c_vctrs {
@@ -24,39 +24,39 @@ class HsidMainGen #(
   }
 
   function automatic void fusion_vctr(
-      input logic signed [DATA_WIDTH-1:0] vctr [HSI_BANDS],
-      output logic [WORD_WIDTH-1:0] fusion_vctr [ELEMENTS]
+      input logic signed [DATA_WIDTH-1:0] vctr [TEST_BANDS],
+      output logic [WORD_WIDTH-1:0] fusion_vctr [TEST_ELEMENTS]
     );
-    for (int i = 0; i < HSI_BANDS; i+=2) begin
+    for (int i = 0; i < TEST_BANDS; i+=2) begin
       fusion_vctr[i/2] = {vctr[i], vctr[i+1]};
     end
   endfunction
 
   function automatic void mse(
-      input logic signed [DATA_WIDTH-1:0] vctr1 [HSI_BANDS],
-      input logic signed [DATA_WIDTH-1:0] vctr2 [HSI_BANDS],
+      input logic signed [DATA_WIDTH-1:0] vctr1 [TEST_BANDS],
+      input logic signed [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
       output logic [WORD_WIDTH-1:0]   mse
     );
     logic signed [DATA_WIDTH:0] diff; // Difference between elements
     logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result
     logic [DATA_WIDTH_ACC-1:0] acc_aux = 0; // Accumulator for the output
-    for (int i = 0; i < HSI_BANDS; i++) begin
+    for (int i = 0; i < TEST_BANDS; i++) begin
       diff = vctr1[i] - vctr2[i]; // Compute difference
       mult = diff * diff; // Compute squared difference
       acc_aux += mult; // Accumulate the result
     end
-    mse = acc_aux  >> $clog2(HSI_BANDS); // Compute mean square error
+    mse = acc_aux  >> $clog2(TEST_BANDS); // Compute mean square error
   endfunction
 
   function automatic void acc_all(
-      input logic signed [DATA_WIDTH-1:0] vctr1 [HSI_BANDS],
-      input logic signed [DATA_WIDTH-1:0] vctr2 [HSI_BANDS],
-      output logic [WORD_WIDTH-1:0] acc_int [HSI_BANDS]
+      input logic signed [DATA_WIDTH-1:0] vctr1 [TEST_BANDS],
+      input logic signed [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
+      output logic [WORD_WIDTH-1:0] acc_int [TEST_BANDS]
     );
     logic signed [DATA_WIDTH:0] diff; // Difference between elements
     logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result
     logic [DATA_WIDTH_ACC-1:0] acc_aux = 0; // Accumulator for the output
-    for (int i = 0; i < HSI_BANDS; i++) begin
+    for (int i = 0; i < TEST_BANDS; i++) begin
       diff = vctr1[i] - vctr2[i]; // Compute difference
       mult = diff * diff; // Compute squared difference
       acc_aux += mult; // Accumulate the result
@@ -65,15 +65,15 @@ class HsidMainGen #(
   endfunction
 
   function automatic void min_max_mse(
-      logic [WORD_WIDTH-1:0] expected_mse [HSI_LIBRARY_SIZE],
+      logic [WORD_WIDTH-1:0] expected_mse [TEST_LIBRARY_SIZE],
       output logic [WORD_WIDTH-1:0] min_mse_value,
       output logic [WORD_WIDTH-1:0] max_mse_value,
-      output logic [HSI_LIBRARY_SIZE_ADDR-1:0] min_mse_ref,
-      output logic [HSI_LIBRARY_SIZE_ADDR-1:0] max_mse_ref
+      output logic [TEST_LIBRARY_SIZE_ADDR-1:0] min_mse_ref,
+      output logic [TEST_LIBRARY_SIZE_ADDR-1:0] max_mse_ref
     );
     logic [WORD_WIDTH-1:0] aux_min_mse_value = (1 << WORD_WIDTH) - 1; // Initialize to max value
     logic [WORD_WIDTH-1:0] aux_max_mse_value = '0; // Initialize to min value
-    for (int i = 0; i < HSI_LIBRARY_SIZE; i++) begin
+    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
       if (expected_mse[i] <= aux_min_mse_value) begin
         aux_min_mse_value = expected_mse[i];
         min_mse_ref = i; // Update reference for minimum MSE
