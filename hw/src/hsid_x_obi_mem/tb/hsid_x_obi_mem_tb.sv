@@ -5,9 +5,10 @@
 
 module hsid_x_obi_mem_tb #(
     parameter TESTS = 30, // Number of tests to run
-    parameter RANDOM_GNT = 1 // If set to 1, test_obi_mem will return random grant signals
+    parameter RANDOM_GNT = 1 // If set to 1, pixel_obi_mem will return random grant signals
   ) ();
 
+  localparam DATA_WIDTH = 16; // Data width for the pixel memory
   localparam WORD_WIDTH = 32;
   // localparam VALUE_MASK = 32'h00003FFF; // Mask to return least significant 14 bits of the address
   localparam VALUE_MASK = 32'h0000FFFF;
@@ -46,11 +47,12 @@ module hsid_x_obi_mem_tb #(
   );
 
   // Instantiate a memory OBI subordinate for testing
-  test_obi_mem #(
+  pixel_obi_mem #(
+    .DATA_WIDTH(DATA_WIDTH), // Data width for the pixel memory
     .RANDOM_GNT(RANDOM_GNT),  // Set to 0 for deterministic behavior
     .RANDOM_VALUE(0), // Set to 0 for deterministic behavior
     .VALUE_MASK(VALUE_MASK) // Mask to return least significant 14 bits of the address
-  ) test_obi_mem (
+  ) pixel_obi_mem (
     .clk(clk),
     .rst_n(rst_n),
     .obi_req(obi_req),
@@ -68,7 +70,7 @@ module hsid_x_obi_mem_tb #(
   int reads;
 
 
-// Waveform generation for debugging
+  // Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
     $dumpvars(0, hsid_x_obi_mem_tb);
@@ -98,6 +100,8 @@ module hsid_x_obi_mem_tb #(
     perform_reads();
 
     #10; // Wait for a clock cycle
+
+    // Test
 
     $finish;
   end
@@ -129,7 +133,7 @@ module hsid_x_obi_mem_tb #(
       assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
       if (data_out_valid) begin
         read_addr = initial_addr + (reads * (WORD_WIDTH / 8));
-        if (data_out == (read_addr & VALUE_MASK)) begin
+        if (data_out == addr_value(read_addr)) begin
           $display("PASS: %d Data received: 0x%h at address 0x%h", reads, data_out, read_addr);
         end else begin
           $error("ERROR: %d Incorrect data 0x%h at address 0x%h", reads, data_out, read_addr);
@@ -143,5 +147,11 @@ module hsid_x_obi_mem_tb #(
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
   endtask
+
+  function logic [31:0] addr_value(logic [WORD_WIDTH-1:0] addr);
+    logic [DATA_WIDTH-1:0] masked_addr;
+    masked_addr = addr[DATA_WIDTH-1:0] & VALUE_MASK; // Mask to return least significant 14 bits of the address
+    return {masked_addr, masked_addr}; // Return least significant 14 bits of the address
+  endfunction
 
 endmodule

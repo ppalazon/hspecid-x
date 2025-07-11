@@ -1,0 +1,61 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_x_top:1.0.0
+description: HSpecID-X - A Hyperspectral Pixel Classifier Accelerator for X-HEEP Platforms
+
+filesets:
+  rtl:
+    files:
+      - hw/src/hsid_x_top/rtl/hsid_x_top.sv
+    file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
+      - ">=uclm:hspecidx:hsid_main:1.0.0"
+      - ">=uclm:hspecidx:hsid_x_ctrl_reg:1.0.0"
+      - ">=uclm:hspecidx:hsid_x_obi_mem:1.0.0"
+
+  tb:
+    files:
+      - hw/src/hsid_main/tb/hsid_main_tb_random.sv
+      - hw/src/hsid_x_ctrl_reg/tb/ctrl_reg_tb_tasks.sv
+      - hw/src/hsid_x_ctrl_reg/tb/reg_inf_debug.sv
+      - hw/src/hsid_x_obi_mem/tb/pixel_obi_mem.sv
+      - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
+      - hw/src/hsid_x_top/tb/hsid_x_top_tb.sv
+    file_type: systemVerilogSource
+
+  nexys_a7_100t:
+    files:
+      - xdc/Nexys-A7-100T.xdc
+
+targets:
+  default: &default
+    filesets:
+      - rtl
+    toplevel: hsid_x_top
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: hsid_x_top_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+        #xelab_options:
+        #xsim_options:
+    # parameters:
+    # - HSI_BANDS=10
+    # - HSI_LIBRARY_SIZE=255
+
+  # synth:
+  #   <<: *default
+  #   description: Synthesize hsid for Nexys A7-100T
+  #   default_tool: vivado
+  #   filesets_append:
+  #     - nexys_a7_100t
+  #   toplevel: hsid
+  #   tools:
+  #     vivado:
+  #       part: xc7a100tcsg324-1

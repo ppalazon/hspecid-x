@@ -5,11 +5,11 @@ description: Hyperspectral pixel identification for HSpecID-x accelerator
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
       - hw/src/hsid_main/rtl/hsid_main_fsm.sv
       - hw/src/hsid_main/rtl/hsid_main.sv
     file_type: systemVerilogSource
     depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
       - ">=uclm:hspecidx:hsid_fifo:1.0.0" # fifo.core
       - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
       - ">=uclm:hspecidx:hsid_mse:1.0.0" # mse.core

@@ -5,7 +5,7 @@ description: Testing vector sum using fulling FIFOs
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_pkg/rtl/hsid_pkg.sv
       - hw/src/vctr_fifo_full/rtl/vctr_fifo_full.sv
     file_type: systemVerilogSource
     depend:

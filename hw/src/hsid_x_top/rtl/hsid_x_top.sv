@@ -8,7 +8,7 @@ module hsid_x_top #(
     parameter HSI_BANDS = 254,  // Number of HSI bands
     parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
     parameter BUFFER_LENGTH = 4,  // Number of entries in the FIFO buffer
-    parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the
+    parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
     localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)
   ) (
@@ -27,7 +27,9 @@ module hsid_x_top #(
     output logic hsid_x_int_o
   );
 
-  typedef enum logic [1:0] {
+  localparam ELEMENTS_ADDR = $clog2(ELEMENTS);  // Address width
+
+  typedef enum logic [2:0] {
     IDLE, START_READ_CAPTURED, READ_CAPTURED, START_READ_LIBRARY, READ_LIBRARY
   } hsid_x_obi_read_t;
 
@@ -56,13 +58,22 @@ module hsid_x_top #(
   logic obi_start;
   wire obi_done;
 
+  // Elements bands
+  logic [ELEMENTS_ADDR-1:0] elements_bands;
+
+  // Assign Interrupt output
+  assign hsid_x_int_o = done;
+  assign elements_bands = (pixel_bands / 2);
+
   hsid_x_obi_read_t current_state = IDLE, next_state = START_READ_CAPTURED;
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-      hsid_x_int_o <= 1'b0;  // Reset interrupt output
+      current_state <= IDLE;
+      error <= 1'b0;  // Reset error flag
     end else begin
       current_state <= next_state;  // Update current state
+      error <= 1'b0;  // Reset error flag
     end
   end
 
@@ -76,7 +87,7 @@ module hsid_x_top #(
       end
       START_READ_CAPTURED: begin
         obi_initial_addr = captured_pixel_addr;
-        obi_limit_in = library_size;
+        obi_limit_in = { {(HSI_LIBRARY_SIZE_ADDR-ELEMENTS_ADDR){1'b0}}, elements_bands };
         obi_start = 1'b1;
         next_state = READ_CAPTURED;
       end
@@ -86,7 +97,7 @@ module hsid_x_top #(
       end
       START_READ_LIBRARY: begin
         obi_initial_addr = library_pixel_addr;
-        obi_limit_in = library_size * library_size;
+        obi_limit_in = elements_bands * library_size;
         obi_start = 1'b1;
         next_state = READ_LIBRARY;
       end
@@ -158,8 +169,7 @@ module hsid_x_top #(
     .HSI_BANDS       (HSI_BANDS),
     .BUFFER_LENGTH   (BUFFER_LENGTH),
     .ELEMENTS        (ELEMENTS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
-    .HSI_BANDS_ADDR  (HSI_BANDS_ADDR)
+    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
   )
   u_hsid_main (
     // Clear signal to reset MSE values

@@ -5,10 +5,10 @@ description: Mean Squared Error module for HSpecID-x accelerator
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
       - hw/src/hsid_mse/rtl/hsid_mse.sv
     file_type: systemVerilogSource
     depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
       - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
 
   tb:

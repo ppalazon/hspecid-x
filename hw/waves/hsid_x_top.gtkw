@@ -1,0 +1,88 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Fri Jul 11 16:19:33 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_x_top_1.0.0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Fri Jul 11 16:13:40 2025"
+[dumpfile_size] 97851
+[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_x_top.gtkw"
+[timestart] 140300
+[size] 2554 1366
+[pos] -1 -1
+*-14.839825 346900 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_x_top_tb.
+[treeopen] hsid_x_top_tb.dut.
+[sst_width] 317
+[signals_width] 354
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsid_x_top_tb.clk
+hsid_x_top_tb.hsid_x_int_o
+hsid_x_top_tb.rst_n
+@200
+-Register Interface
+@22
+hsid_x_top_tb.u_reg_inf_debug.addr[31:0]
+@28
+hsid_x_top_tb.u_reg_inf_debug.error
+@22
+hsid_x_top_tb.u_reg_inf_debug.rdata[31:0]
+@28
+hsid_x_top_tb.u_reg_inf_debug.ready
+hsid_x_top_tb.u_reg_inf_debug.valid
+@22
+hsid_x_top_tb.u_reg_inf_debug.wdata[31:0]
+@28
+hsid_x_top_tb.u_reg_inf_debug.write
+@22
+hsid_x_top_tb.u_reg_inf_debug.wstrb[3:0]
+@28
+hsid_x_top_tb.hsid_x_int_o
+@200
+-OBI Bus
+@22
+hsid_x_top_tb.u_obi_bus_debug.addr[31:0]
+hsid_x_top_tb.u_obi_bus_debug.be[3:0]
+@28
+hsid_x_top_tb.u_obi_bus_debug.gnt
+@22
+hsid_x_top_tb.u_obi_bus_debug.rdata[31:0]
+@28
+hsid_x_top_tb.u_obi_bus_debug.req
+hsid_x_top_tb.u_obi_bus_debug.rvalid
+@22
+hsid_x_top_tb.u_obi_bus_debug.wdata[31:0]
+@28
+hsid_x_top_tb.u_obi_bus_debug.we
+@200
+-DUT
+@28
+hsid_x_top_tb.dut.start
+hsid_x_top_tb.dut.idle
+hsid_x_top_tb.dut.error
+hsid_x_top_tb.dut.done
+hsid_x_top_tb.dut.clear
+hsid_x_top_tb.dut.current_state[2:0]
+hsid_x_top_tb.dut.obi_start
+hsid_x_top_tb.dut.obi_done
+@22
+hsid_x_top_tb.dut.obi_initial_addr[31:0]
+@24
+hsid_x_top_tb.dut.obi_limit_in[11:0]
+@200
+-HSI Main
+@29
+hsid_x_top_tb.dut.u_hsid_main.element_start
+@28
+hsid_x_top_tb.dut.u_hsid_main.element_last
+@24
+hsid_x_top_tb.dut.u_hsid_main.element_threshold[6:0]
+hsid_x_top_tb.dut.u_hsid_main.mse_out[31:0]
+@28
+hsid_x_top_tb.dut.u_hsid_main.mse_valid
+@22
+hsid_x_top_tb.dut.u_hsid_main.fifo_measure_data_out[31:0]
+hsid_x_top_tb.dut.u_hsid_main.fifo_ref_data_out[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

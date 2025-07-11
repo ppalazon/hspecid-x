@@ -1,19 +1,16 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Tue Jul  8 10:40:11 2025
+[*] Fri Jul 11 08:36:04 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_x_ctrl_reg_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Tue Jul  8 10:39:55 2025"
-[dumpfile_size] 27607
+[dumpfile_mtime] "Fri Jul 11 08:33:01 2025"
+[dumpfile_size] 38039
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_x_ctrl_reg.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-15.149754 245000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.111277 245000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_x_ctrl_reg_tb.
-[treeopen] hsid_x_ctrl_reg_tb.dut.
-[treeopen] hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.
-[treeopen] hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.
 [sst_width] 366
 [signals_width] 594
 [sst_expanded] 1
@@ -25,9 +22,7 @@ hsid_x_ctrl_reg_tb.rst_n
 hsid_x_ctrl_reg_tb.captured_pixel_addr[31:0]
 @28
 hsid_x_ctrl_reg_tb.clear
-@29
 hsid_x_ctrl_reg_tb.ready
-@28
 hsid_x_ctrl_reg_tb.done
 hsid_x_ctrl_reg_tb.error
 hsid_x_ctrl_reg_tb.idle
@@ -42,23 +37,20 @@ hsid_x_ctrl_reg_tb.data_in[31:0]
 hsid_x_ctrl_reg_tb.data_out[31:0]
 @200
 -RegBus
-@22
-hsid_x_ctrl_reg_tb.regbus_slave.addr[31:0]
 @28
-hsid_x_ctrl_reg_tb.regbus_slave.error
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.error
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.ready
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.valid
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.write
 @22
-hsid_x_ctrl_reg_tb.regbus_slave.rdata[31:0]
-@28
-hsid_x_ctrl_reg_tb.regbus_slave.ready
-hsid_x_ctrl_reg_tb.regbus_slave.valid
-@22
-hsid_x_ctrl_reg_tb.regbus_slave.wdata[31:0]
-@28
-hsid_x_ctrl_reg_tb.regbus_slave.write
-@22
-hsid_x_ctrl_reg_tb.regbus_slave.wstrb[3:0]
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.addr[31:0]
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.rdata[31:0]
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.wdata[31:0]
+hsid_x_ctrl_reg_tb.reg_inf_debug_inst.wstrb[3:0]
 @200
 -Registers
+@23
+hsid_x_ctrl_reg_tb.dut.library_pixel_addr[31:0]
 @22
 hsid_x_ctrl_reg_tb.dut.captured_pixel_addr[31:0]
 @28
@@ -67,53 +59,11 @@ hsid_x_ctrl_reg_tb.dut.done
 hsid_x_ctrl_reg_tb.dut.error
 hsid_x_ctrl_reg_tb.dut.idle
 @22
-hsid_x_ctrl_reg_tb.dut.library_pixel_addr[31:0]
+hsid_x_ctrl_reg_tb.mse_max_ref[11:0]
 hsid_x_ctrl_reg_tb.dut.mse_max_value[31:0]
+hsid_x_ctrl_reg_tb.mse_min_ref[11:0]
 hsid_x_ctrl_reg_tb.dut.mse_min_value[31:0]
-hsid_x_ctrl_reg_tb.dut.hw2reg[143:0]
 @28
 hsid_x_ctrl_reg_tb.dut.start
-@200
--Internal Registers
-@28
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.clk_i
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.wr_err
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.addrmiss
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_error
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_re
-@22
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.addr_hit[8:0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_addr[5:0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_be[3:0]
-@28
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.library_size_we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.pixel_bands_we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.library_pixel_addr_we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_clear_we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_start_we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_done_qs
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_clear_wd
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_error_qs
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_idle_qs
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_ready_qs
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.status_start_wd
-@22
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_rdata[31:0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.reg_wdata[31:0]
-@200
--Specific
-@28
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.clk_i
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.d[0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.de
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.q[0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.qe
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.qs[0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.rst_ni
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.wd[0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.we
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.wr_data[0]
-hsid_x_ctrl_reg_tb.dut.hsid_x_ctrl_reg_top_inst.i_regs.u_status_idle.wr_en
 [pattern_trace] 1
 [pattern_trace] 0

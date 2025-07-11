@@ -5,14 +5,17 @@ description: FIFO for HSpecID-x accelerator accelerator
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
       - hw/src/hsid_fifo/rtl/hsid_fifo.sv
     file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
 
   tb:
     files:
       - hw/src/hsid_fifo/tb/hsid_fifo_tb.sv
     file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
 
 targets:
   default: &default

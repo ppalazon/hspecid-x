@@ -5,7 +5,7 @@ description: Testing vector sum by ASAP FIFOs
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
+      - hw/src/hsid_pkg/rtl/hsid_pkg.sv
       - hw/src/vctr_fifo_strm/rtl/vctr_fifo_strm.sv
     file_type: systemVerilogSource
     depend:

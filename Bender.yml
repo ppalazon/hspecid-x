@@ -21,7 +21,7 @@ dependencies:
 frozen: false
 
 sources:
-  - hw/src/hsid_pkg/hsid_pkg.sv
+  - hw/src/hsid_pkg/hsid_pkg/rtl/hsid_pkg.sv
   - hw/src/**/rtl/*.sv
 
 workspace:

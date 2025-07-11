@@ -5,9 +5,10 @@ description: Simple Squared Difference module
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
       - hw/src/hsid_sq_df/rtl/hsid_sq_df.sv
     file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
 
   tb:
     files:

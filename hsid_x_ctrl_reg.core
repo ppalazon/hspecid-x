@@ -5,18 +5,20 @@ description: Control register module for HSpecID-x accelerator
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_reg_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_top.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg.sv
     file_type: systemVerilogSource
     depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
       - "pulp-platform.org::common_cells" # common_cells.core from deps
       - "uclm:hspecidx:register_interface" # register_interface.core in root
 
   tb:
     files:
+      - hw/src/hsid_x_ctrl_reg/tb/reg_inf_debug.sv
+      - hw/src/hsid_x_ctrl_reg/tb/ctrl_reg_tb_tasks.sv
       - hw/src/hsid_x_ctrl_reg/tb/hsid_x_ctrl_reg_tb.sv
     file_type: systemVerilogSource
 

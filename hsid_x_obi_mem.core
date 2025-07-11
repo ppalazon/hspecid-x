@@ -5,15 +5,16 @@ description: OBI Manager to request pixels from memory for HSpecID-x accelerator
 filesets:
   rtl:
     files:
-      - hw/src/hsid_pkg.sv
       - hw/src/hsid_x_obi_mem/rtl/hsid_x_obi_inf_pkg.sv
       - hw/src/hsid_x_obi_mem/rtl/hsid_x_obi_mem.sv
     file_type: systemVerilogSource
+    depend:
+      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
 
   tb:
     files:
       - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
-      - hw/src/hsid_x_obi_mem/tb/test_obi_mem.sv
+      - hw/src/hsid_x_obi_mem/tb/pixel_obi_mem.sv
       - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_tb.sv
     file_type: systemVerilogSource
 

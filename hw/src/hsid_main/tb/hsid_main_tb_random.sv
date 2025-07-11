@@ -15,7 +15,7 @@ class HsidMainGen #(
   localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
   localparam TEST_ELEMENTS = TEST_BANDS / DATA_PER_WORD; // Number of elements in the vector
 
-  rand logic signed [DATA_WIDTH-1:0] measure [TEST_BANDS];
+  rand logic [DATA_WIDTH-1:0] measure [TEST_BANDS];
 
   // Generate random vectors
   constraint c_vctrs {
@@ -24,7 +24,7 @@ class HsidMainGen #(
   }
 
   function automatic void fusion_vctr(
-      input logic signed [DATA_WIDTH-1:0] vctr [TEST_BANDS],
+      input logic [DATA_WIDTH-1:0] vctr [TEST_BANDS],
       output logic [WORD_WIDTH-1:0] fusion_vctr [TEST_ELEMENTS]
     );
     for (int i = 0; i < TEST_BANDS; i+=2) begin
@@ -33,8 +33,8 @@ class HsidMainGen #(
   endfunction
 
   function automatic void mse(
-      input logic signed [DATA_WIDTH-1:0] vctr1 [TEST_BANDS],
-      input logic signed [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
+      input logic [DATA_WIDTH-1:0] vctr1 [TEST_BANDS],
+      input logic [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
       output logic [WORD_WIDTH-1:0]   mse
     );
     logic signed [DATA_WIDTH:0] diff; // Difference between elements
@@ -44,13 +44,16 @@ class HsidMainGen #(
       diff = vctr1[i] - vctr2[i]; // Compute difference
       mult = diff * diff; // Compute squared difference
       acc_aux += mult; // Accumulate the result
+      // $display("Band %0d: vctr1 = %0d, vctr2 = %0d, diff = %0d, mult = %0d, acc_aux = %0d",
+      //   i, vctr1[i], vctr2[i], diff, mult, acc_aux);
     end
-    mse = acc_aux  >> $clog2(TEST_BANDS); // Compute mean square error
+
+    mse = acc_aux  / TEST_BANDS; // Compute mean square error
   endfunction
 
   function automatic void acc_all(
-      input logic signed [DATA_WIDTH-1:0] vctr1 [TEST_BANDS],
-      input logic signed [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
+      input logic [DATA_WIDTH-1:0] vctr1 [TEST_BANDS],
+      input logic [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
       output logic [WORD_WIDTH-1:0] acc_int [TEST_BANDS]
     );
     logic signed [DATA_WIDTH:0] diff; // Difference between elements

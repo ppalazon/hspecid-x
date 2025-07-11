@@ -1,6 +1,6 @@
 create_project hsid_main ./vivado/hsid_main -part xc7a100tcsg324-1
 set_property board_part digilentinc.com:nexys-a7-100t:part0:1.3 [current_project]
-add_files {./hw/src/hsid_pkg.sv \
+add_files {./hw/src/hsid_pkg/rtl/hsid_pkg.sv \
   ./hw/src/hsid_fifo/rtl/ \
   ./hw/src/hsid_sq_df_acc/rtl/ \
   ./hw/src/hsid_mse/rtl/ \

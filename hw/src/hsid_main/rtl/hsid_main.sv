@@ -11,7 +11,7 @@ module hsid_main #(
     parameter BUFFER_LENGTH = 4,  // Number of entries in the FIFO buffer
     parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
     parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
-    parameter HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
+    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     localparam ELEMENTS_ADDR = $clog2(ELEMENTS),  // Address width for elements
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI bands
   ) (
