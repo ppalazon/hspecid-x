@@ -2,20 +2,21 @@
 
 import hsid_pkg::*;
 
-module hsid_mse_tb;
+module hsid_mse_tb #(
+    parameter WORD_WIDTH = HSID_WORD_WIDTH, // Width of the word in bits
+    parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for HSI bands
+    parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than WORD_WIDTH
+    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than WORD_WIDTH
+    parameter HSI_BANDS = HSID_MAX_HSP_BANDS, // Maximum number of HSI bands
+    parameter HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY, // Maximum size of the HSI library
+    parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
+    parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
+    parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
+  );
 
-  localparam WORD_WIDTH = HSID_WORD_WIDTH; // Width of the word in bits
-  localparam DATA_WIDTH = HSID_DATA_WIDTH; // 16 bits by default
-  localparam DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL; // Data width for multiplication, larger than WORD_WIDTH
-  localparam DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC; // Data width for accumulator, larger than WORD_WIDTH
-  localparam HSI_BANDS = HSID_MAX_HSP_BANDS; // Number of HSI bands
   localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS); // Address width for HSI bands
-  localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY; // Size of the HSI library
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
-
-  localparam TEST_BANDS = HSID_TEST_BANDS; // Number of HSI bands to test
-  localparam TEST_ELEMENTS = TEST_BANDS / 2; // Number of elements in the vector for testbench
-  localparam TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE; // Size of the HSI library to test
+  localparam TEST_ELEMENTS = TEST_BANDS / 2; // Number of elements in the vector for testbe
 
   reg clk;
   reg rst_n;
@@ -55,8 +56,11 @@ module hsid_mse_tb;
   // Test vectors
   logic [WORD_WIDTH-1:0] vctr1 [TEST_ELEMENTS];
   logic [WORD_WIDTH-1:0] vctr2 [TEST_ELEMENTS];
-  logic [WORD_WIDTH-1:0] expected_mse [TEST_ELEMENTS];
+  logic [WORD_WIDTH-1:0] expected_mse [TEST_LIBRARY_SIZE];
   logic [WORD_WIDTH-1:0] acc_in [TEST_LIBRARY_SIZE][TEST_BANDS];
+
+  // Random value
+  int count_insert = 0;
 
   // Waveform generation for debugging
   initial begin
@@ -101,23 +105,26 @@ module hsid_mse_tb;
         $display("Test %0d: Accumulated: %p", i, acc_in[i]);
 
         // Start processing the vectors
-        element_valid = 1;
-        vctr_ref = (i+1) % TEST_LIBRARY_SIZE; // Set the reference vector for MSE
 
-        for (int j = 0; j < TEST_ELEMENTS; j++) begin
-          if (j == 0) begin
+        vctr_ref = i[TEST_LIBRARY_SIZE-1:0]+1; // Set the reference vector for MSE
+
+        count_insert = 0;
+        while (count_insert < TEST_ELEMENTS) begin
+          element_valid = TEST_RND_INSERT ? $urandom % 2: 1; // Randomly enable or disable element processing
+          if (count_insert == 0) begin
             element_start = 1; // Start the vector processing
           end else begin
             element_start = 0;
           end
-          if (j == TEST_ELEMENTS - 1) begin
+          if (count_insert == TEST_ELEMENTS - 1) begin
             element_last = 1;
           end else begin
             element_last = 0;
           end
-          element_a = vctr1[j];
-          element_b = vctr2[j];
+          element_a = vctr1[count_insert];
+          element_b = vctr2[count_insert];
           #10; // Wait for a clock cycle
+          if (element_valid) count_insert++;
         end
         element_valid = 0;
       end else begin
@@ -125,7 +132,9 @@ module hsid_mse_tb;
       end
     end
 
-    #60; // Wait for the last MSE calculation to complete
+    $display("Expected MSE values: %p", expected_mse);
+
+    #100; // Wait for the last MSE calculation to complete
 
     $finish;
   end
@@ -135,12 +144,12 @@ module hsid_mse_tb;
     assert (mse_value == expected_mse[mse_order]) begin
       $display("Test %0d: MSE is correct: %0d", mse_order, mse_value);
     end else begin
-      $display("Test %0d: MSE is incorrect: expected %0d, got %0d", mse_order, expected_mse[mse_order], mse_value);
+      $error("Test %0d: MSE is incorrect: expected %0d, got %0d", mse_order, expected_mse[mse_order], mse_value);
     end
     assert (mse_ref == (mse_order +1)) begin
       $display("Test %0d: Reference vector is correct: %0d", mse_order, mse_ref);
     end else begin
-      $display("Test %0d: Reference vector is incorrect: expected %0d, got %0d", mse_order, (mse_order + 1), mse_ref);
+      $error("Test %0d: Reference vector is incorrect: expected %0d, got %0d", mse_order, (mse_order + 1), mse_ref);
     end
     mse_order++;
   end
