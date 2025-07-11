@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Wed Jul  9 08:06:49 2025
+[*] Fri Jul 11 19:26:00 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_x_obi_mem_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Wed Jul  9 08:04:12 2025"
-[dumpfile_size] 6679
+[dumpfile_mtime] "Fri Jul 11 19:22:28 2025"
+[dumpfile_size] 29022
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_x_obi_mem.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-14.534685 186400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-13.643693 51960 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_x_obi_mem_tb.
 [sst_width] 317
 [signals_width] 315
@@ -36,7 +36,7 @@ hsid_x_obi_mem_tb.start
 -DUT
 @22
 hsid_x_obi_mem_tb.dut.data_out[31:0]
-@29
+@28
 hsid_x_obi_mem_tb.dut.data_out_valid
 @22
 hsid_x_obi_mem_tb.dut.initial_addr[31:0]
@@ -77,5 +77,9 @@ hsid_x_obi_mem_tb.obi_bus_debug.rvalid
 hsid_x_obi_mem_tb.obi_bus_debug.wdata[31:0]
 @28
 hsid_x_obi_mem_tb.obi_bus_debug.we
+@200
+-Memory
+@23
+hsid_x_obi_mem_tb.pixel_obi_mem.pixel_value[15:0]
 [pattern_trace] 1
 [pattern_trace] 0

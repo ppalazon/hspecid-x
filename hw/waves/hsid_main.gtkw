@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Thu Jul 10 17:11:11 2025
+[*] Fri Jul 11 18:45:23 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_main_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Thu Jul 10 17:11:04 2025"
-[dumpfile_size] 37373
+[dumpfile_mtime] "Fri Jul 11 18:45:03 2025"
+[dumpfile_size] 30296
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_main.gtkw"
 [timestart] 0
 [size] 2554 1366
@@ -32,7 +32,6 @@ hsid_main_tb.start
 hsid_main_tb.mse_max_value[31:0]
 hsid_main_tb.mse_max_ref[11:0]
 hsid_main_tb.mse_min_value[31:0]
-@25
 hsid_main_tb.mse_min_ref[11:0]
 @200
 -DUT
@@ -63,7 +62,9 @@ hsid_main_tb.dut.fifo_measure.data_out[31:0]
 hsid_main_tb.dut.fifo_measure.loop_en
 hsid_main_tb.dut.fifo_measure.rd_en
 hsid_main_tb.dut.fifo_measure.wr_en
+@29
 hsid_main_tb.dut.fifo_measure.full
+@28
 hsid_main_tb.dut.fifo_measure.almost_full
 @200
 -Ref FIFO

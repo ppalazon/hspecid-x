@@ -11,7 +11,8 @@ module hsid_main_tb #(
     parameter BUFFER_LENGTH = HSID_BUFFER_LENGTH,  // Length of the buffer
     parameter HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY,  // Size of the HSI library
     parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
-    parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE // Size of the HSI library to test
+    parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
+    parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
   ) ();
 
   localparam ELEMENTS = HSI_BANDS / 2;  // Number of elements in the vector
@@ -84,6 +85,10 @@ module hsid_main_tb #(
 
   logic [WORD_WIDTH-1:0] fusion_vctr [TEST_ELEMENTS];
 
+  // Count for the number of inserted elements
+  int count_insert;
+  logic insert_en;
+
   // Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
@@ -148,11 +153,14 @@ module hsid_main_tb #(
 
     // Send the measure vector
     hsid_main_gen.fusion_vctr(captured, fusion_vctr);
-    for (int i = 0; i < TEST_ELEMENTS; i++) begin
-      hsi_vctr_in = fusion_vctr[i];
-      hsi_vctr_in_valid = 1;
+    count_insert = 0;
+    while (count_insert < TEST_ELEMENTS) begin
+      insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
+      hsi_vctr_in = fusion_vctr[count_insert];
+      hsi_vctr_in_valid = insert_en;
       #10;
       assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
+      if (insert_en) count_insert++;
     end
 
     hsi_vctr_in_valid = 0;  // Disable input vector valid signal
@@ -164,13 +172,16 @@ module hsid_main_tb #(
     // Send the library vectors
     for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
       hsid_main_gen.fusion_vctr(lib[i], fusion_vctr);
+      count_insert = 0;
       for (int j = 0; j < TEST_ELEMENTS; j++) begin
+        insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
         hsi_vctr_in = fusion_vctr[j];
-        hsi_vctr_in_valid = 1;
+        hsi_vctr_in_valid = insert_en;
         #10;
         if (!(i == TEST_LIBRARY_SIZE - 1 && j == TEST_ELEMENTS - 1)) begin
           assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
         end
+        if (insert_en) count_insert++;
       end
     end
 

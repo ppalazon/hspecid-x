@@ -71,44 +71,50 @@ module hsid_x_top #(
     if (!rst_n) begin
       current_state <= IDLE;
       error <= 1'b0;  // Reset error flag
+      obi_initial_addr <= 0;
+      obi_limit_in <= 1;
+      obi_start <= 1'b0;
     end else begin
       current_state <= next_state;  // Update current state
       error <= 1'b0;  // Reset error flag
+      if (current_state == IDLE) begin
+        obi_initial_addr <= 0;
+        obi_limit_in <= 1;
+        obi_start <= 1'b0;
+      end else if (current_state == START_READ_CAPTURED) begin
+        obi_initial_addr <= captured_pixel_addr;
+        obi_limit_in <= { {(HSI_LIBRARY_SIZE_ADDR-ELEMENTS_ADDR){1'b0}}, elements_bands };
+        obi_start <= 1'b1;
+      end else if (current_state == READ_CAPTURED) begin
+        obi_start <= 1'b0;
+      end else if (current_state == START_READ_LIBRARY) begin
+        obi_initial_addr <= library_pixel_addr;
+        obi_limit_in <= elements_bands * library_size;
+        obi_start <= 1'b1;
+      end else if (current_state == READ_LIBRARY) begin
+        obi_start <= 1'b1;
+      end
     end
   end
 
   always_comb begin
     case (current_state)
       IDLE: begin
-        obi_initial_addr = 0;
-        obi_limit_in = 1;
-        obi_start = 1'b0;
         next_state = start ? START_READ_CAPTURED : IDLE;
       end
       START_READ_CAPTURED: begin
-        obi_initial_addr = captured_pixel_addr;
-        obi_limit_in = { {(HSI_LIBRARY_SIZE_ADDR-ELEMENTS_ADDR){1'b0}}, elements_bands };
-        obi_start = 1'b1;
         next_state = READ_CAPTURED;
       end
       READ_CAPTURED: begin
-        obi_start = 1'b0;
         next_state = obi_done ? START_READ_LIBRARY : READ_CAPTURED;
       end
       START_READ_LIBRARY: begin
-        obi_initial_addr = library_pixel_addr;
-        obi_limit_in = elements_bands * library_size;
-        obi_start = 1'b1;
         next_state = READ_LIBRARY;
       end
       READ_LIBRARY: begin
-        obi_start = 1'b1;
         next_state = obi_done ? IDLE : READ_LIBRARY;
       end
       default: begin
-        obi_initial_addr = 0;
-        obi_limit_in = 1;
-        obi_start = 1'b0;
         next_state = IDLE;
       end
     endcase

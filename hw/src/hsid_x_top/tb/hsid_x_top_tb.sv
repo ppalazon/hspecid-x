@@ -18,8 +18,8 @@ module hsid_x_top_tb #(
     parameter TEST_MEM_RND_GNT = 1,
     parameter TEST_MEM_RND_VALUE = 0,
     parameter TEST_MEM_MASK = 32'h00003FFF,  // Mask to return least significant 14 bits of the address
-    parameter TEST_CAPTURED_PIXEL_ADDR = 32'h00000000, // Address for captured pixel data
-    parameter TEST_LIBRARY_PIXEL_ADDR = 32'h00010000 - (3 * TEST_ELEMENTS * 4)  // Address for library pixel data, 4 pixels is the same as captured pixel data
+    parameter TEST_CAPTURED_PIXEL_ADDR = 32'h00000004, // Address for captured pixel data
+    parameter TEST_LIBRARY_PIXEL_ADDR = 32'h00010004 - (3 * TEST_ELEMENTS * 4)  // Address for library pixel data, 4 pixels is the same as captured pixel data
   ) ();
 
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE); // Address width for test library size
