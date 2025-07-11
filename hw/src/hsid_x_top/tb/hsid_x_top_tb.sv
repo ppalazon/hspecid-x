@@ -15,7 +15,7 @@ module hsid_x_top_tb #(
     parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
     parameter TEST_ELEMENTS = TEST_BANDS / 2, // Number of HSI bands to test
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
-    parameter TEST_MEM_RND_GNT = 0,
+    parameter TEST_MEM_RND_GNT = 1,
     parameter TEST_MEM_RND_VALUE = 0,
     parameter TEST_MEM_MASK = 32'h00003FFF,  // Mask to return least significant 14 bits of the address
     parameter TEST_CAPTURED_PIXEL_ADDR = 32'h00000000, // Address for captured pixel data

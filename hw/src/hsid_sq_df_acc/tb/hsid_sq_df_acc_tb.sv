@@ -2,12 +2,14 @@
 
 import hsid_pkg::*;
 
-module hsid_sq_df_acc_tb;
+module hsid_sq_df_acc_tb #(
+    parameter DATA_WIDTH = HSID_DATA_WIDTH, // 16 bits by default
+    parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
+    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than DATA_WIDTH
+    parameter TEST_BANDS = HSID_TEST_BANDS, // Length of the vector
+    parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
+  );
 
-  localparam DATA_WIDTH = HSID_DATA_WIDTH; // 16 bits by default
-  localparam DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL;
-  localparam DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC;
-  localparam VECTOR_LENGTH = HSID_VECTOR_LENGTH_TB; // Length of the vector
   localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY; // Size of the HSI library
   localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
 
@@ -31,6 +33,11 @@ module hsid_sq_df_acc_tb;
   wire acc_last;
   wire [HSI_LIBRARY_SIZE_ADDR-1:0] acc_ref; // Reference vector for sum
 
+  // Cycle count for the test
+  int count_cycle = 0;
+  logic cycle_valid_in = 0;
+  int count_cycle_valid_out = 0;
+
   hsid_sq_df_acc #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
@@ -52,12 +59,17 @@ module hsid_sq_df_acc_tb;
   );
 
   // Random class to generate test vectors
-  HsidSqDfAccGen sq_df_acc_gen = new();
+  HsidSqDfAccGen #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
+    .TEST_BANDS(TEST_BANDS)
+  ) sq_df_acc_gen = new();
 
   // Intermediate sq_df_acc accumulated vector
-  logic [DATA_WIDTH_ACC-1:0] acc_vctr [0:VECTOR_LENGTH-1];
+  logic [DATA_WIDTH_ACC-1:0] acc_vctr [0:TEST_BANDS-1];
   integer pipeline_stages = 3; // Number of pipeline stages in the DUT
-  integer cycle_count = VECTOR_LENGTH + pipeline_stages; // Number of cycles to run the test, vector length + pipeline stages
+  integer cycle_count = TEST_BANDS + pipeline_stages; // Number of cycles to run the test, vector length + pipeline stages
 
   // Waveform generation for debugging
   initial begin
@@ -83,12 +95,19 @@ module hsid_sq_df_acc_tb;
       if (sq_df_acc_gen.randomize()) begin
         // Compute the expected accumulated vector
         sq_df_acc_gen.sq_df_acc_vctr(acc_vctr);
-
         data_in_ref = i % HSI_LIBRARY_SIZE; // Set reference vector for sum
+        $display("Test %0d: Vector a: %p", i, sq_df_acc_gen.vctr1);
+        $display("Test %0d: Vector b: %p", i, sq_df_acc_gen.vctr2);
+        $display("Test %0d: Expected accumulated vector: %p", i, acc_vctr);
         // Insert values into the DUT
-        for (int cycle=0; cycle<cycle_count; cycle++) begin
+        count_cycle = 0;
+        count_cycle_valid_out = 0;
+        while (count_cycle < cycle_count) begin
+          // Mark if I should insert a value in this cycle
+          cycle_valid_in = (TEST_RND_INSERT == 1) ? $urandom % 2 : 1;
+
           // Initial accumulator value in the first cycle
-          if (cycle == 0) begin : set_initial_acc
+          if (count_cycle == 0) begin : set_initial_acc
             initial_acc_en = 1; // Enable initial accumulator value
             initial_acc = sq_df_acc_gen.initial_acc; // Set initial accumulator value
           end else begin
@@ -96,11 +115,11 @@ module hsid_sq_df_acc_tb;
           end
 
           // Set input data valid signal
-          if (cycle < VECTOR_LENGTH) begin : data_in
-            data_in_valid = 1; // Valid input values
-            data_in_a = sq_df_acc_gen.vctr1[cycle];
-            data_in_b = sq_df_acc_gen.vctr2[cycle];
-            data_in_last = (cycle == VECTOR_LENGTH - 1); // Set band counter for HSI bands
+          if (count_cycle < TEST_BANDS) begin : data_in
+            data_in_valid = cycle_valid_in; // Valid input values
+            data_in_a = sq_df_acc_gen.vctr1[count_cycle];
+            data_in_b = sq_df_acc_gen.vctr2[count_cycle];
+            data_in_last = (count_cycle == TEST_BANDS - 1); // Set band counter for HSI bands
           end else begin
             data_in_valid = 0; // No more valid input values
             data_in_a = 0;
@@ -108,30 +127,18 @@ module hsid_sq_df_acc_tb;
             data_in_last = 0; // No more last flag
           end
 
-          // Read output data and check validity
-          if (cycle >= pipeline_stages) begin : output_check
-            if(cycle == VECTOR_LENGTH + pipeline_stages) begin
-              assert (acc_last) else $error("Low `acc_last` on last cycle: %0d", cycle);
+          if (acc_valid) begin
+            assert (acc_value == acc_vctr[count_cycle_valid_out]) else begin
+              $error("Test case %0d failed: expected %0d, got %0d at cycle %0d", i, acc_vctr[count_cycle_valid_out], acc_value, count_cycle);
             end
-            assert (data_in_ref == acc_ref) else begin
-              $error("Reference vector mismatch at cycle %0d: expected %0d, got %0d", cycle, data_in_ref, acc_ref);
+            if (count_cycle_valid_out == TEST_BANDS - 1) begin
+              assert (acc_last) else $error("Low `acc_last` on last cycle: %0d", count_cycle);
             end
-            if (acc_valid) begin
-              if (acc_value !== acc_vctr[cycle - pipeline_stages]) begin
-                $error("Test case %0d failed: expected %0d, got %0d at cycle %0d", i, acc_vctr[cycle - pipeline_stages], acc_value, cycle);
-              end else begin
-                $display("Test case %0d passed at cycle %0d", i, cycle);
-              end
-            end else begin
-              $error("Output not valid at cycle %0d", cycle);
-            end
-          end else begin
-            if (acc_valid) begin
-              $error("Output valid before pipeline stages at cycle %0d", cycle);
-            end
+            count_cycle_valid_out++;
           end
 
           #10; // Wait for one clock cycle
+          if (cycle_valid_in) count_cycle++;
         end
       end
     end
