@@ -1,17 +1,17 @@
 [*]
 [*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul 11 17:36:10 2025
+[*] Fri Jul 11 17:49:02 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_sq_df_acc_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul 11 17:32:47 2025"
-[dumpfile_size] 11935
+[dumpfile_mtime] "Fri Jul 11 17:48:15 2025"
+[dumpfile_size] 12361
 [savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_sq_df_acc.gtkw"
-[timestart] 240540
+[timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-14.067823 342540 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.767824 342540 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_sq_df_acc_tb.
-[sst_width] 317
+[sst_width] 370
 [signals_width] 347
 [sst_expanded] 1
 [sst_vpaned_height] 899
@@ -38,5 +38,7 @@ hsid_sq_df_acc_tb.initial_acc[47:0]
 hsid_sq_df_acc_tb.initial_acc_en
 hsid_sq_df_acc_tb.acc_valid
 hsid_sq_df_acc_tb.acc_last
+@23
+hsid_sq_df_acc_tb.dut.acc_ref[11:0]
 [pattern_trace] 1
 [pattern_trace] 0

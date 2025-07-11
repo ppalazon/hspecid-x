@@ -132,7 +132,8 @@ module hsid_sq_df_acc_tb #(
               $error("Test case %0d failed: expected %0d, got %0d at cycle %0d", i, acc_vctr[count_cycle_valid_out], acc_value, count_cycle);
             end
             if (count_cycle_valid_out == TEST_BANDS - 1) begin
-              assert (acc_last) else $error("Low `acc_last` on last cycle: %0d", count_cycle);
+              assert (acc_last) else $error("Low `acc_last`: %b on last cycle: %0d", acc_last, count_cycle);
+              assert (acc_ref == data_in_ref) else $error("Low `acc_ref`: %0d on last cycle: %0d", acc_ref, count_cycle);
             end
             count_cycle_valid_out++;
           end
