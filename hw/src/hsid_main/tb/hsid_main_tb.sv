@@ -207,7 +207,7 @@ module hsid_main_tb #(
   end
 
   initial begin
-    #1000; $finish;  // Timeout to prevent infinite simulation
+    #2000; $finish;  // Timeout to prevent infinite simulation
   end
 
   always

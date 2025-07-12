@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e # Exit on error
-set -x # Enable verbose command output
+# set -x # Enable verbose command output
 
 MODULE_NAME="$1"
 
