@@ -23,4 +23,8 @@ package hsid_pkg;
     IDLE, READ_MEASURE, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
   } hsid_main_state_t;
 
+  typedef enum logic [2:0] {
+    OR_IDLE, START_READ_CAPTURED, READ_CAPTURED, START_READ_LIBRARY, READ_LIBRARY
+  } hsid_x_obi_read_t;
+
 endpackage

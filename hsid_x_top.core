@@ -5,6 +5,7 @@ description: HSpecID-X - A Hyperspectral Pixel Classifier Accelerator for X-HEEP
 filesets:
   rtl:
     files:
+      - hw/src/hsid_x_top/rtl/hsid_x_top_fsm.sv
       - hw/src/hsid_x_top/rtl/hsid_x_top.sv
     file_type: systemVerilogSource
     depend:

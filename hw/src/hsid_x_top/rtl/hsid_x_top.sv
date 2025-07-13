@@ -29,98 +29,57 @@ module hsid_x_top #(
 
   localparam ELEMENTS_ADDR = $clog2(ELEMENTS);  // Address width
 
-  typedef enum logic [2:0] {
-    IDLE, START_READ_CAPTURED, READ_CAPTURED, START_READ_LIBRARY, READ_LIBRARY
-  } hsid_x_obi_read_t;
+  wire start;
+  wire clear;
+  wire idle;
+  wire ready;
+  wire done;
+  wire error;
 
-  logic start;
-  logic clear;
-  logic idle;
-  logic ready;
-  logic done;
-  logic error;
+  wire [HSI_LIBRARY_SIZE_ADDR-1:0] library_size;
+  wire [HSI_BANDS_ADDR-1:0] pixel_bands;
+  wire [WORD_WIDTH-1:0] captured_pixel_addr;
+  wire [WORD_WIDTH-1:0] library_pixel_addr;
 
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] library_size;
-  logic [HSI_BANDS_ADDR-1:0] pixel_bands;
-  logic [WORD_WIDTH-1:0] captured_pixel_addr;
-  logic [WORD_WIDTH-1:0] library_pixel_addr;
+  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref; // Pixel reference for minimum MSE value
+  wire [WORD_WIDTH-1:0] mse_min_value;  // Minimum MSE
+  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;  // Pixel reference for maximum MSE value
+  wire [WORD_WIDTH-1:0] mse_max_value;  // Maximum MSE
 
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref; // Pixel reference for minimum MSE value
-  logic [WORD_WIDTH-1:0] mse_min_value;  // Minimum MSE
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;  // Pixel reference for maximum MSE value
-  logic [WORD_WIDTH-1:0] mse_max_value;  // Maximum MSE
-
-  // Obi wires
-  logic [WORD_WIDTH-1:0] obi_initial_addr;
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] obi_limit_in;
-  logic obi_data_out_valid;
-  logic [WORD_WIDTH-1:0] obi_data_out;
-  logic obi_start;
+  wire obi_data_out_valid;
+  wire [WORD_WIDTH-1:0] obi_data_out;
+  wire [WORD_WIDTH-1:0] obi_initial_addr;
+  wire [HSI_LIBRARY_SIZE_ADDR-1:0] obi_limit_in;
+  wire obi_start;
   wire obi_done;
 
-  // Elements bands
-  logic [ELEMENTS_ADDR-1:0] elements_bands;
-
-  // Assign Interrupt output
   assign hsid_x_int_o = done;
-  assign elements_bands = (pixel_bands / 2);
 
-  hsid_x_obi_read_t current_state = IDLE, next_state = START_READ_CAPTURED;
+  hsid_x_top_fsm #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
+    .HSI_BANDS(HSI_BANDS),
+    .ELEMENTS(ELEMENTS),
+    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+  ) fsm (
+    .clk(clk),
+    .rst_n(rst_n),
+    .pixel_bands(pixel_bands),
+    .library_size(library_size),
+    .captured_pixel_addr(captured_pixel_addr),
+    .library_pixel_addr(library_pixel_addr),
+    .start(start),
+    .clear(clear),
+    .obi_initial_addr(obi_initial_addr),
+    .obi_limit_in(obi_limit_in),
+    .obi_start(obi_start),
+    .obi_done(obi_done),
+    .error(error)
+  );
 
-  always_ff @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-      current_state <= IDLE;
-      error <= 1'b0;  // Reset error flag
-      obi_initial_addr <= 0;
-      obi_limit_in <= 1;
-      obi_start <= 1'b0;
-    end else begin
-      current_state <= next_state;  // Update current state
-      error <= 1'b0;  // Reset error flag
-      if (current_state == IDLE) begin
-        obi_initial_addr <= 0;
-        obi_limit_in <= 1;
-        obi_start <= 1'b0;
-      end else if (current_state == START_READ_CAPTURED) begin
-        obi_initial_addr <= captured_pixel_addr;
-        obi_limit_in <= { {(HSI_LIBRARY_SIZE_ADDR-ELEMENTS_ADDR){1'b0}}, elements_bands };
-        obi_start <= 1'b1;
-      end else if (current_state == READ_CAPTURED) begin
-        obi_start <= 1'b0;
-      end else if (current_state == START_READ_LIBRARY) begin
-        obi_initial_addr <= library_pixel_addr;
-        obi_limit_in <= elements_bands * library_size;
-        obi_start <= 1'b1;
-      end else if (current_state == READ_LIBRARY) begin
-        obi_start <= 1'b1;
-      end
-    end
-  end
 
-  always_comb begin
-    case (current_state)
-      IDLE: begin
-        next_state = start ? START_READ_CAPTURED : IDLE;
-      end
-      START_READ_CAPTURED: begin
-        next_state = READ_CAPTURED;
-      end
-      READ_CAPTURED: begin
-        next_state = obi_done ? START_READ_LIBRARY : READ_CAPTURED;
-      end
-      START_READ_LIBRARY: begin
-        next_state = READ_LIBRARY;
-      end
-      READ_LIBRARY: begin
-        next_state = obi_done ? IDLE : READ_LIBRARY;
-      end
-      default: begin
-        next_state = IDLE;
-      end
-    endcase
-  end
-
-  // Register interface to hardware interface
+// Register interface to hardware interface
   hsid_x_ctrl_reg #(
     .HSI_BANDS(HSI_BANDS),
     .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
@@ -146,7 +105,7 @@ module hsid_x_top #(
     .mse_max_value(mse_max_value)
   );
 
-  // OBI interface to memory interface
+// OBI interface to memory interface
   hsid_x_obi_mem #(
     .WORD_WIDTH      (WORD_WIDTH),
     .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
@@ -166,7 +125,7 @@ module hsid_x_top #(
     .start         (obi_start)
   );
 
-  // HSID Main module instantiation
+// HSID Main module instantiation
   hsid_main #(
     .WORD_WIDTH      (WORD_WIDTH),
     .DATA_WIDTH      (DATA_WIDTH),
