@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_sq_df:1.0.0
+name: uclm:hspecidx:hsid_sq_df
 description: Simple Squared Difference module
 
 filesets:
@@ -8,7 +8,7 @@ filesets:
       - hw/src/hsid_sq_df/rtl/hsid_sq_df.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
+      - "uclm:hspecidx:hsid_pkg"
 
   tb:
     files:

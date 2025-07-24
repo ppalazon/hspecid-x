@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_fifo:1.0.0
+name: uclm:hspecidx:hsid_fifo
 description: FIFO for HSpecID-x accelerator accelerator
 
 filesets:
@@ -8,14 +8,21 @@ filesets:
       - hw/src/hsid_fifo/rtl/hsid_fifo.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
+      - "uclm:hspecidx:hsid_pkg"
 
   tb:
     files:
+      - hw/src/hsid_fifo/tb/hsid_fifo_random.sv
+      - hw/src/hsid_fifo/tb/hsid_fifo_verif.sv
       - hw/src/hsid_fifo/tb/hsid_fifo_tb.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
+      - "uclm:hspecidx:hsid_pkg"
+
+  tcl_modelsim:
+    files:
+      - hw/tcl/modelsim-do/hsid_fifo_debug.do
+    file_type: tclSource
 
 targets:
   default: &default
@@ -29,9 +36,21 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
+      - tool_modelsim? (tcl_modelsim)
     toplevel: hsid_fifo_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common
         #xelab_options:
         #xsim_options:
+      modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
+        compilation_mode: common
+        # vsim_options:
+        #   - "-do"
+        #   - "'vcd file dump.vcd; vcd add -r /*'"
+        # - "-voptargs='+acc'"
+      #vlog_options:
+      #vsim_options:
+      #vsim_args:
+      #vsim_libs:
+      #vsim_top:

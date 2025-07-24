@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:vctr_fifo_full:1.0.0
+name: uclm:hspecidx:vctr_fifo_full
 description: Testing vector sum using fulling FIFOs
 
 filesets:
@@ -9,7 +9,7 @@ filesets:
       - hw/src/vctr_fifo_full/rtl/vctr_fifo_full.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_fifo:1.0.0" # fifo.core
+      - "uclm:hspecidx:hsid_fifo" # fifo.core
 
   tb:
     files:

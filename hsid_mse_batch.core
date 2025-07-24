@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_mse_batch:1.0.0
+name: uclm:hspecidx:hsid_mse_batch
 description: 2-issue and 4-issue MSE processors for HSpecID-x accelerator
 
 filesets:
@@ -9,9 +9,9 @@ filesets:
       - hw/src/hsid_mse_batch/rtl/hsid_mse_batch_4.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
-      - ">=uclm:hspecidx:hsid_mse:1.0.0" # fifo.core
-      - ">=uclm:hspecidx:hsid_sq_df:1.0.0" # vctr_fifo_strm.core
+      - "uclm:hspecidx:hsid_pkg"
+      - "uclm:hspecidx:hsid_mse" # fifo.core
+      - "uclm:hspecidx:hsid_sq_df" # vctr_fifo_strm.core
 
   tb:
     files:

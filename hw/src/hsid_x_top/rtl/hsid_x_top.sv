@@ -27,8 +27,6 @@ module hsid_x_top #(
     output logic hsid_x_int_o
   );
 
-  localparam ELEMENTS_ADDR = $clog2(ELEMENTS);  // Address width
-
   wire start;
   wire clear;
   wire idle;

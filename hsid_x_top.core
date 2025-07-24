@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_x_top:1.0.0
+name: uclm:hspecidx:hsid_x_top
 description: HSpecID-X - A Hyperspectral Pixel Classifier Accelerator for X-HEEP Platforms
 
 filesets:
@@ -9,10 +9,10 @@ filesets:
       - hw/src/hsid_x_top/rtl/hsid_x_top.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
-      - ">=uclm:hspecidx:hsid_main:1.0.0"
-      - ">=uclm:hspecidx:hsid_x_ctrl_reg:1.0.0"
-      - ">=uclm:hspecidx:hsid_x_obi_mem:1.0.0"
+      - "uclm:hspecidx:hsid_pkg"
+      - "uclm:hspecidx:hsid_main"
+      - "uclm:hspecidx:hsid_x_ctrl_reg"
+      - "uclm:hspecidx:hsid_x_obi_mem"
 
   tb:
     files:

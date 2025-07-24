@@ -8,7 +8,6 @@ module hsid_x_top_fsm #(
     parameter HSI_BANDS = 128,  // Number of HSI bands
     parameter HSI_LIBRARY_SIZE = 256,  // Size of the HSI library
     parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
-    localparam ELEMENTS_ADDR = $clog2(ELEMENTS),  // Address width for elements
     localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
     localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)
   ) (
@@ -31,6 +30,8 @@ module hsid_x_top_fsm #(
 
     output logic error  // Error flag
   );
+
+  localparam ELEMENTS_ADDR = $clog2(ELEMENTS);  // Address width
 
   // Elements bands
   logic [ELEMENTS_ADDR-1:0] elements_bands;

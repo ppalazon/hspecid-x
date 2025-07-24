@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_pkg:1.0.0
+name: uclm:hspecidx:hsid_pkg
 description: HSID package for HSpecID-x accelerator
 
 filesets:

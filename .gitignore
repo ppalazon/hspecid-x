@@ -13,7 +13,7 @@ build/
 sim/
 vivado/
 .Xil
-.venv
+.direnv
 
 # Avoid including hardware vendor directories
 hw/vendor/*
@@ -22,3 +22,7 @@ hw/vendor/*
 # Exclude bender files
 .bender/
 hw/deps/
+
+# Exclude vsim files
+etch*
+transcript

@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_x_ctrl_reg:1.0.0
+name: uclm:hspecidx:hsid_x_ctrl_reg
 description: Control register module for HSpecID-x accelerator
 
 filesets:
@@ -11,7 +11,7 @@ filesets:
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
+      - "uclm:hspecidx:hsid_pkg"
       - "pulp-platform.org::common_cells" # common_cells.core from deps
       - "uclm:hspecidx:register_interface" # register_interface.core in root
 

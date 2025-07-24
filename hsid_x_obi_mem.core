@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_x_obi_mem:1.0.0
+name: uclm:hspecidx:hsid_x_obi_mem
 description: OBI Manager to request pixels from memory for HSpecID-x accelerator
 
 filesets:
@@ -9,7 +9,7 @@ filesets:
       - hw/src/hsid_x_obi_mem/rtl/hsid_x_obi_mem.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
+      - "uclm:hspecidx:hsid_pkg"
 
   tb:
     files:

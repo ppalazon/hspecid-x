@@ -18,10 +18,10 @@ MODULE_NAME="$1"
 BASE_DIR=$(pwd)
 WAVES=${BASE_DIR}/hw/waves
 
-FUSESOC_NAME="uclm:hspecidx:${MODULE_NAME}:1.0.0"
-FUSESOC_SIM_DIR="build/uclm_hspecidx_${MODULE_NAME}_1.0.0/sim-xsim"
+FUSESOC_NAME="uclm:hspecidx:${MODULE_NAME}"
+FUSESOC_SIM_DIR="build/uclm_hspecidx_${MODULE_NAME}_0/sim-xsim"
 
-fusesoc run --no-export --target sim $FUSESOC_NAME
+fusesoc run --no-export --target sim --tool xsim $FUSESOC_NAME
 
 if [ "$SHOW_WAVEFORM" = true ]; then
   sed -E 's/\$scope module ([^ ]+)\(.*\) /\$scope module \1 /' $FUSESOC_SIM_DIR/wave.vcd > $FUSESOC_SIM_DIR/cleaned.vcd

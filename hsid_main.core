@@ -1,5 +1,5 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_main:1.0.0
+name: uclm:hspecidx:hsid_main
 description: Hyperspectral pixel identification for HSpecID-x accelerator
 
 filesets:
@@ -9,11 +9,11 @@ filesets:
       - hw/src/hsid_main/rtl/hsid_main.sv
     file_type: systemVerilogSource
     depend:
-      - ">=uclm:hspecidx:hsid_pkg:1.0.0"
-      - ">=uclm:hspecidx:hsid_fifo:1.0.0" # fifo.core
-      - ">=uclm:hspecidx:hsid_sq_df_acc:1.0.0" # sq_df_acc.core
-      - ">=uclm:hspecidx:hsid_mse:1.0.0" # mse.core
-      - ">=uclm:hspecidx:hsid_mse_comp:1.0.0" # mse_comp.core
+      - "uclm:hspecidx:hsid_pkg"
+      - "uclm:hspecidx:hsid_fifo" # fifo.core
+      - "uclm:hspecidx:hsid_sq_df_acc" # sq_df_acc.core
+      - "uclm:hspecidx:hsid_mse" # mse.core
+      - "uclm:hspecidx:hsid_mse_comp" # mse_comp.core
 
   tb:
     files:
