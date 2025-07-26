@@ -41,16 +41,5 @@ targets:
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common
-        #xelab_options:
-        #xsim_options:
       modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
-        # vsim_options:
-        #   - "-do"
-        #   - "'vcd file dump.vcd; vcd add -r /*'"
-        # - "-voptargs='+acc'"
-      #vlog_options:
-      #vsim_options:
-      #vsim_args:
-      #vsim_libs:
-      #vsim_top:
