@@ -4,12 +4,12 @@ import hsid_pkg::*;
 
 module hsid_fifo_tb #(
     parameter DATA_WIDTH = 32,  // 32 bits by default
-    parameter FIFO_DEPTH = 16,  // 16 entries by default
+    parameter FIFO_ADDR_WIDTH = 4, // Address width for FIFO depth
     parameter FIFO_ALMOST_FULL_THRESHOLD = 10 // Optional threshold for almost full
   );
 
-  // Parameters
-  localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH); // Address width for FIFO depth
+  // Local parameters
+  localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH; // Define FIFO depth based on address width
 
   // Signals
   reg clk;
@@ -28,7 +28,7 @@ module hsid_fifo_tb #(
   // Instantiate the FIFO module
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(FIFO_DEPTH)
+    .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -47,7 +47,7 @@ module hsid_fifo_tb #(
   // bind verification to the DUT instance
   bind dut hsid_fifo_abv #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(FIFO_DEPTH)
+    .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) hsid_fifo_abv_inst (
     .clk(dut.clk),
     .rst_n(dut.rst_n),
@@ -96,7 +96,7 @@ module hsid_fifo_tb #(
 
   hsid_fifo_op #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(FIFO_DEPTH)
+    .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) random_op = new();
 
   // Generate a queue

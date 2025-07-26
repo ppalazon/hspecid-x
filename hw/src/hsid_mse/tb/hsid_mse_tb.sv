@@ -7,15 +7,13 @@ module hsid_mse_tb #(
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for HSI bands
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than WORD_WIDTH
-    parameter HSI_BANDS = HSID_MAX_HSP_BANDS, // Maximum number of HSI bands
-    parameter HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY, // Maximum size of the HSI library
     parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
     parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
   );
 
-  localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS); // Address width for HSI bands
-  localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
+  parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH; // Address width for HSI bands
+  parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH;
   localparam TEST_ELEMENTS = TEST_BANDS / 2; // Number of elements in the vector for testbe
 
   reg clk;
@@ -25,10 +23,10 @@ module hsid_mse_tb #(
   reg [WORD_WIDTH-1:0] element_a;
   reg [WORD_WIDTH-1:0] element_b;
   reg element_valid;
-  reg [HSI_LIBRARY_SIZE_ADDR-1:0] vctr_ref; // Reference vector for MSE
-  reg [HSI_BANDS_ADDR-1:0] hsi_bands; // HSI bands to process
+  reg [HSP_LIBRARY_WIDTH-1:0] vctr_ref; // Reference vector for MSE
+  reg [HSP_BANDS_WIDTH-1:0] hsi_bands; // HSI bands to process
   wire [WORD_WIDTH-1:0] mse_value;
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref; // Reference vector for MSE
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_ref; // Reference vector for MSE
   wire mse_valid;
 
   hsid_mse #(
@@ -36,8 +34,8 @@ module hsid_mse_tb #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
-    .HSI_BANDS(HSI_BANDS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -74,7 +72,7 @@ module hsid_mse_tb #(
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
     .TEST_BANDS(TEST_BANDS),
-    .TEST_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
+    .TEST_LIBRARY_SIZE(TEST_LIBRARY_SIZE),
     .TEST_ELEMENTS(TEST_ELEMENTS)
   ) hsi_mse_gen= new();
 

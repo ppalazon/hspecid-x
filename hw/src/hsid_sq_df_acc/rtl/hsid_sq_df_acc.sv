@@ -6,8 +6,7 @@ module hsid_sq_df_acc #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
     parameter DATA_WIDTH_MUL = 32, // Data width for multiplication, larger than DATA_WIDTH
     parameter DATA_WIDTH_ACC = 48, // Data width for accumulator, larger than DATA_WIDTH
-    parameter HSI_LIBRARY_SIZE = 4095, // Size of the HSI library
-    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE) // Address width for HSI library size
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH // Address width for HSI library size
   ) (
     input logic clk,
     input logic rst_n,
@@ -19,12 +18,12 @@ module hsid_sq_df_acc #(
     input logic signed [DATA_WIDTH-1:0] data_in_a, // Input vector 1
     input logic signed [DATA_WIDTH-1:0] data_in_b, // Input vector 2
     input logic data_in_last,
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] data_in_ref, // Reference vector for sum
+    input logic [HSP_LIBRARY_WIDTH-1:0] data_in_ref, // Reference vector for sum
 
     output logic acc_valid, // Output enable signal
     output logic [DATA_WIDTH_ACC-1:0] acc_value, // Output result
     output logic acc_last, // Output band counter
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] acc_ref // Reference vector for sum
+    output logic [HSP_LIBRARY_WIDTH-1:0] acc_ref // Reference vector for sum
   );
 
   // logic signed [DATA_WIDTH-1:0] data_in_v1_reg, data_in_v2_reg; // Register for input vector 1
@@ -32,13 +31,13 @@ module hsid_sq_df_acc #(
   // logic acc_1_en, acc_2_en, acc_3_en; // Enable signals for accumulators
   // logic [DATA_WIDTH_ACC-1:0] acc_1, acc_2, acc_3; // Accumulators for pipeline stages
   // logic last_1, last_2, last_3; // Band counter for HSI bands, using one extra bit to avoid overflow
-  // logic [HSI_LIBRARY_SIZE_ADDR-1:0] ref_1, ref_2, ref_3; // Band counter output for HSI bands
+  // logic [HSP_LIBRARY_WIDTH-1:0] ref_1, ref_2, ref_3; // Band counter output for HSI bands
 
   logic stage_1_en, stage_2_en; // Enable signals for pipeline stages
   logic acc_1_en, acc_2_en; // Enable signals for accumulators
   logic [DATA_WIDTH_ACC-1:0] acc_1, acc_2; // Accumulators for pipeline stages
   logic last_1, last_2; // Band counter for HSI bands, using one extra bit to avoid overflow
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] ref_1, ref_2; // Band counter output for HSI bands
+  logic [HSP_LIBRARY_WIDTH-1:0] ref_1, ref_2; // Band counter output for HSI bands
 
 
   logic signed [DATA_WIDTH:0] diff; // Difference between elements, using one extra bit for overflow

@@ -6,13 +6,11 @@ import ctrl_reg_tb_tasks::*;
 
 `include "register_interface/typedef.svh"
 
-module hsid_x_ctrl_reg_tb;
-
-  localparam WORD_WIDTH = HSID_WORD_WIDTH;
-  localparam HSI_BANDS = HSID_MAX_HSP_BANDS;
-  localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY;
-  localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS);
-  localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
+module hsid_x_ctrl_reg_tb #(
+    parameter int WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI library size
+  );
 
   reg clk;
   reg rst_n;
@@ -22,13 +20,13 @@ module hsid_x_ctrl_reg_tb;
   reg done;
   reg error;
   reg ready;
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] library_size;
-  wire [HSI_BANDS_ADDR-1:0] pixel_bands;
+  wire [HSP_LIBRARY_WIDTH-1:0] library_size;
+  wire [HSP_BANDS_WIDTH-1:0] pixel_bands;
   wire [WORD_WIDTH-1:0] captured_pixel_addr;
   wire [WORD_WIDTH-1:0] library_pixel_addr;
-  reg [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref;
+  reg [HSP_LIBRARY_WIDTH-1:0] mse_min_ref;
   reg [WORD_WIDTH-1:0] mse_min_value;
-  reg [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;
+  reg [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;
   reg [WORD_WIDTH-1:0] mse_max_value;
 
   logic [WORD_WIDTH-1:0] data_in;
@@ -42,12 +40,12 @@ module hsid_x_ctrl_reg_tb;
   logic [WORD_WIDTH-1:0] mse_max_ref_w;
   logic [WORD_WIDTH-1:0] mse_min_ref_w;
 
-  assign library_size_w = {{(32-HSI_LIBRARY_SIZE_ADDR){1'b0}}, library_size};
-  assign pixel_bands_w = {{(32-HSI_BANDS_ADDR){1'b0}}, pixel_bands};
+  assign library_size_w = {{(32-HSP_LIBRARY_WIDTH){1'b0}}, library_size};
+  assign pixel_bands_w = {{(32-HSP_BANDS_WIDTH){1'b0}}, pixel_bands};
   assign start_w = {31'b0, start};
   assign clear_w = {31'b0, clear};
-  assign mse_max_ref_w = {{(32-HSI_LIBRARY_SIZE_ADDR){1'b0}}, mse_max_ref};
-  assign mse_min_ref_w = {{(32-HSI_LIBRARY_SIZE_ADDR){1'b0}}, mse_min_ref};
+  assign mse_max_ref_w = {{(32-HSP_LIBRARY_WIDTH){1'b0}}, mse_max_ref};
+  assign mse_min_ref_w = {{(32-HSP_LIBRARY_WIDTH){1'b0}}, mse_min_ref};
 
 
   // REG_BUS #(.ADDR_WIDTH(32), .DATA_WIDTH(32)) regbus_slave(clk);
@@ -56,8 +54,8 @@ module hsid_x_ctrl_reg_tb;
 
   hsid_x_ctrl_reg #(
     .WORD_WIDTH(WORD_WIDTH),
-    .HSI_BANDS(HSI_BANDS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -125,7 +123,7 @@ module hsid_x_ctrl_reg_tb;
 
     data_in = 32'hFFFFFFFF;
     write_reg(reg_req, HSID_X_CTRL_LIBRARY_SIZE, data_in);
-    assert_value(library_size_w, HSI_LIBRARY_SIZE, "Library size limited to 13 bits");
+    assert_value(library_size_w, 2**HSP_LIBRARY_WIDTH - 1, "Library size limited to 13 bits");
 
     // Writing pixel bands
     data_in = 5;
@@ -134,7 +132,7 @@ module hsid_x_ctrl_reg_tb;
 
     data_in = 32'hFFFFFFFF;
     write_reg(reg_req, HSID_X_CTRL_PIXEL_BANDS, data_in);
-    assert_value(pixel_bands_w, HSI_BANDS, "Pixel bands limited to 9 bits");
+    assert_value(pixel_bands_w, 2 ** HSP_BANDS_WIDTH - 1, "Pixel bands limited to 9 bits");
 
     // Writing captured pixel addr
     data_in = 32'h12345678;
@@ -206,9 +204,9 @@ module hsid_x_ctrl_reg_tb;
     assert_read_reg(HSID_X_CTRL_STATUS, 32'b000000);
 
     $display("Case 5: Reading outputs");
-    mse_max_ref = $urandom() % HSI_LIBRARY_SIZE;
+    mse_max_ref = $urandom() % (2**HSP_LIBRARY_WIDTH);
     mse_max_value = $urandom();
-    mse_min_ref = $urandom() % HSI_LIBRARY_SIZE;
+    mse_min_ref = $urandom() % (2**HSP_LIBRARY_WIDTH);
     mse_min_value = $urandom();
     #10;
 

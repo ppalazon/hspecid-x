@@ -1,9 +1,10 @@
 `timescale 1ns / 1ps
 
+import hsid_pkg::*;
+
 module hsid_x_obi_mem #(
-    parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter HSI_LIBRARY_SIZE = 8192,  // Width of the counter for address generation
-    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI library size
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI library size
   ) (
     input logic clk,
     input logic rst_n,
@@ -14,7 +15,7 @@ module hsid_x_obi_mem #(
     input hsid_x_obi_inf_pkg::obi_resp_t obi_rsp,
 
     input logic [WORD_WIDTH-1:0] initial_addr,
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] limit,
+    input logic [HSP_LIBRARY_WIDTH-1:0] limit,
 
     output logic data_out_valid,
     output logic [WORD_WIDTH-1:0] data_out,
@@ -31,9 +32,9 @@ module hsid_x_obi_mem #(
 
   hsid_x_obi_mem_state_t current_state = IDLE, next_state = INIT;
 
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] current_limit;
+  logic [HSP_LIBRARY_WIDTH-1:0] current_limit;
   logic [WORD_WIDTH-1:0] current_addr;
-  logic [HSI_LIBRARY_SIZE_ADDR:0] requests, reads;
+  logic [HSP_LIBRARY_WIDTH:0] requests, reads;
 
   logic finish_reading;
 

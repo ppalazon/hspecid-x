@@ -3,18 +3,18 @@
 import hsid_pkg::*;  // Import the package for HSI MSE
 
 module hsid_main_fsm #(
-    parameter HSI_BANDS = 254,  // Number of HSI bands
-    parameter ELEMENTS = HSI_BANDS / 2,  // Number of elements in the vector
-    parameter ELEMENTS_ADDR = $clog2(ELEMENTS),  // Address width for HSI bands
-    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
-    parameter HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Number of bits to represent vector length
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // Data width for HSI bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,  // Number of bits to represent vector length
+    localparam HSP_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH)  // Address width for HSI bands
   ) (
     input logic clk,
     input logic rst_n,
 
     // Library size input
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] hsi_library_size,  // Length of the vectors
-    input logic [ELEMENTS_ADDR-1:0] element_threshold,  // HSI bands to process
+    input logic [HSP_LIBRARY_WIDTH-1:0] hsi_library_size,  // Length of the vectors
+    input logic [HSP_PACK_WIDTH-1:0] element_threshold,  // HSI bands to process
 
     // Fifo status signals
     input logic fifo_measure_complete,  // Full signal for measure vector FIFO
@@ -29,7 +29,7 @@ module hsid_main_fsm #(
 
     // Current state
     output hsid_main_state_t state,
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] vctr_count,
+    output logic [HSP_LIBRARY_WIDTH-1:0] vctr_count,
     output logic element_start,  // Start vector processing signal
     output logic element_last,  // Last vector processing signal
     output logic element_valid,  // Element valid signal
@@ -44,7 +44,7 @@ module hsid_main_fsm #(
   );
 
   // Assigns statements
-  logic [ELEMENTS_ADDR:0] element_count;
+  logic [HSP_PACK_WIDTH:0] element_count;
   assign fifo_both_read_en = (state == COMPUTE_MSE && !fifo_ref_empty && !fifo_measure_empty);
   // assign element_last = (element_count == ELEMENTS - 1);
   // assign element_start = (element_count == 0); // && fifo_both_read_en

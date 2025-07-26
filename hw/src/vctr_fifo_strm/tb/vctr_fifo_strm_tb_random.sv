@@ -2,14 +2,15 @@
 
 import hsid_pkg::*;
 
-class VctrFifoStreamGen;
+class VctrFifoStreamGen#(
+    parameter int DATA_WIDTH = HSID_DATA_WIDTH,
+    parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH
+  );
 
-  localparam int DATA_WIDTH = HSID_DATA_WIDTH;
-  localparam int VECTOR_LENGTH = HSID_VECTOR_LENGTH_TB;
+  localparam int VECTOR_LENGTH = 2 ** HSP_BANDS_WIDTH;
 
   rand logic [DATA_WIDTH-1:0] vctr1 [VECTOR_LENGTH];
   rand logic [DATA_WIDTH-1:0] vctr2 [VECTOR_LENGTH];
-
 
   // Generate random vectors
   constraint c_vctrs {
@@ -18,7 +19,7 @@ class VctrFifoStreamGen;
   }
 
   function automatic void sum_vctr(
-      output logic [DATA_WIDTH-1:0]   sum [VECTOR_LENGTH] // wider to hold overflow
+      output logic [DATA_WIDTH-1:0] sum [VECTOR_LENGTH] // wider to hold overflow
     );
     for (int i = 0; i < VECTOR_LENGTH; i++) begin
       sum[i] = vctr1[i] + vctr2[i];

@@ -2,9 +2,9 @@
 
 import hsid_pkg::*;
 
-module hsid_sq_df_tb;
-
-  localparam DATA_WIDTH = HSID_DATA_WIDTH;
+module hsid_sq_df_tb #(
+    parameter int DATA_WIDTH = HSID_DATA_WIDTH // Data width for the input vectors
+  );
 
   reg clk;
   reg rst_n;

@@ -2,7 +2,7 @@
 
 module vctr_fifo_full #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
-    parameter VECTOR_LENGTH = 8  // 8 entries by default
+    parameter HSP_BANDS_WIDTH = 3  // 8 entries by default
   ) (
     input logic clk,
     input logic rst_n,
@@ -16,6 +16,8 @@ module vctr_fifo_full #(
     output logic idle,
     output logic ready
   );
+
+  localparam [HSP_BANDS_WIDTH-1:0] ALMOST_FULL_THRESHOLD = (2 ** HSP_BANDS_WIDTH) - 1; // Number of HSI bands
 
   typedef enum logic [2:0] {
     IDLE, READING, OPERATION, DONE
@@ -92,7 +94,7 @@ module vctr_fifo_full #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(VECTOR_LENGTH)
+    .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
   ) vctr_in_1 (
     .clk(clk),
     .rst_n(rst_n),
@@ -100,7 +102,7 @@ module vctr_fifo_full #(
     .wr_en(data_in_en && current_state == READING),
     .rd_en(current_state == OPERATION),
     .data_in(data_in),
-    .almost_full_threshold(VECTOR_LENGTH - 1),
+    .almost_full_threshold(ALMOST_FULL_THRESHOLD),
     .data_out(vctr_in_1_data),
     .full(vctr_in_1_full),
     .almost_full(),
@@ -110,7 +112,7 @@ module vctr_fifo_full #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(VECTOR_LENGTH)
+    .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
   ) vctr_in_2 (
     .clk(clk),
     .rst_n(rst_n),
@@ -118,7 +120,7 @@ module vctr_fifo_full #(
     .wr_en(data_in_en && vctr_in_1_full && current_state == READING),
     .rd_en(current_state == OPERATION),
     .data_in(data_in),
-    .almost_full_threshold(VECTOR_LENGTH - 1),
+    .almost_full_threshold(ALMOST_FULL_THRESHOLD),
     .data_out(vctr_in_2_data),
     .full(vctr_in_2_full),
     .almost_full(),
@@ -128,7 +130,7 @@ module vctr_fifo_full #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(VECTOR_LENGTH)
+    .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
   ) vctr_out (
     .clk(clk),
     .rst_n(rst_n),
@@ -136,7 +138,7 @@ module vctr_fifo_full #(
     .wr_en(vctr_out_en),
     .rd_en(current_state == DONE && data_out_en),  // Read enable signal for output FIFO
     .data_in(vctr_out_data),
-    .almost_full_threshold(VECTOR_LENGTH - 1),
+    .almost_full_threshold(ALMOST_FULL_THRESHOLD),
     .data_out(data_out),
     .full(vctr_out_full),
     .almost_full(),

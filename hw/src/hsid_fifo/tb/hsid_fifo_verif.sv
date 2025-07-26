@@ -2,8 +2,8 @@
 
 module hsid_fifo_abv #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
-    parameter FIFO_DEPTH = 8,  // 8 entries by default
-    localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH) // Address width for FIFO depth
+    parameter FIFO_ADDR_WIDTH = 4, // Address width for FIFO depth
+    localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH
   ) (
     input logic clk,
     input logic rst_n,

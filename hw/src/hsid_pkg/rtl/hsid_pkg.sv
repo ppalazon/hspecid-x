@@ -6,12 +6,9 @@ package hsid_pkg;
   localparam int HSID_DATA_WIDTH = 16; // 16 bits (but only 14 bits used from hsi pixel)
   localparam int HSID_DATA_WIDTH_MUL = HSID_DATA_WIDTH * 2; // Data width for multiplication
   localparam int HSID_DATA_WIDTH_ACC = HSID_DATA_WIDTH * 3; // Data width for accumulator
-  localparam int HSID_VECTOR_LENGTH_TB = 24; // Length of the vector for testbench
-  localparam int HSID_LENGTH_BITS = 10; // Number of bits for length
-  localparam int HSID_BUFFER_LENGTH = 4; // Length of the buffer
-  localparam int HSID_MAX_HSP_BANDS = 255; // Number of bands in HSI (8 bits)
-  localparam int HSID_MAX_HSP_LIBRARY = 4095 ; // Size of the HSI library (11 bits)
-  localparam int HSID_DATA_PER_WORD = HSID_WORD_WIDTH / HSID_DATA_WIDTH; // Number of data elements per word
+  localparam int HSID_HSP_BANDS_WIDTH = 8; // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
+  localparam int HSID_HSP_LIBRARY_WIDTH = 11 ; // Numer of bits for Hyperspectral Pixels Library (11 bits - 4096 pixels)
+  localparam int HSID_BUFFER_WIDTH = 2; // Number of bits for buffer address (4 entries)
 
   // Test parameters
   localparam int HSID_TEST_BANDS = 16; // Number of HSI bands to test

@@ -1,8 +1,9 @@
 class hsid_fifo_op #(
-    parameter int DATA_WIDTH = 32,  // Width of the data in bits
-    parameter FIFO_DEPTH = 8,  // 8 entries by default
-    localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH) // Address width for FIFO depth
+    parameter DATA_WIDTH = 32,  // Width of the data in bits
+    parameter FIFO_ADDR_WIDTH = 3 // Address width for FIFO depth
   );
+
+  localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH; // Define FIFO depth based on address width
 
   rand logic [DATA_WIDTH-1:0] data_in;
   rand logic wr_en;

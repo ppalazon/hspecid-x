@@ -2,38 +2,37 @@
 
 import hsid_pkg::*;
 
-module hsid_mse_comp_tb;
-
-  localparam WORD_WIDTH = HSID_WORD_WIDTH;  // Width of the word in bits
-  localparam HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY;  // Size of the HSI library
-  localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE);
+module hsid_mse_comp_tb #(
+    parameter int WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Number of bits for HSI library size
+  );
 
   reg clk;
   reg rst_n;
   reg mse_in_valid;
   reg [WORD_WIDTH-1:0] mse_in;
-  reg [HSI_LIBRARY_SIZE_ADDR-1:0] mse_in_ref;  // Reference value for MSE, initialized to 0
+  reg [HSP_LIBRARY_WIDTH-1:0] mse_in_ref;  // Reference value for MSE, initialized to 0
   reg clear;  // Clear signal, not used in this test
   wire mse_out_valid;
   wire mse_min_changed;
   wire mse_max_changed;
   wire [WORD_WIDTH-1:0] mse_min_value;
   wire [WORD_WIDTH-1:0] mse_max_value;
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref;
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_min_ref;
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;
 
   // Aux min and max values for comparison
   logic [WORD_WIDTH-1:0] aux_min_value = 32'hFFFFFFFF;  // Initialize aux_min to max value
   logic [WORD_WIDTH-1:0] aux_max_value = 32'h0;  // Initialize aux_max to min value
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] aux_min_ref = 0; // Initialize aux_min_ref to 0
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] aux_max_ref = 0; // Initialize aux_max_ref to 0
+  logic [HSP_LIBRARY_WIDTH-1:0] aux_min_ref = 0; // Initialize aux_min_ref to 0
+  logic [HSP_LIBRARY_WIDTH-1:0] aux_max_ref = 0; // Initialize aux_max_ref to 0
   logic aux_min_changed = 0;  // Initialize aux_min_changed to 0
   logic aux_max_changed = 0;  // Initialize aux_max_changed to 0
 
 
   hsid_mse_comp #(
     .WORD_WIDTH(WORD_WIDTH),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -70,7 +69,7 @@ module hsid_mse_comp_tb;
     // First value: medium
     mse_in_valid = 1;
     mse_in = 32'h0000FFFF;  // Input MSE value
-    mse_in_ref = 12'h1;
+    mse_in_ref = 'h1;
     #10;
     mse_in_valid = 0;  // Disable input MSE valid signal
 
@@ -83,7 +82,7 @@ module hsid_mse_comp_tb;
     // Second value: bigger
     mse_in_valid = 1;
     mse_in = 32'h000FFFFF;  // Input MSE value
-    mse_in_ref = 12'h2;
+    mse_in_ref = 'h2;
     #10;
     mse_in_valid = 0;  // Disable input MSE valid signal
 
@@ -96,7 +95,7 @@ module hsid_mse_comp_tb;
     // Second value: smaller
     mse_in_valid = 1;
     mse_in = 32'h00000FFF;  // Input MSE value
-    mse_in_ref = 12'h3;
+    mse_in_ref = 'h3;
     #10;
     mse_in_valid = 0;  // Disable input MSE valid signal
 
@@ -122,7 +121,7 @@ module hsid_mse_comp_tb;
     for (int i = 0; i < 50; i++) begin
       mse_in_valid = $urandom % 2;
       mse_in = $urandom;  // Random MSE value
-      mse_in_ref = i % HSI_LIBRARY_SIZE;  // Random reference value within library size
+      mse_in_ref = i[HSP_LIBRARY_WIDTH-1:0];  // Random reference value within library size
       if (mse_in_valid) begin
         aux_min_changed = mse_in <= aux_min_value;
         aux_max_changed = mse_in >= aux_max_value;

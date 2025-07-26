@@ -2,8 +2,7 @@
 
 module hsid_fifo #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
-    parameter FIFO_DEPTH = 8,  // 8 entries by default
-    localparam FIFO_ADDR_WIDTH = $clog2(FIFO_DEPTH) // Address width for FIFO depth
+    parameter FIFO_ADDR_WIDTH = 3 // Address width for FIFO depth
   ) (
     input logic clk,
     input logic rst_n,
@@ -18,6 +17,8 @@ module hsid_fifo #(
     output logic empty,
     input logic clear
   );
+
+  localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH; // Define FIFO depth based on address width
 
   // Inicializing FIFO memory
   logic [DATA_WIDTH-1:0] fifo_mem[0:FIFO_DEPTH-1];
@@ -59,27 +60,27 @@ module hsid_fifo #(
   task loop_fifo();
     data_out <= fifo_mem[rd_ptr];
     fifo_mem[wr_ptr] <= fifo_mem[rd_ptr];
-    rd_ptr <= rd_ptr == FIFO_DEPTH-1 ? 0 : rd_ptr + 1;
-    wr_ptr <= wr_ptr == FIFO_DEPTH-1 ? 0 : wr_ptr + 1;
+    rd_ptr <= rd_ptr + 1;
+    wr_ptr <= wr_ptr + 1;
   endtask
 
   task read_fifo();
     data_out <= fifo_mem[rd_ptr];
-    rd_ptr   <= rd_ptr == FIFO_DEPTH-1 ? 0 : rd_ptr + 1;
+    rd_ptr   <= rd_ptr + 1;
     fifo_count <= fifo_count - 1;
   endtask
 
   task write_input();
     fifo_mem[wr_ptr] <= data_in;
-    wr_ptr <= wr_ptr == FIFO_DEPTH-1 ? 0 : wr_ptr + 1;
+    wr_ptr <= wr_ptr + 1;
     fifo_count <= fifo_count + 1;
   endtask
 
   task read_and_write();
     data_out <= fifo_mem[rd_ptr];
     fifo_mem[wr_ptr] <= data_in;
-    rd_ptr <= rd_ptr == FIFO_DEPTH-1 ? 0 : rd_ptr + 1;
-    wr_ptr <= wr_ptr == FIFO_DEPTH-1 ? 0 : wr_ptr + 1;
+    rd_ptr <= rd_ptr + 1;
+    wr_ptr <= wr_ptr + 1;
     fifo_count <= fifo_count; // No change in count
   endtask
 

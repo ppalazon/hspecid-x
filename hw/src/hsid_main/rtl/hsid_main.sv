@@ -3,17 +3,13 @@
 import hsid_pkg::*;  // Import the package for HSI MSE
 
 module hsid_main #(
-    parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter DATA_WIDTH = 16,  // 16 bits by default
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
     parameter DATA_WIDTH_MUL = DATA_WIDTH * 2,  // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = DATA_WIDTH * 3,  // Data width for accumulator, larger than WORD
-    parameter HSI_BANDS = 255,  // Number of HSI bands
-    parameter BUFFER_LENGTH = 4,  // Number of entries in the FIFO buffer
-    parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
-    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
-    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
-    localparam ELEMENTS_ADDR = $clog2(ELEMENTS),  // Address width for elements
-    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI bands
+    parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Number of bits for buffer address (4 entries)
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI bands
   ) (
     input logic clk,
     input logic rst_n,
@@ -23,12 +19,12 @@ module hsid_main #(
     input logic [WORD_WIDTH-1:0] hsi_vctr_in, // Input sample word data
 
     // Input parameters for library size and pixel bands
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] library_size_in,  // Amount of HSI library vectors to process
-    input logic [HSI_BANDS_ADDR-1:0] hsi_bands_in,  // HSI bands to process
+    input logic [HSP_LIBRARY_WIDTH-1:0] library_size_in,  // Amount of HSI library vectors to process
+    input logic [HSP_BANDS_WIDTH-1:0] hsi_bands_in,  // HSI bands to process
 
     // Output parameters with the MSE result
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref,
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref,
+    output logic [HSP_LIBRARY_WIDTH-1:0] mse_min_ref,
+    output logic [HSP_LIBRARY_WIDTH-1:0] mse_max_ref,
     output logic [WORD_WIDTH-1:0] mse_min_value,  // Mean Squared Error output
     output logic [WORD_WIDTH-1:0] mse_max_value,  // Mean Squared Error output
 
@@ -41,6 +37,9 @@ module hsid_main #(
     output logic idle,
     output logic ready
   );
+
+  localparam BUFFER_SIZE = 2 ** BUFFER_WIDTH;  // Size of the FIFO buffer
+  localparam HSP_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH); // Address width for packed HSP
 
   wire hsid_main_state_t state;
   wire fifo_measure_complete, fifo_measure_empty;
@@ -57,12 +56,12 @@ module hsid_main #(
   wire element_start;  // Start vector processing signal
   wire element_last;  // Last vector processing signal
   wire element_valid; // Element valid signal
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] vctr_ref;  // Reference vector for MSE
+  wire [HSP_LIBRARY_WIDTH-1:0] vctr_ref;  // Reference vector for MSE
   wire [WORD_WIDTH-1:0] mse_out;  // Mean Squared Error
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref;  // Reference vector for MSE
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_ref;  // Reference vector for MSE
 
   // Assigns statements
-  wire [ELEMENTS_ADDR-1:0] element_threshold; // Threshold for element count to restart the element count and check almost full condition
+  wire [HSP_PACK_WIDTH-1:0] element_threshold; // Threshold for element count to restart the element count and check almost full condition
   assign element_threshold = (hsi_bands_in / 2);
 
   // Assigns statements
@@ -71,9 +70,10 @@ module hsid_main #(
   assign fifo_ref_write_en = (state == COMPUTE_MSE && hsi_vctr_in_valid);
 
   hsid_main_fsm #(
-    .HSI_BANDS(HSI_BANDS),
-    .ELEMENTS(ELEMENTS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .WORD_WIDTH(WORD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) fsm (
     .clk(clk),
     .rst_n(rst_n),
@@ -102,8 +102,8 @@ module hsid_main #(
   hsid_mse #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
-    .HSI_BANDS(HSI_BANDS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL)
   ) hsi_mse (
@@ -123,7 +123,7 @@ module hsid_main #(
 
   hsid_mse_comp #(
     .WORD_WIDTH(WORD_WIDTH),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsi_mse_comp (
     .clk(clk),
     .rst_n(rst_n),
@@ -142,7 +142,7 @@ module hsid_main #(
 
   hsid_fifo #(
     .DATA_WIDTH(WORD_WIDTH),
-    .FIFO_DEPTH(ELEMENTS)  // FIFO depth for HSI bands
+    .FIFO_ADDR_WIDTH(HSP_PACK_WIDTH)  // FIFO depth for HSI bands
   ) fifo_measure (
     .clk(clk),
     .rst_n(rst_n),
@@ -160,7 +160,7 @@ module hsid_main #(
 
   hsid_fifo #(
     .DATA_WIDTH(WORD_WIDTH),
-    .FIFO_DEPTH(BUFFER_LENGTH)  // Some buffer length for input vectors
+    .FIFO_ADDR_WIDTH(BUFFER_WIDTH)  // Some buffer length for input vectors
   ) fifo_ref (
     .clk(clk),
     .rst_n(rst_n),
@@ -168,7 +168,7 @@ module hsid_main #(
     .wr_en(fifo_ref_write_en),
     .rd_en(fifo_both_read_en),
     .data_in(hsi_vctr_in),
-    .almost_full_threshold(BUFFER_LENGTH - 1),  // Threshold for almost full condition
+    .almost_full_threshold(BUFFER_SIZE - 1),  // Threshold for almost full condition
     .data_out(fifo_ref_data_out),
     .full(fifo_ref_full),
     .almost_full(),

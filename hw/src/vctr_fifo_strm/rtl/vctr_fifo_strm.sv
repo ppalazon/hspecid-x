@@ -2,8 +2,8 @@
 
 module vctr_fifo_strm #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
-    parameter LENGTH_BITS = 10,  // Number of bits to represent vector length
-    parameter BUFFER_LENGTH = 4  // 8 entries by default
+    parameter HSP_BANDS_WIDTH = 8,  // Number of bits to represent vector length
+    parameter BUFFER_WIDTH = 2  // Width of the buffer for vector operations
   ) (
     input logic clk,
     input logic rst_n,
@@ -20,13 +20,15 @@ module vctr_fifo_strm #(
     output logic [DATA_WIDTH-1:0] data_out,
     output logic data_out_empty,  // Empty signal for output FIFO
 
-    input logic [LENGTH_BITS-1:0] vector_length,  // Length of the vectors
+    input logic [HSP_BANDS_WIDTH-1:0] vector_length,  // Length of the vectors
 
     input  logic start,
     output logic done,
     output logic idle,
     output logic ready
   );
+
+  localparam BUFFER_SIZE = 2 ** BUFFER_WIDTH; // Number of entries in the FIFO buffer
 
   typedef enum logic [1:0] {
     IDLE, COMPUTE, DONE
@@ -42,7 +44,7 @@ module vctr_fifo_strm #(
   // Operands for vector operations
   logic [DATA_WIDTH-1:0] read_v1_data, read_v2_data, vctr_out_data;
   logic vctr_out_en, compute_en; // Pipeline control signals
-  logic [LENGTH_BITS-1:0] processed;
+  logic [HSP_BANDS_WIDTH-1:0] processed;
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -99,7 +101,7 @@ module vctr_fifo_strm #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(BUFFER_LENGTH)
+    .FIFO_ADDR_WIDTH(BUFFER_WIDTH)
   ) vctr_in_1 (
     .clk(clk),
     .rst_n(rst_n),
@@ -107,7 +109,7 @@ module vctr_fifo_strm #(
     .wr_en(current_state == COMPUTE && data_in_v1_en && !vctr_out_almost_full),
     .rd_en(current_state == COMPUTE && !vctr_in_1_empty && !vctr_in_2_empty),
     .data_in(data_in_v1),
-    .almost_full_threshold(BUFFER_LENGTH - 1),
+    .almost_full_threshold(BUFFER_SIZE - 1),
     .data_out(read_v1_data),
     .full(data_in_v1_full),
     .almost_full(),
@@ -117,7 +119,7 @@ module vctr_fifo_strm #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(BUFFER_LENGTH)
+    .FIFO_ADDR_WIDTH(BUFFER_WIDTH)
   ) vctr_in_2 (
     .clk(clk),
     .rst_n(rst_n),
@@ -125,7 +127,7 @@ module vctr_fifo_strm #(
     .wr_en(current_state == COMPUTE && data_in_v2_en && !vctr_out_almost_full),
     .rd_en(current_state == COMPUTE && !vctr_in_1_empty && !vctr_in_2_empty),
     .data_in(data_in_v2),
-    .almost_full_threshold(BUFFER_LENGTH - 1),
+    .almost_full_threshold(BUFFER_SIZE - 1),
     .data_out(read_v2_data),
     .full(data_in_v2_full),
     .almost_full(),
@@ -135,7 +137,7 @@ module vctr_fifo_strm #(
 
   hsid_fifo #(
     .DATA_WIDTH(DATA_WIDTH),
-    .FIFO_DEPTH(BUFFER_LENGTH)
+    .FIFO_ADDR_WIDTH(BUFFER_WIDTH)
   ) vctr_out (
     .clk(clk),
     .rst_n(rst_n),
@@ -143,7 +145,7 @@ module vctr_fifo_strm #(
     .wr_en(vctr_out_en),
     .rd_en(current_state != IDLE && data_out_en),
     .data_in(vctr_out_data),
-    .almost_full_threshold(BUFFER_LENGTH - 2),
+    .almost_full_threshold(BUFFER_SIZE - 2),
     .data_out(data_out),
     .full(vctr_out_full),
     .almost_full(vctr_out_almost_full),

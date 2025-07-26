@@ -5,24 +5,22 @@ module hsid_mse #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
     parameter DATA_WIDTH_MUL = 32,  // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = 48,  // Data width for accumulator, larger than WORD
-    parameter HSI_BANDS = 255,  // Number of HSI bands
-    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
-    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
-    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Address width for HSI library size
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI library size
   ) (
     input logic clk,
     input logic rst_n,
 
     input logic element_start,
     input logic element_last,
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] vctr_ref,
+    input logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref,
     input logic [WORD_WIDTH-1:0] element_a, // Input sample word data
     input logic [WORD_WIDTH-1:0] element_b, // Input sample word data
     input logic element_valid,  // Enable input sample data
-    input logic [HSI_BANDS_ADDR-1:0] hsi_bands,  // HSI bands to process
+    input logic [HSP_BANDS_WIDTH-1:0] hsi_bands,  // HSI bands to process
 
     output logic [WORD_WIDTH-1:0] mse_value,  // Output mean square error
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_ref,  // Reference vector for sum
+    output logic [HSP_LIBRARY_WIDTH-1:0] mse_ref,  // Reference vector for sum
     output logic mse_valid  // Enable input sample data
   );
 
@@ -32,7 +30,7 @@ module hsid_mse #(
   logic channel_1_acc_valid, channel_2_acc_valid;
   logic [DATA_WIDTH_ACC-1:0] channel_1_acc_value, channel_2_acc_value;
   logic channel_1_acc_last, channel_2_acc_last;
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] channel_1_acc_ref, channel_2_acc_ref;  // Reference vector for sum
+  logic [HSP_LIBRARY_WIDTH-1:0] channel_1_acc_ref, channel_2_acc_ref;  // Reference vector for sum
 
   // Catch the square difference accumulator outputs
   logic acc_sum_en;  // Enable signal for mean square error accumulator
@@ -46,7 +44,7 @@ module hsid_mse #(
   // Pipeline statage for mean square error
   logic acc_valid;
   logic [DATA_WIDTH_ACC:0] acc_value;  // Accumulator for both channels
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] acc_ref;  // Reference vector for mean square error
+  logic [HSP_LIBRARY_WIDTH-1:0] acc_ref;  // Reference vector for mean square error
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -83,7 +81,7 @@ module hsid_mse #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) channel_1 (
     .clk(clk),
     .rst_n(rst_n),
@@ -104,7 +102,7 @@ module hsid_mse #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) channel_2 (
     .clk(clk),
     .rst_n(rst_n),

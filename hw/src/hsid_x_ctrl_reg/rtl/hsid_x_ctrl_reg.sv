@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 
+import hsid_pkg::*;
+
 module hsid_x_ctrl_reg #(
-    parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter HSI_BANDS = 254,  // Number of HSI bands
-    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
-    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
-    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
     input logic clk,
     input logic rst_n,
@@ -23,15 +23,15 @@ module hsid_x_ctrl_reg #(
     input logic done,
     input logic error,
 
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] library_size,  // Size of the Hyperspectral pixel library
-    output logic [HSI_BANDS_ADDR-1:0] pixel_bands,  // Number of bands per hyperspectral pixel
+    output logic [HSP_LIBRARY_WIDTH-1:0] library_size,  // Size of the Hyperspectral pixel library
+    output logic [HSP_BANDS_WIDTH-1:0] pixel_bands,  // Number of bands per hyperspectral pixel
 
     output logic [WORD_WIDTH-1:0] captured_pixel_addr,  // Address of the captured pixel
     output logic [WORD_WIDTH-1:0] library_pixel_addr,  // Address of the library pixel
 
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref, // Pixel reference for minimum MSE value
+    input logic [HSP_LIBRARY_WIDTH-1:0] mse_min_ref, // Pixel reference for minimum MSE value
     input logic [WORD_WIDTH-1:0] mse_min_value,  // Minimum MSE value
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref,  // Pixel reference for maximum MSE value
+    input logic [HSP_LIBRARY_WIDTH-1:0] mse_max_ref,  // Pixel reference for maximum MSE value
     input logic [WORD_WIDTH-1:0] mse_max_value  // Maximum MSE value
   );
 
@@ -87,8 +87,8 @@ module hsid_x_ctrl_reg #(
   assign clear = reg2hw.status.clear.q;
   assign captured_pixel_addr = reg2hw.captured_pixel_addr.q;
   assign library_pixel_addr = reg2hw.library_pixel_addr.q;
-  assign library_size = reg2hw.library_size.q[HSI_LIBRARY_SIZE_ADDR-1:0];
-  assign pixel_bands = reg2hw.pixel_bands.q[HSI_BANDS_ADDR-1:0];  // Number of bands
+  assign library_size = reg2hw.library_size.q[HSP_LIBRARY_WIDTH-1:0];
+  assign pixel_bands = reg2hw.pixel_bands.q[HSP_BANDS_WIDTH-1:0];  // Number of bands
 
   // HW to Register interface (Input)
   assign hw2reg.status.idle.d = idle;
@@ -100,13 +100,13 @@ module hsid_x_ctrl_reg #(
   assign hw2reg.status.ready.d = ready;
   assign hw2reg.status.ready.de = 1'b1;
 
-  assign hw2reg.mse_min_ref.d = {{(WORD_WIDTH-HSI_LIBRARY_SIZE_ADDR){1'b0}}, mse_min_ref}; // Zero-extend to match width
+  assign hw2reg.mse_min_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_min_ref}; // Zero-extend to match width
   assign hw2reg.mse_min_ref.de = 1'b1;
 
   assign hw2reg.mse_min_value.d = mse_min_value;
   assign hw2reg.mse_min_value.de = 1'b1;
 
-  assign hw2reg.mse_max_ref.d = {{(WORD_WIDTH-HSI_LIBRARY_SIZE_ADDR){1'b0}}, mse_max_ref}; // Zero-extend to match width
+  assign hw2reg.mse_max_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_max_ref}; // Zero-extend to match width
   assign hw2reg.mse_max_ref.de = 1'b1;
 
   assign hw2reg.mse_max_value.d = mse_max_value;

@@ -2,10 +2,12 @@
 
 import hsid_pkg::*;
 
-module vctr_fifo_full_tb;
+module vctr_fifo_full_tb #(
+    parameter DATA_WIDTH = HSID_DATA_WIDTH,
+    parameter HSP_BANDS_WIDTH = 3  // 8 entries by default
+  );
 
-  parameter DATA_WIDTH = HSID_DATA_WIDTH;
-  parameter VECTOR_LENGTH = HSID_VECTOR_LENGTH_TB;
+  localparam int VECTOR_LENGTH = 2 ** HSP_BANDS_WIDTH; // Length of the vector for testbench
 
   reg clk;
   reg rst_n;
@@ -18,12 +20,12 @@ module vctr_fifo_full_tb;
   wire idle;
   wire ready;
 
-  // Generate 2 simple vectors with 8 values each
-  reg [DATA_WIDTH-1:0] vctr_sum [0:VECTOR_LENGTH-1];
+// Generate 2 simple vectors with 8 values each
+  reg [DATA_WIDTH-1:0] vctr_sum [];
 
   vctr_fifo_full #(
     .DATA_WIDTH(DATA_WIDTH),
-    .VECTOR_LENGTH(VECTOR_LENGTH)
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -37,10 +39,13 @@ module vctr_fifo_full_tb;
     .ready(ready)
   );
 
-  // Random class to generate test vectors
-  VctrFifoFullGen vffg;
+// Random class to generate test vectors
+  VctrFifoFullGen #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
+  ) vffg;
 
-  // Waveform generation for debugging
+// Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
     $dumpvars(0, vctr_fifo_full_tb);
@@ -62,8 +67,14 @@ module vctr_fifo_full_tb;
 
     // Initialize vectors
     vffg = new();
-    if (vffg.randomize()) begin
+    for (int i = 0; i < 10; i++) begin
+      if (!vffg.randomize()) $fatal(0, "Failed to randomize vectors");
+
       vffg.sum_vctr(vctr_sum);
+
+      $display("Vector 1: %p", vffg.vctr1);
+      $display("Vector 2: %p", vffg.vctr2);
+      $display("Expected sum: %p", vctr_sum);
 
       $display("Test case 1: Start operation");
       start = 1;
@@ -99,24 +110,25 @@ module vctr_fifo_full_tb;
       data_out_en = 1; // Enable output reading
       for (int i = 0; i < VECTOR_LENGTH; i++) begin
         #10;
-        $display("Element [%0d], Vector1: %d, Vector2: %d, Results: %d", i, vffg.vctr1[i], vffg.vctr2[i], data_out);
+        // $display("Element [%0d], Vector1: %d, Vector2: %d, Results: %d", i, vffg.vctr1[i], vffg.vctr2[i], data_out);
         if (data_out !== vctr_sum[i]) begin
           $error("Error: Output data does not match expected value. Expected: %h, Got: %h", vctr_sum[i], data_out);
         end
       end
 
+      data_out_en = 0; // Disable output reading
+      $display("Test case completed successfully");
+      #10;
+
       if (!idle) begin
         $error("Error: DUT not idle after operation");
       end
 
-      // End simulation
-      $display("Testbench completed");
-      $finish;
-
-    end else begin
-      $error("Failed to randomize vectors");
-      $finish;
     end
+
+    // End simulation
+    $display("Testbench completed");
+    $finish;
   end
 
   always

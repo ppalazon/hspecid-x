@@ -9,9 +9,9 @@ module hsid_x_top_tb #(
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL,  // Data width for multiplication, larger than DATA_WIDTH
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC,  // Data width for accumulator, larger than DATA_WIDTH
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
-    parameter HSI_BANDS = HSID_MAX_HSP_BANDS,  // Number of HSI bands
-    parameter BUFFER_LENGTH = HSID_BUFFER_LENGTH,  // Length of the buffer
-    parameter HSI_LIBRARY_SIZE = HSID_MAX_HSP_LIBRARY,  // Size of the HSI library
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
+    parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Length of the buffer
     parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
     parameter TEST_ELEMENTS = TEST_BANDS / 2, // Number of HSI bands to test
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
@@ -21,8 +21,6 @@ module hsid_x_top_tb #(
     parameter TEST_CAPTURED_PIXEL_ADDR = 32'h00000004, // Address for captured pixel data
     parameter TEST_LIBRARY_PIXEL_ADDR = 32'h00010004 - (3 * TEST_ELEMENTS * 4)  // Address for library pixel data, 4 pixels is the same as captured pixel data
   ) ();
-
-  localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE); // Address width for test library size
 
   reg clk;
   reg rst_n;
@@ -39,18 +37,17 @@ module hsid_x_top_tb #(
   logic [WORD_WIDTH-1:0] da_addr; // Direct access address
   logic [WORD_WIDTH-1:0] min_mse_value_expected;
   logic [WORD_WIDTH-1:0] max_mse_value_expected;
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] min_mse_ref_expected;
-  logic [HSI_LIBRARY_SIZE_ADDR-1:0] max_mse_ref_expected;
+  logic [HSP_LIBRARY_WIDTH-1:0] min_mse_ref_expected;
+  logic [HSP_LIBRARY_WIDTH-1:0] max_mse_ref_expected;
 
   hsid_x_top #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
-    .HSI_BANDS(HSI_BANDS),
-    .ELEMENTS(HSI_BANDS / 2), // Number of elements in the vector
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
-    .BUFFER_LENGTH(BUFFER_LENGTH)
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
+    .BUFFER_WIDTH(BUFFER_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -176,9 +173,9 @@ module hsid_x_top_tb #(
     assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
 
     // // Check the MSE results
-    assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, {{(WORD_WIDTH-HSI_LIBRARY_SIZE_ADDR){1'b0}}, min_mse_ref_expected });
+    assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, min_mse_ref_expected });
     assert_read_reg(HSID_X_CTRL_MSE_MIN_VALUE, min_mse_value_expected);
-    assert_read_reg(HSID_X_CTRL_MSE_MAX_REF, {{(WORD_WIDTH-HSI_LIBRARY_SIZE_ADDR){1'b0}}, max_mse_ref_expected });
+    assert_read_reg(HSID_X_CTRL_MSE_MAX_REF, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, max_mse_ref_expected });
     assert_read_reg(HSID_X_CTRL_MSE_MAX_VALUE, max_mse_value_expected);
 
     #20;

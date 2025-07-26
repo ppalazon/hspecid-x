@@ -1,9 +1,10 @@
 `timescale 1ns / 1ps
 
+import hsid_pkg::*;
+
 module hsid_mse_comp #(
-    parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter HSI_LIBRARY_SIZE = 4095,
-    parameter HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)  // Number of bits for HSI library size
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Number of bits for HSI library size
   ) (
     input logic clk,
     input logic rst_n,
@@ -12,15 +13,15 @@ module hsid_mse_comp #(
     input logic clear,
     input logic mse_in_valid,  // Enable input MSE data
     input logic [WORD_WIDTH-1:0] mse_in_value,  // Input MSE
-    input logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_in_ref,
+    input logic [HSP_LIBRARY_WIDTH-1:0] mse_in_ref,
 
     // Output mse data
     output logic mse_out_valid,  // Enable output MSE data
     output logic [WORD_WIDTH-1:0] mse_min_value,
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref,
+    output logic [HSP_LIBRARY_WIDTH-1:0] mse_min_ref,
     output logic mse_min_changed,
     output logic [WORD_WIDTH-1:0] mse_max_value,
-    output logic [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref,
+    output logic [HSP_LIBRARY_WIDTH-1:0] mse_max_ref,
     output logic mse_max_changed
   );
 

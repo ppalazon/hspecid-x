@@ -4,16 +4,13 @@
 // `include "obi/assign.svh"
 
 module hsid_x_obi_mem_tb #(
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for the pixel memory
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH, // Address width for HSI library size
+    parameter VALUE_MASK = 32'h0000FFFF, // Mask to return least significant 16 bits of the address
     parameter TESTS = 30, // Number of tests to run
     parameter RANDOM_GNT = 1 // If set to 1, pixel_obi_mem will return random grant signals
   ) ();
-
-  localparam DATA_WIDTH = 16; // Data width for the pixel memory
-  localparam WORD_WIDTH = 32;
-  // localparam VALUE_MASK = 32'h00003FFF; // Mask to return least significant 14 bits of the address
-  localparam VALUE_MASK = 32'h0000FFFF;
-  localparam HSI_LIBRARY_SIZE = 8192; // Maximum size of the HSI library
-  localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE); // Address width for HSI library size
 
   reg clk;
   reg rst_n;
@@ -22,7 +19,7 @@ module hsid_x_obi_mem_tb #(
   reg [WORD_WIDTH-1:0] initial_addr;
   wire data_out_valid;
   wire [WORD_WIDTH-1:0] data_out;
-  reg [HSI_LIBRARY_SIZE_ADDR-1:0] limit; // Limit for the number of requests
+  reg [HSP_LIBRARY_WIDTH-1:0] limit; // Limit for the number of requests
   reg start;
   wire idle;
   wire ready;
@@ -30,7 +27,7 @@ module hsid_x_obi_mem_tb #(
 
   hsid_x_obi_mem #(
     .WORD_WIDTH(WORD_WIDTH),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),

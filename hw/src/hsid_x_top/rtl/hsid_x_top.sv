@@ -1,16 +1,15 @@
 `timescale 1ns / 1ps
 
+import hsid_pkg::*;
+
 module hsid_x_top #(
-    parameter WORD_WIDTH = 32,  // Width of the word in bits
-    parameter DATA_WIDTH = 16,  // 16 bits by default
-    parameter DATA_WIDTH_MUL = 32,  // Data width for multiplication, larger than WORD_WIDTH
-    parameter DATA_WIDTH_ACC = 48,  // Data width for accumulator, larger than WORD
-    parameter HSI_BANDS = 254,  // Number of HSI bands
-    parameter HSI_LIBRARY_SIZE = 4095,  // Size of the HSI library
-    parameter BUFFER_LENGTH = 4,  // Number of entries in the FIFO buffer
-    parameter ELEMENTS = HSI_BANDS / 2, // Number of elements in the vector
-    localparam HSI_BANDS_ADDR = $clog2(HSI_BANDS),  // Address width for HSI bands
-    localparam HSI_LIBRARY_SIZE_ADDR = $clog2(HSI_LIBRARY_SIZE)
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
+    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
+    parameter DATA_WIDTH_MUL = DATA_WIDTH * 2,  // Data width for multiplication
+    parameter DATA_WIDTH_ACC = DATA_WIDTH * 3,  // Data width for accumulator
+    parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Number of entries in the FIFO buffer
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
     input logic clk,
     input logic rst_n,
@@ -34,20 +33,20 @@ module hsid_x_top #(
   wire done;
   wire error;
 
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] library_size;
-  wire [HSI_BANDS_ADDR-1:0] pixel_bands;
+  wire [HSP_LIBRARY_WIDTH-1:0] library_size;
+  wire [HSP_BANDS_WIDTH-1:0] pixel_bands;
   wire [WORD_WIDTH-1:0] captured_pixel_addr;
   wire [WORD_WIDTH-1:0] library_pixel_addr;
 
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_min_ref; // Pixel reference for minimum MSE value
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_min_ref; // Pixel reference for minimum MSE value
   wire [WORD_WIDTH-1:0] mse_min_value;  // Minimum MSE
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] mse_max_ref;  // Pixel reference for maximum MSE value
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;  // Pixel reference for maximum MSE value
   wire [WORD_WIDTH-1:0] mse_max_value;  // Maximum MSE
 
   wire obi_data_out_valid;
   wire [WORD_WIDTH-1:0] obi_data_out;
   wire [WORD_WIDTH-1:0] obi_initial_addr;
-  wire [HSI_LIBRARY_SIZE_ADDR-1:0] obi_limit_in;
+  wire [HSP_LIBRARY_WIDTH-1:0] obi_limit_in;
   wire obi_start;
   wire obi_done;
 
@@ -56,10 +55,8 @@ module hsid_x_top #(
   hsid_x_top_fsm #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
-    .HSI_BANDS(HSI_BANDS),
-    .ELEMENTS(ELEMENTS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) fsm (
     .clk(clk),
     .rst_n(rst_n),
@@ -77,10 +74,10 @@ module hsid_x_top #(
   );
 
 
-// Register interface to hardware interface
+  // Register interface to hardware interface
   hsid_x_ctrl_reg #(
-    .HSI_BANDS(HSI_BANDS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
     .WORD_WIDTH(WORD_WIDTH)
   ) hsid_x_ctrl_reg (
     .clk(clk),
@@ -103,10 +100,10 @@ module hsid_x_top #(
     .mse_max_value(mse_max_value)
   );
 
-// OBI interface to memory interface
+  // OBI interface to memory interface
   hsid_x_obi_mem #(
     .WORD_WIDTH      (WORD_WIDTH),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   )
   u_hsid_x_obi_mem (
     .clk           (clk),
@@ -123,16 +120,15 @@ module hsid_x_top #(
     .start         (obi_start)
   );
 
-// HSID Main module instantiation
+  // HSID Main module instantiation
   hsid_main #(
-    .WORD_WIDTH      (WORD_WIDTH),
-    .DATA_WIDTH      (DATA_WIDTH),
-    .DATA_WIDTH_MUL  (DATA_WIDTH_MUL),
-    .DATA_WIDTH_ACC  (DATA_WIDTH_ACC),
-    .HSI_BANDS       (HSI_BANDS),
-    .BUFFER_LENGTH   (BUFFER_LENGTH),
-    .ELEMENTS        (ELEMENTS),
-    .HSI_LIBRARY_SIZE(HSI_LIBRARY_SIZE)
+    .WORD_WIDTH (WORD_WIDTH),
+    .DATA_WIDTH (DATA_WIDTH),
+    .DATA_WIDTH_MUL (DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC (DATA_WIDTH_ACC),
+    .HSP_BANDS_WIDTH (HSP_BANDS_WIDTH),
+    .BUFFER_WIDTH (BUFFER_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   )
   u_hsid_main (
     // Clear signal to reset MSE values

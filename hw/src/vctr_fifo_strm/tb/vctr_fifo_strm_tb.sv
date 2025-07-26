@@ -5,9 +5,10 @@ import hsid_pkg::*;
 module vctr_fifo_strm_tb;
 
   localparam int DATA_WIDTH = HSID_DATA_WIDTH;
-  localparam int LENGTH_BITS = HSID_LENGTH_BITS;
-  localparam int BUFFER_LENGTH = HSID_BUFFER_LENGTH;
-  localparam int VECTOR_LENGTH = HSID_VECTOR_LENGTH_TB;
+  localparam int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH;
+  localparam int BUFFER_WIDTH = 2;
+
+  localparam int HSP_BANDS = 2 ** HSP_BANDS_WIDTH; // Length of the vector for testbench
 
   reg clk;
   reg rst_n;
@@ -18,7 +19,7 @@ module vctr_fifo_strm_tb;
   reg data_out_en;
   wire [DATA_WIDTH-1:0] data_out;
   wire data_out_empty;
-  reg [LENGTH_BITS-1:0] vector_length;
+  reg [HSP_BANDS_WIDTH-1:0] vector_length;
   reg start;
   wire done;
   wire idle;
@@ -26,8 +27,8 @@ module vctr_fifo_strm_tb;
 
   vctr_fifo_strm #(
     .DATA_WIDTH(DATA_WIDTH),
-    .LENGTH_BITS(LENGTH_BITS),
-    .BUFFER_LENGTH(BUFFER_LENGTH)
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .BUFFER_WIDTH(BUFFER_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -48,9 +49,9 @@ module vctr_fifo_strm_tb;
   );
 
   // Generate 2 simple vectors with 8 values each
-  reg [DATA_WIDTH-1:0] vctr_1 [0:VECTOR_LENGTH-1];
-  reg [DATA_WIDTH-1:0] vctr_2 [0:VECTOR_LENGTH-1];
-  reg [DATA_WIDTH-1:0] vctr_sum [0:VECTOR_LENGTH-1];
+  reg [DATA_WIDTH-1:0] vctr_1 [0:HSP_BANDS-1];
+  reg [DATA_WIDTH-1:0] vctr_2 [0:HSP_BANDS-1];
+  reg [DATA_WIDTH-1:0] vctr_sum [0:HSP_BANDS-1];
 
   // Count inserted and processed elements
   integer processed = 0;
@@ -70,13 +71,13 @@ module vctr_fifo_strm_tb;
     data_in_v2_en = 0;
     data_in_v2 = 0;
     data_out_en = 0;
-    vector_length = VECTOR_LENGTH[LENGTH_BITS-1:0]; // 8 elements
+    vector_length = HSP_BANDS[HSP_BANDS_WIDTH-1:0]; // 8 elements
     start = 0;
 
     // Initialize test vectors
-    for (int i=0; i<VECTOR_LENGTH; i++) begin
+    for (int i=0; i<HSP_BANDS; i++) begin
       vctr_1[i] = 16'h0001 + i; // 0x0001, 0x0002, ..., 0x0008
-      vctr_2[i] = VECTOR_LENGTH + 1 + i; // 0x0009, 0x000A, ..., 0x0010
+      vctr_2[i] = HSP_BANDS + 1 + i; // 0x0009, 0x000A, ..., 0x0010
       vctr_sum[i] = vctr_1[i] + vctr_2[i]; // Expected sum
     end
 
@@ -155,6 +156,9 @@ module vctr_fifo_strm_tb;
         processed++;
       end
     end
+
+    #10;
+    $display("Test case completed successfully");
 
     if (!idle) begin
       $error("Error: DUT not idle after operation");
