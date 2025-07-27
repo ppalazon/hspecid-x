@@ -45,7 +45,7 @@ class HsidSqDfAccGen #(
     initial_acc dist {0:=15, MAX_DATA_ACC:=15, [1:MAX_DATA_ACC-1]:/70};
   }
 
-  function automatic void sq_df_acc_vctr(
+  function void sq_df_acc_vctr(
       output logic [DATA_WIDTH_ACC-1:0]   acc[], // wider to hold overflow
       output logic overflow // overflow flag
     );

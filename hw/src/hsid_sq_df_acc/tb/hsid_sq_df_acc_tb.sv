@@ -20,7 +20,7 @@ module hsid_sq_df_acc_tb #(
   reg rst_n;
 
   // Clean signal
-  reg clean;
+  reg clear;
 
   // Input initial accumulator value
   reg initial_acc_en;
@@ -52,7 +52,7 @@ module hsid_sq_df_acc_tb #(
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
-    .clean(clean),
+    .clear(clear),
     .initial_acc_en(initial_acc_en),
     .initial_acc(initial_acc),
     .data_in_valid(data_in_valid),
@@ -77,7 +77,7 @@ module hsid_sq_df_acc_tb #(
   ) sq_df_acc_gen = new();
 
   covergroup sq_df_acc_cg @(posedge clk);
-    coverpoint clean;
+    coverpoint clear;
     coverpoint data_in_valid;
     coverpoint data_in_a iff (data_in_valid) {
       bins zero = {0};
@@ -116,6 +116,48 @@ module hsid_sq_df_acc_tb #(
 
   sq_df_acc_cg sq_df_acc_cov = new();
 
+  // Bind dut to sva assertions
+  hsid_sq_df_acc_sva #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) dut_sva (
+    .clk(clk),
+    .rst_n(rst_n),
+    .data_in_valid(data_in_valid),
+    .data_in_a(data_in_a),
+    .data_in_b(data_in_b),
+    .data_in_last(data_in_last),
+    .data_in_ref(data_in_ref),
+    .acc_valid(acc_valid),
+    .acc_value(acc_value),
+    .acc_last(acc_last),
+    .acc_ref(acc_ref),
+    .acc_of(acc_of),
+    .clear(clear),
+    .initial_acc_en(initial_acc_en),
+    .initial_acc(initial_acc),
+    // Internal signals for verification
+    .stage_1_en(dut.stage_1_en),
+    .stage_2_en(dut.stage_2_en),
+    .stage_3_en(dut.stage_3_en),
+    .acc_1_en(dut.acc_1_en),
+    .acc_2_en(dut.acc_2_en),
+    .acc_1(dut.acc_1),
+    .acc_2(dut.acc_2),
+    .acc_3(dut.acc_3),
+    .last_1(dut.last_1),
+    .last_2(dut.last_2),
+    .last_3(dut.last_3),
+    .ref_1(dut.ref_1),
+    .ref_2(dut.ref_2),
+    .ref_3(dut.ref_3),
+    .acc_of_3(dut.acc_of_3),
+    .diff(dut.diff),
+    .mult(dut.mult)
+  );
+
   // Intermediate sq_df_acc accumulated vector
   logic [DATA_WIDTH_ACC-1:0] acc_vctr [];
   logic expected_overflow; // Expected overflow flag for the accumulated vector
@@ -138,7 +180,7 @@ module hsid_sq_df_acc_tb #(
     data_in_b = 0;
     data_in_last = 0;
     data_in_ref = 0; // Initialize reference vector for sum
-    clean = 0;
+    clear = 0;
 
     #3 rst_n = 0; // Reset the DUT
     #5 rst_n = 1; // Release reset
@@ -204,9 +246,9 @@ module hsid_sq_df_acc_tb #(
     // Test clean signal
     $display("Testing clean signal...");
     #10;
-    clean = 1; // Enable clean signal
+    clear = 1; // Enable clean signal
     #10;
-    clean = 0; // Disable clean signal
+    clear = 0; // Disable clean signal
     #10;
 
     $finish;

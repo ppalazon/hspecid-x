@@ -13,7 +13,7 @@ filesets:
   tb:
     files:
       - hw/src/hsid_fifo/tb/hsid_fifo_random.sv
-      - hw/src/hsid_fifo/tb/hsid_fifo_verif.sv
+      - hw/src/hsid_fifo/tb/hsid_fifo_sva.sv
       - hw/src/hsid_fifo/tb/hsid_fifo_tb.sv
     file_type: systemVerilogSource
     depend:

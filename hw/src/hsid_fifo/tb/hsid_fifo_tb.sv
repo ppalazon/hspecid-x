@@ -45,7 +45,7 @@ module hsid_fifo_tb #(
   );
 
   // bind verification to the DUT instance
-  bind dut hsid_fifo_abv #(
+  bind dut hsid_fifo_sva #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) hsid_fifo_abv_inst (

@@ -18,6 +18,7 @@ module hsid_mse_tb #(
 
   reg clk;
   reg rst_n;
+  reg clear;  // Clear signal to reset MSE values
   reg element_start;
   reg element_last;
   reg [WORD_WIDTH-1:0] element_a;
@@ -28,6 +29,7 @@ module hsid_mse_tb #(
   wire [WORD_WIDTH-1:0] mse_value;
   wire [HSP_LIBRARY_WIDTH-1:0] mse_ref; // Reference vector for MSE
   wire mse_valid;
+  wire mse_of; // Overflow flag for mean square error
 
   hsid_mse #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -39,6 +41,7 @@ module hsid_mse_tb #(
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
+    .clear(clear),
     .element_start(element_start),
     .element_last(element_last),
     .vctr_ref(vctr_ref),
@@ -48,7 +51,8 @@ module hsid_mse_tb #(
     .hsi_bands(hsi_bands),
     .mse_value(mse_value),
     .mse_ref(mse_ref),
-    .mse_valid(mse_valid)
+    .mse_valid(mse_valid),
+    .mse_of(mse_of)
   );
 
   // Test vectors
@@ -79,6 +83,7 @@ module hsid_mse_tb #(
   initial begin
     clk = 1;
     rst_n = 1;
+    clear = 0;
     element_start = 0;
     element_last = 0; // Not used in this test, but required by the DUT
     element_a = 0;

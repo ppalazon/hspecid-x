@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module hsid_fifo_abv #(
+module hsid_fifo_sva #(
     parameter DATA_WIDTH = 16,  // 16 bits by default
     parameter FIFO_ADDR_WIDTH = 4, // Address width for FIFO depth
     localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH
@@ -25,8 +25,11 @@ module hsid_fifo_abv #(
     input logic [FIFO_ADDR_WIDTH-1:0] wr_ptr = 0,
     input logic [FIFO_ADDR_WIDTH-1:0] rd_ptr = 0,
     input logic [FIFO_ADDR_WIDTH:0] fifo_count = 0, // It has to be one bit larger than the address width to count from 0 to FIFO_DEPTH
-    input logic [2:0] fifo_request
+    input logic [1:0] fifo_request
   );
+
+
+  localparam MAX_PTR_VALUE = FIFO_DEPTH - 1;
 
   // Assert fifo full condition
   property fifo_full;
@@ -52,18 +55,36 @@ module hsid_fifo_abv #(
   cover property (fifo_empty); // $display("Checked: FIFO is empty");
 
   // Assert values next cycle when clear is set
-  property fifo_after_clear;
+  property on_clear;
     @(posedge clk) disable iff (!rst_n) clear |=> (fifo_count == 0 && wr_ptr == 0 && rd_ptr == 0);
   endproperty
-  assert property (fifo_after_clear) else $error("FIFO is not cleared properly");
-  cover property (fifo_after_clear); //$display("Checked: FIFO is cleared");
+  assert property (on_clear) else $error("FIFO is not cleared properly");
+  cover property (on_clear); //$display("Checked: FIFO is cleared");
 
   // Assert loop operation on data_out and mem_fifo
-  property fifo_after_loop;
-    @(posedge clk) disable iff (!rst_n) loop_en && !empty && !clear |=>
+  property on_loop;
+    @(posedge clk) disable iff (!rst_n) loop_en && !empty && !clear |-> ##1
       fifo_count == $past(fifo_count) && data_out == fifo_mem[$past(rd_ptr)] && fifo_mem[$past(wr_ptr)] == fifo_mem[$past(rd_ptr)];
   endproperty
-  assert property (fifo_after_loop) else $error("FIFO data_out on loop operation is not correct");
-  cover property (fifo_after_loop); //$display("Checked: FIFO data_out on loop operation is not correct");
+  assert property (on_loop) else $error("FIFO data_out on loop operation is not correct");
+  cover property (on_loop); //$display("Checked: FIFO data_out on loop operation is not correct");
+
+  // Assert read operation on data_out and rd_ptr
+  property on_read;
+    @(posedge clk) disable iff (!rst_n) rd_en && !empty && !clear && !loop_en |-> ##1
+      data_out == fifo_mem[$past(rd_ptr)] && rd_ptr == (($past(rd_ptr) + 1) & MAX_PTR_VALUE);
+  endproperty
+
+  assert property (on_read) else $error("FIFO on read operation is not correct: data_out = %0h, rd_ptr = %0h -> %0h / %0h", data_out, $past(rd_ptr), $past(rd_ptr)+1, rd_ptr);
+  cover property (on_read); // $display("Checked: FIFO data_out and rd_ptr on read operation");
+
+  // Assert write operation on data_in and wr_ptr
+  property on_write;
+    @(posedge clk) disable iff (!rst_n) wr_en && !full && !clear && !loop_en |-> ##1
+      fifo_mem[$past(wr_ptr)] == $past(data_in) && wr_ptr == (($past(wr_ptr) + 1) & MAX_PTR_VALUE);
+  endproperty
+
+  assert property (on_write) else $error("FIFO on write operation is not correct: data_in = %0h, wr_ptr = %0h -> %0h / %0h", data_in, $past(wr_ptr), $past(wr_ptr)+1, wr_ptr);
+  cover property (on_write); // $display("Checked: FIFO data_in and wr_ptr on write operation");
 
 endmodule

@@ -15,4 +15,4 @@ vsim -assertdebug -coverage -cvgperinstance +nowarnTFMPC $top_opt -msgmode both
 add wave -group "DUT" /$top/dut/*
 
 view cover
-view assertionX
+view assertion
