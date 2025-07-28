@@ -218,7 +218,7 @@ module hsid_sq_df_acc_tb #(
           data_in_valid = cycle_valid_in; // Valid input values
           data_in_a = sq_df_acc_gen.vctr1[count_cycle];
           data_in_b = sq_df_acc_gen.vctr2[count_cycle];
-          data_in_last = (count_cycle == sq_df_acc_gen.hsp_bands - 1); // Set band counter for HSI bands
+          data_in_last = (count_cycle == sq_df_acc_gen.hsp_bands - 1); // Set band counter for HSP bands
         end else begin
           data_in_valid = 0; // No more valid input values
           data_in_a = 0;

@@ -21,12 +21,12 @@ hsid_mse_tb.clk
 @24
 hsid_mse_tb.vctr_ref[11:0]
 @22
-hsid_mse_tb.element_a[31:0]
-hsid_mse_tb.element_b[31:0]
+hsid_mse_tb.band_pack_a[31:0]
+hsid_mse_tb.band_pack_b[31:0]
 @28
-hsid_mse_tb.element_last
-hsid_mse_tb.element_start
-hsid_mse_tb.element_valid
+hsid_mse_tb.band_pack_last
+hsid_mse_tb.band_pack_start
+hsid_mse_tb.band_pack_valid
 hsid_mse_tb.rst_n
 hsid_mse_tb.mse_valid
 @24

@@ -11,9 +11,9 @@ package hsid_pkg;
   localparam int HSID_BUFFER_WIDTH = 2; // Number of bits for buffer address (4 entries)
 
   // Test parameters
-  localparam int HSID_TEST_BANDS = 16; // Number of HSI bands to test
+  localparam int HSID_TEST_BANDS = 16; // Number of HSP bands to test
   localparam int HSID_TEST_LIBRARY_SIZE = 10; // Size of the HSI library to test
-  localparam int HSID_TEST_ELEMENTS = HSID_TEST_BANDS / 2; // Number of elements in the vector for testbench
+  localparam int HSID_TEST_BAND_PACKS = HSID_TEST_BANDS / 2; // Number of band packs in the vector for testbench
 
   // HSI MSE library state machine states
   typedef enum logic [2:0] {

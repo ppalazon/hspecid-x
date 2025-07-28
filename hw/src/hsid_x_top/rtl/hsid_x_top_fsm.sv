@@ -5,14 +5,14 @@ import hsid_pkg::*;
 module hsid_x_top_fsm #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
     input logic clk,
     input logic rst_n,
 
     // Register interface
-    input [HSP_BANDS_WIDTH-1:0] pixel_bands,  // HSI bands to process
+    input [HSP_BANDS_WIDTH-1:0] pixel_bands,  // HSP bands to process
     input [HSP_LIBRARY_WIDTH-1:0] library_size,  // Size of the HSI library
     input [WORD_WIDTH-1:0] captured_pixel_addr,  // Address for captured pixel data
     input [WORD_WIDTH-1:0] library_pixel_addr,  // Address for library pixel data
@@ -28,14 +28,14 @@ module hsid_x_top_fsm #(
     output logic error  // Error flag
   );
 
-  localparam HSP_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH);  // Address width for HSI bands
+  localparam HSP_BAND_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH);  // Address width for HSP bands
 
   // Elements bands
-  logic [HSP_PACK_WIDTH-1:0] elements_bands;
+  logic [HSP_BAND_PACK_WIDTH-1:0] pixel_band_packs;
 
   // Assign Interrupt output
 
-  assign elements_bands = (pixel_bands / 2);
+  assign pixel_band_packs = (pixel_bands / 2);
 
   hsid_x_obi_read_t current_state = OR_IDLE, next_state = START_READ_CAPTURED;
 
@@ -55,13 +55,13 @@ module hsid_x_top_fsm #(
         obi_start <= 1'b0;
       end else if (current_state == START_READ_CAPTURED) begin
         obi_initial_addr <= captured_pixel_addr;
-        obi_limit_in <= { {(HSP_LIBRARY_WIDTH-HSP_PACK_WIDTH){1'b0}}, elements_bands };
+        obi_limit_in <= { {(HSP_LIBRARY_WIDTH-HSP_BAND_PACK_WIDTH){1'b0}}, pixel_band_packs };
         obi_start <= 1'b1;
       end else if (current_state == READ_CAPTURED) begin
         obi_start <= 1'b0;
       end else if (current_state == START_READ_LIBRARY) begin
         obi_initial_addr <= library_pixel_addr;
-        obi_limit_in <= elements_bands * library_size;
+        obi_limit_in <= pixel_band_packs * library_size;
         obi_start <= 1'b1;
       end else if (current_state == READ_LIBRARY) begin
         obi_start <= 1'b1;

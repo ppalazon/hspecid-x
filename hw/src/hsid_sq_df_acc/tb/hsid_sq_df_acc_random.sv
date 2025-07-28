@@ -12,11 +12,11 @@ class HsidSqDfAccGen #(
 
   localparam int MAX_DATA = (1 << DATA_WIDTH) - 1; // Maximum value for data vectors
   localparam logic[DATA_WIDTH_ACC-1:0] MAX_DATA_ACC = (1 << DATA_WIDTH_ACC) - 1; // Maximum value for accumulator, it's wider than 32 bits
-  localparam int MAX_HSP_BANDS = (1 << HSP_BANDS_WIDTH) - 1; // Maximum value for HSI bands
+  localparam int MAX_HSP_BANDS = (1 << HSP_BANDS_WIDTH) - 1; // Maximum value for HSP bands
   localparam int MAX_HSP_LIBRARY = (1 << HSP_LIBRARY_WIDTH) - 1; // Maximum value for HSI library
 
   rand logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref; // Reference vector, avoid repetition
-  rand logic [HSP_BANDS_WIDTH-1:0] hsp_bands; // Number of HSI bands
+  rand logic [HSP_BANDS_WIDTH-1:0] hsp_bands; // Number of HSP bands
   rand logic [DATA_WIDTH-1:0] vctr1 [];
   rand logic [DATA_WIDTH-1:0] vctr2 [];
   rand logic [DATA_WIDTH_ACC-1:0] initial_acc; // Initial accumulator value

@@ -7,13 +7,13 @@ class HsidMainGen #(
     parameter int DATA_WIDTH = HSID_DATA_WIDTH, // 16 bits (only 14 bits used)
     parameter int DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
     parameter int DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than DATA_WIDTH
-    parameter int TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands
+    parameter int TEST_BANDS = HSID_TEST_BANDS, // Number of HSP bands
     parameter int TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE // Size of the HSI library
   );
 
   localparam TEST_LIBRARY_SIZE_ADDR = $clog2(TEST_LIBRARY_SIZE);
-  localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH; // Number of data elements per word
-  localparam TEST_ELEMENTS = TEST_BANDS / DATA_PER_WORD; // Number of elements in the vector
+  localparam DATA_PER_WORD = WORD_WIDTH / DATA_WIDTH;
+  localparam TEST_BAND_PACKS = TEST_BANDS / DATA_PER_WORD;
 
   rand logic [DATA_WIDTH-1:0] measure [TEST_BANDS];
 
@@ -25,7 +25,7 @@ class HsidMainGen #(
 
   function automatic void fusion_vctr(
       input logic [DATA_WIDTH-1:0] vctr [TEST_BANDS],
-      output logic [WORD_WIDTH-1:0] fusion_vctr [TEST_ELEMENTS]
+      output logic [WORD_WIDTH-1:0] fusion_vctr [TEST_BAND_PACKS]
     );
     for (int i = 0; i < TEST_BANDS; i+=2) begin
       fusion_vctr[i/2] = {vctr[i], vctr[i+1]};
@@ -37,7 +37,7 @@ class HsidMainGen #(
       input logic [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
       output logic [WORD_WIDTH-1:0]   mse
     );
-    logic signed [DATA_WIDTH:0] diff; // Difference between elements
+    logic signed [DATA_WIDTH:0] diff; // Difference between bands
     logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result
     logic [DATA_WIDTH_ACC-1:0] acc_aux = 0; // Accumulator for the output
     for (int i = 0; i < TEST_BANDS; i++) begin
@@ -56,7 +56,7 @@ class HsidMainGen #(
       input logic [DATA_WIDTH-1:0] vctr2 [TEST_BANDS],
       output logic [WORD_WIDTH-1:0] acc_int [TEST_BANDS]
     );
-    logic signed [DATA_WIDTH:0] diff; // Difference between elements
+    logic signed [DATA_WIDTH:0] diff; // Difference between bands
     logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result
     logic [DATA_WIDTH_ACC-1:0] acc_aux = 0; // Accumulator for the output
     for (int i = 0; i < TEST_BANDS; i++) begin

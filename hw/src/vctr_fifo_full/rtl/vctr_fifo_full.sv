@@ -17,7 +17,7 @@ module vctr_fifo_full #(
     output logic ready
   );
 
-  localparam [HSP_BANDS_WIDTH-1:0] ALMOST_FULL_THRESHOLD = (2 ** HSP_BANDS_WIDTH) - 1; // Number of HSI bands
+  localparam [HSP_BANDS_WIDTH-1:0] ALMOST_FULL_THRESHOLD = (2 ** HSP_BANDS_WIDTH) - 1; // Number of HSP bands
 
   typedef enum logic [2:0] {
     IDLE, READING, OPERATION, DONE

@@ -10,20 +10,19 @@ module hsid_main_tb #(
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,  // Number of bits for Hyperspectral Pixels Library (11 bits - 4096 pixels)
     parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Length of the buffer
-    parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
+    parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSP bands to test
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
     parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
   ) ();
 
-  localparam ELEMENTS = HSP_BANDS_WIDTH / 2;  // Number of elements in the vector
-  localparam TEST_ELEMENTS = TEST_BANDS / 2; // Number of elements in the vector for testbench
+  localparam TEST_BAND_PACKS = TEST_BANDS / 2; // Number of band packs in the vector for testbench
 
   reg clk;
   reg rst_n;
   reg hsi_vctr_in_valid;
   reg [WORD_WIDTH-1:0] hsi_vctr_in;
   reg [HSP_LIBRARY_WIDTH-1:0] library_size_in;
-  reg [HSP_BANDS_WIDTH-1:0] hsi_bands_in;  // HSI bands to process
+  reg [HSP_BANDS_WIDTH-1:0] hsi_bands_in;  // HSP bands to process
   wire [HSP_LIBRARY_WIDTH-1:0] mse_min_ref;
   wire [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;
   wire [WORD_WIDTH-1:0] mse_min_value;
@@ -80,9 +79,9 @@ module hsid_main_tb #(
   logic [HSP_LIBRARY_WIDTH-1:0] min_mse_ref_expected;
   logic [HSP_LIBRARY_WIDTH-1:0] max_mse_ref_expected;
 
-  logic [WORD_WIDTH-1:0] fusion_vctr [TEST_ELEMENTS];
+  logic [WORD_WIDTH-1:0] fusion_vctr [TEST_BAND_PACKS];
 
-  // Count for the number of inserted elements
+  // Count for the number of inserted band packs
   int count_insert;
   logic insert_en;
 
@@ -100,7 +99,7 @@ module hsid_main_tb #(
     library_size_in = 0;
     start = 0;
     clear = 0;
-    hsi_bands_in = TEST_BANDS;  // Set HSI bands to maximum
+    hsi_bands_in = TEST_BANDS;  // Set HSP bands to maximum
     library_size_in = TEST_LIBRARY_SIZE;  // Set library size to maximum
 
     // Generate a random vector as a measure
@@ -151,7 +150,7 @@ module hsid_main_tb #(
     // Send the measure vector
     hsid_main_gen.fusion_vctr(captured, fusion_vctr);
     count_insert = 0;
-    while (count_insert < TEST_ELEMENTS) begin
+    while (count_insert < TEST_BAND_PACKS) begin
       insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
       hsi_vctr_in = fusion_vctr[count_insert];
       hsi_vctr_in_valid = insert_en;
@@ -170,12 +169,12 @@ module hsid_main_tb #(
     for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
       hsid_main_gen.fusion_vctr(lib[i], fusion_vctr);
       count_insert = 0;
-      for (int j = 0; j < TEST_ELEMENTS; j++) begin
+      for (int j = 0; j < TEST_BAND_PACKS; j++) begin
         insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
         hsi_vctr_in = fusion_vctr[j];
         hsi_vctr_in_valid = insert_en;
         #10;
-        if (!(i == TEST_LIBRARY_SIZE - 1 && j == TEST_ELEMENTS - 1)) begin
+        if (!(i == TEST_LIBRARY_SIZE - 1 && j == TEST_BAND_PACKS - 1)) begin
           assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
         end
         if (insert_en) count_insert++;

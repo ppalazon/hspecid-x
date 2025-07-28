@@ -7,7 +7,7 @@ module hsid_mse #(
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL,  // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC,  // Data width for accumulator, larger than WORD
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI library size
   ) (
     input logic clk,
@@ -15,13 +15,13 @@ module hsid_mse #(
 
     input logic clear,
 
-    input logic element_start,
-    input logic element_last,
+    input logic band_pack_start,
+    input logic band_pack_last,
     input logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref,
-    input logic [WORD_WIDTH-1:0] element_a, // Input sample word data
-    input logic [WORD_WIDTH-1:0] element_b, // Input sample word data
-    input logic element_valid,  // Enable input sample data
-    input logic [HSP_BANDS_WIDTH-1:0] hsi_bands,  // HSI bands to process
+    input logic [WORD_WIDTH-1:0] band_pack_a, // Input sample word data
+    input logic [WORD_WIDTH-1:0] band_pack_b, // Input sample word data
+    input logic band_pack_valid,  // Enable input sample data
+    input logic [HSP_BANDS_WIDTH-1:0] hsi_bands,  // HSP bands to process
 
     output logic [WORD_WIDTH-1:0] mse_value,  // Output mean square error
     output logic [HSP_LIBRARY_WIDTH-1:0] mse_ref,  // Reference vector for sum
@@ -89,13 +89,13 @@ module hsid_mse #(
   ) channel_1 (
     .clk(clk),
     .rst_n(rst_n),
-    .data_in_valid(element_valid),  // Enable input sample data
-    .initial_acc_en(element_valid && element_start),  // Enable initial accumulator value on first element
+    .data_in_valid(band_pack_valid),  // Enable input sample data
+    .initial_acc_en(band_pack_valid && band_pack_start),  // Enable initial accumulator value on first element
     .initial_acc('0),
-    .data_in_a(element_a[DATA_WIDTH-1:0]),  // Use only the lower bits of the word
-    .data_in_b(element_b[DATA_WIDTH-1:0]),  // Use only the lower bits of the word
+    .data_in_a(band_pack_a[DATA_WIDTH-1:0]),  // Use only the lower bits of the word
+    .data_in_b(band_pack_b[DATA_WIDTH-1:0]),  // Use only the lower bits of the word
     .data_in_ref(vctr_ref),
-    .data_in_last(element_last),
+    .data_in_last(band_pack_last),
     .acc_valid(channel_1_acc_valid),
     .acc_value(channel_1_acc_value),
     .acc_last(channel_1_acc_last),
@@ -112,12 +112,12 @@ module hsid_mse #(
   ) channel_2 (
     .clk(clk),
     .rst_n(rst_n),
-    .data_in_valid(element_valid),  // Enable input sample data
-    .initial_acc_en(element_valid && element_start),
+    .data_in_valid(band_pack_valid),  // Enable input sample data
+    .initial_acc_en(band_pack_valid && band_pack_start),
     .initial_acc('0),
-    .data_in_a(element_a[WORD_WIDTH-1:DATA_WIDTH]),  // Use the upper bits of the word
-    .data_in_b(element_b[WORD_WIDTH-1:DATA_WIDTH]),  //Use the upper bits of the word
-    .data_in_last(element_last),
+    .data_in_a(band_pack_a[WORD_WIDTH-1:DATA_WIDTH]),  // Use the upper bits of the word
+    .data_in_b(band_pack_b[WORD_WIDTH-1:DATA_WIDTH]),  //Use the upper bits of the word
+    .data_in_last(band_pack_last),
     .data_in_ref(vctr_ref),
     .acc_valid(channel_2_acc_valid),
     .acc_value(channel_2_acc_value),

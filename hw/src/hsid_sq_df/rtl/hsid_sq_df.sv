@@ -11,7 +11,7 @@ module hsid_sq_df #(
     output logic [(DATA_WIDTH*2)-1:0] data_out // Output result
   );
 
-  logic [DATA_WIDTH-1:0] diff; // Difference between elements
+  logic [DATA_WIDTH-1:0] diff; // Difference between bands
 
   always_ff @(posedge clk) begin
     if (!rst_n) begin

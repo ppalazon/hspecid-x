@@ -8,8 +8,8 @@ module hsid_main #(
     parameter DATA_WIDTH_MUL = DATA_WIDTH * 2,  // Data width for multiplication, larger than WORD_WIDTH
     parameter DATA_WIDTH_ACC = DATA_WIDTH * 3,  // Data width for accumulator, larger than WORD
     parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Number of bits for buffer address (4 entries)
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
-    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSP bands
   ) (
     input logic clk,
     input logic rst_n,
@@ -20,7 +20,7 @@ module hsid_main #(
 
     // Input parameters for library size and pixel bands
     input logic [HSP_LIBRARY_WIDTH-1:0] library_size_in,  // Amount of HSI library vectors to process
-    input logic [HSP_BANDS_WIDTH-1:0] hsi_bands_in,  // HSI bands to process
+    input logic [HSP_BANDS_WIDTH-1:0] hsi_bands_in,  // HSP bands to process
 
     // Output parameters with the MSE result
     output logic [HSP_LIBRARY_WIDTH-1:0] mse_min_ref,
@@ -39,7 +39,7 @@ module hsid_main #(
   );
 
   localparam BUFFER_SIZE = 2 ** BUFFER_WIDTH;  // Size of the FIFO buffer
-  localparam HSP_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH); // Address width for packed HSP
+  localparam HSP_BAND_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH); // Address width for packed HSP
 
   wire hsid_main_state_t state;
   wire fifo_measure_complete, fifo_measure_empty;
@@ -53,16 +53,16 @@ module hsid_main #(
 
   wire mse_valid;  // MSE valid signal
   wire mse_comparison_valid;  // MSE valid signal
-  wire element_start;  // Start vector processing signal
-  wire element_last;  // Last vector processing signal
-  wire element_valid; // Element valid signal
+  wire band_pack_start;  // Start vector processing signal
+  wire band_pack_last;  // Last vector processing signal
+  wire band_pack_valid; // Element valid signal
   wire [HSP_LIBRARY_WIDTH-1:0] vctr_ref;  // Reference vector for MSE
   wire [WORD_WIDTH-1:0] mse_out;  // Mean Squared Error
   wire [HSP_LIBRARY_WIDTH-1:0] mse_ref;  // Reference vector for MSE
 
   // Assigns statements
-  wire [HSP_PACK_WIDTH-1:0] element_threshold; // Threshold for element count to restart the element count and check almost full condition
-  assign element_threshold = (hsi_bands_in / 2);
+  wire [HSP_BAND_PACK_WIDTH-1:0] band_pack_threshold; // Threshold for element count to restart the element count and check almost full condition
+  assign band_pack_threshold = (hsi_bands_in / 2);
 
   // Assigns statements
   assign fifo_measure_data_in = (state == READ_MEASURE) ? hsi_vctr_in : '0; //(state == COMPUTE_MSE ? fifo_measure_data_out : '0);
@@ -87,10 +87,10 @@ module hsid_main #(
     .msi_comparison_valid(mse_comparison_valid),  // MSE comparison valid signal
     .state(state),
     .vctr_count(vctr_ref),  // Not used in this module
-    .element_threshold(element_threshold),
-    .element_start(element_start),  // Start vector processing signal
-    .element_last(element_last),
-    .element_valid(element_valid),
+    .band_pack_threshold(band_pack_threshold),
+    .band_pack_start(band_pack_start),  // Start vector processing signal
+    .band_pack_last(band_pack_last),
+    .band_pack_valid(band_pack_valid),
     .vctr_last(),  // Library finished signal
     .fifo_both_read_en(fifo_both_read_en),  // FIFO read enable signal
     .start(start),
@@ -109,12 +109,12 @@ module hsid_main #(
   ) hsi_mse (
     .clk(clk),
     .rst_n(rst_n),
-    .element_start(element_start),
-    .element_last(element_last),
+    .band_pack_start(band_pack_start),
+    .band_pack_last(band_pack_last),
     .vctr_ref(vctr_ref),
-    .element_a(fifo_measure_data_out),
-    .element_b(fifo_ref_data_out),
-    .element_valid(element_valid),
+    .band_pack_a(fifo_measure_data_out),
+    .band_pack_b(fifo_ref_data_out),
+    .band_pack_valid(band_pack_valid),
     .hsi_bands(hsi_bands_in),
     .mse_value(mse_out),
     .mse_ref(mse_ref),
@@ -142,7 +142,7 @@ module hsid_main #(
 
   hsid_fifo #(
     .DATA_WIDTH(WORD_WIDTH),
-    .FIFO_ADDR_WIDTH(HSP_PACK_WIDTH)  // FIFO depth for HSI bands
+    .FIFO_ADDR_WIDTH(HSP_BAND_PACK_WIDTH)  // FIFO depth for HSP bands
   ) fifo_measure (
     .clk(clk),
     .rst_n(rst_n),
@@ -150,7 +150,7 @@ module hsid_main #(
     .wr_en(fifo_measure_write_en),
     .rd_en(fifo_both_read_en),
     .data_in(fifo_measure_data_in),
-    .almost_full_threshold(element_threshold),  // Threshold for almost full condition
+    .almost_full_threshold(band_pack_threshold),  // Threshold for almost full condition
     .data_out(fifo_measure_data_out),
     .full(),
     .almost_full(fifo_measure_complete),

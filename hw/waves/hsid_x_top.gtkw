@@ -94,10 +94,10 @@ hsid_x_top_tb.dut.u_hsid_main.clk
 hsid_x_top_tb.dut.u_hsid_main.hsi_vctr_in[31:0]
 @28
 hsid_x_top_tb.dut.u_hsid_main.hsi_vctr_in_valid
-hsid_x_top_tb.dut.u_hsid_main.element_start
-hsid_x_top_tb.dut.u_hsid_main.element_last
+hsid_x_top_tb.dut.u_hsid_main.band_pack_start
+hsid_x_top_tb.dut.u_hsid_main.band_pack_last
 @24
-hsid_x_top_tb.dut.u_hsid_main.element_threshold[6:0]
+hsid_x_top_tb.dut.u_hsid_main.band_pack_threshold[6:0]
 hsid_x_top_tb.dut.u_hsid_main.mse_out[31:0]
 @28
 hsid_x_top_tb.dut.u_hsid_main.mse_valid

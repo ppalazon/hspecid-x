@@ -8,7 +8,7 @@ module hsid_x_top #(
     parameter DATA_WIDTH_MUL = DATA_WIDTH * 2,  // Data width for multiplication
     parameter DATA_WIDTH_ACC = DATA_WIDTH * 3,  // Data width for accumulator
     parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Number of entries in the FIFO buffer
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
     input logic clk,

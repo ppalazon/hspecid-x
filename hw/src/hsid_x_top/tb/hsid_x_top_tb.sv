@@ -12,14 +12,14 @@ module hsid_x_top_tb #(
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
     parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Length of the buffer
-    parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSI bands to test
-    parameter TEST_ELEMENTS = TEST_BANDS / 2, // Number of HSI bands to test
+    parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSP bands to test
+    parameter TEST_BAND_PACKS = TEST_BANDS / 2, // Number of HSP bands to test
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
     parameter TEST_MEM_RND_GNT = 1,
     parameter TEST_MEM_RND_VALUE = 0,
     parameter TEST_MEM_MASK = 32'h00003FFF,  // Mask to return least significant 14 bits of the address
     parameter TEST_CAPTURED_PIXEL_ADDR = 32'h00000004, // Address for captured pixel data
-    parameter TEST_LIBRARY_PIXEL_ADDR = 32'h00010004 - (3 * TEST_ELEMENTS * 4)  // Address for library pixel data, 4 pixels is the same as captured pixel data
+    parameter TEST_LIBRARY_PIXEL_ADDR = 32'h00010004 - (3 * TEST_BAND_PACKS * 4)  // Address for library pixel data, 4 pixels is the same as captured pixel data
   ) ();
 
   reg clk;
@@ -119,7 +119,7 @@ module hsid_x_top_tb #(
     $display("Captured Pixel Data:    %p", captured_pixel);
     // Get reference pixel data from the memory and compute expected MSE
     for (int j = 0; j < TEST_LIBRARY_SIZE; j++) begin
-      da_addr = TEST_LIBRARY_PIXEL_ADDR + (j * 4 * TEST_ELEMENTS); // Address for each band
+      da_addr = TEST_LIBRARY_PIXEL_ADDR + (j * 4 * TEST_BAND_PACKS); // Address for each band
       read_pixel_mem(da_addr, reference_pixel);
       hsid_main_gen.mse(captured_pixel, reference_pixel, expected_mse[j]);
       $display("Library Pixel %0d: %p, MSE: %0d", j, reference_pixel, expected_mse[j]);

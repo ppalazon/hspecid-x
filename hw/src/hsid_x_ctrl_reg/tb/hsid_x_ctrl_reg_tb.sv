@@ -8,7 +8,7 @@ import ctrl_reg_tb_tasks::*;
 
 module hsid_x_ctrl_reg_tb #(
     parameter int WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
-    parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI library size
   );
 

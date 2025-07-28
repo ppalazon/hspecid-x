@@ -4,17 +4,17 @@ import hsid_pkg::*;  // Import the package for HSI MSE
 
 module hsid_main_fsm #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
-    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // Data width for HSI bands
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // Data width for HSP bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,  // Number of bits to represent vector length
-    localparam HSP_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH)  // Address width for HSI bands
+    localparam HSP_BAND_PACK_WIDTH = HSP_BANDS_WIDTH - $clog2(WORD_WIDTH / DATA_WIDTH)  // Address width for HSP bands
   ) (
     input logic clk,
     input logic rst_n,
 
     // Library size input
     input logic [HSP_LIBRARY_WIDTH-1:0] hsi_library_size,  // Length of the vectors
-    input logic [HSP_PACK_WIDTH-1:0] element_threshold,  // HSI bands to process
+    input logic [HSP_BAND_PACK_WIDTH-1:0] band_pack_threshold,  // HSP bands to process
 
     // Fifo status signals
     input logic fifo_measure_complete,  // Full signal for measure vector FIFO
@@ -30,9 +30,9 @@ module hsid_main_fsm #(
     // Current state
     output hsid_main_state_t state,
     output logic [HSP_LIBRARY_WIDTH-1:0] vctr_count,
-    output logic element_start,  // Start vector processing signal
-    output logic element_last,  // Last vector processing signal
-    output logic element_valid,  // Element valid signal
+    output logic band_pack_start,  // Start vector processing signal
+    output logic band_pack_last,  // Last vector processing signal
+    output logic band_pack_valid,  // Element valid signal
     output logic vctr_last,
     output logic fifo_both_read_en,
 
@@ -44,10 +44,8 @@ module hsid_main_fsm #(
   );
 
   // Assigns statements
-  logic [HSP_PACK_WIDTH:0] element_count;
+  logic [HSP_BAND_PACK_WIDTH:0] band_pack_count;
   assign fifo_both_read_en = (state == COMPUTE_MSE && !fifo_ref_empty && !fifo_measure_empty);
-  // assign element_last = (element_count == ELEMENTS - 1);
-  // assign element_start = (element_count == 0); // && fifo_both_read_en
   assign vctr_last = (vctr_count == hsi_library_size - 1);
 
   hsid_main_state_t current_state = IDLE, next_state = READ_MEASURE;
@@ -59,25 +57,25 @@ module hsid_main_fsm #(
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= IDLE;  // Reset to IDLE state
-      element_count <= 0;  // Reset element count
+      band_pack_count <= 0;  // Reset element count
       vctr_count <= 0;  // Reset vector count
-      element_start <= 0;  // Reset start signal
-      element_last <= 0;  // Reset last signal
-      element_valid <= 0;  // Reset valid signal
+      band_pack_start <= 0;  // Reset start signal
+      band_pack_last <= 0;  // Reset last signal
+      band_pack_valid <= 0;  // Reset valid signal
       fifo_measure_loop <= 0;  // Reset measure loop signal
     end else begin
       current_state <= next_state;  // Transition to next state
-      element_start <= (element_count == 0 && fifo_both_read_en);
-      element_last <= (element_count == element_threshold - 1);
-      element_valid <= fifo_both_read_en;
+      band_pack_start <= (band_pack_count == 0 && fifo_both_read_en);
+      band_pack_last <= (band_pack_count == band_pack_threshold - 1);
+      band_pack_valid <= fifo_both_read_en;
       if (fifo_both_read_en) begin
         fifo_measure_loop <= 1'b1;
-        if (element_count == element_threshold - 1) begin
-          element_count <= 0;  // Reset element count when threshold is reached
+        if (band_pack_count == band_pack_threshold - 1) begin
+          band_pack_count <= 0;  // Reset element count when threshold is reached
         end else begin
-          element_count <= element_count + 1;
+          band_pack_count <= band_pack_count + 1;
         end
-        if (element_last) begin
+        if (band_pack_last) begin
           vctr_count <= vctr_count + 1;
         end
       end else begin
@@ -98,7 +96,7 @@ module hsid_main_fsm #(
       end
       COMPUTE_MSE: begin
         idle = 0; ready = !fifo_ref_full; done = 0;
-        next_state = (vctr_last & element_last) ? WAIT_MSE : COMPUTE_MSE;
+        next_state = (vctr_last & band_pack_last) ? WAIT_MSE : COMPUTE_MSE;
       end
       WAIT_MSE: begin
         idle = 0; ready = 0; done = 0;

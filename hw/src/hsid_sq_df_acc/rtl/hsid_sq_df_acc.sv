@@ -32,11 +32,11 @@ module hsid_sq_df_acc #(
   logic stage_1_en, stage_2_en, stage_3_en; // Enable signals for pipeline stages
   logic acc_1_en, acc_2_en; // Enable signals for accumulators
   logic [DATA_WIDTH_ACC-1:0] acc_1, acc_2, acc_3; // Accumulators for pipeline stages
-  logic last_1, last_2, last_3; // Band counter for HSI bands, using one extra bit to avoid overflow
-  logic [HSP_LIBRARY_WIDTH-1:0] ref_1, ref_2, ref_3; // Band counter output for HSI bands
+  logic last_1, last_2, last_3; // Band counter for HSP bands, using one extra bit to avoid overflow
+  logic [HSP_LIBRARY_WIDTH-1:0] ref_1, ref_2, ref_3; // Band counter output for HSP bands
   logic acc_of_3; // Overflow flags for pipeline stages
 
-  logic signed [DATA_WIDTH:0] diff; // Difference between elements, using one extra bit to avoid overflow / underflow
+  logic signed [DATA_WIDTH:0] diff; // Difference between bands, using one extra bit to avoid overflow / underflow
   logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result, using double the width of the input data
 
   always_ff @(posedge clk or negedge rst_n) begin

@@ -8,8 +8,8 @@ module hsid_mse_batch_2 #(
     input logic clk,
     input logic rst_n,
 
-    input logic [WORD_WIDTH-1:0] data_vctr_1, // Input vctr 1 with 4 elements
-    input logic [WORD_WIDTH-1:0] data_vctr_2, // Input vctr 2 with 4 elements
+    input logic [WORD_WIDTH-1:0] data_vctr_1, // Input vctr 1 with 2 bands
+    input logic [WORD_WIDTH-1:0] data_vctr_2, // Input vctr 2 with 2 bands
 
     output logic [DATA_WIDTH_SUM-1:0] data_sum_out // Output sum
   );

@@ -8,8 +8,8 @@ module hsid_mse_batch_4 #(
     input logic clk,
     input logic rst_n,
 
-    input logic [WORD_WIDTH-1:0] data_vctr_1, // Input vctr 1 with 4 elements
-    input logic [WORD_WIDTH-1:0] data_vctr_2, // Input vctr 2 with 4 elements
+    input logic [WORD_WIDTH-1:0] data_vctr_1, // Input vctr 1 with 2 bands
+    input logic [WORD_WIDTH-1:0] data_vctr_2, // Input vctr 2 with 2 bands
 
     output logic [DATA_WIDTH_SUM-1:0] data_sum_out // Output sum
   );
@@ -17,14 +17,14 @@ module hsid_mse_batch_4 #(
   logic [DATA_WIDTH_SUM-1:0] mse_2_r1; // Output for the squa
   logic [DATA_WIDTH_SUM-1:0] mse_2_r2;
 
-  // Instantiate two mse_2 modules for the first two pairs of elements
+  // Instantiate two mse_2 modules for the first two pairs of bands
   hsid_mse_batch_2 #(
     .DATA_WIDTH(DATA_WIDTH)
   ) mse_2_p1 (
     .clk(clk),
     .rst_n(rst_n),
-    .data_vctr_1(data_vctr_1[DATA_WIDTH*2-1:0]), // First two elements of vector 1
-    .data_vctr_2(data_vctr_2[DATA_WIDTH*2-1:0]), // First two elements of vector 2
+    .data_vctr_1(data_vctr_1[DATA_WIDTH*2-1:0]), // First two bands of vector 1
+    .data_vctr_2(data_vctr_2[DATA_WIDTH*2-1:0]), // First two bands of vector 2
     .data_sum_out(mse_2_r1) // Output for first squared difference
   );
 
@@ -33,8 +33,8 @@ module hsid_mse_batch_4 #(
   ) mse_2_p2 (
     .clk(clk),
     .rst_n(rst_n),
-    .data_vctr_1(data_vctr_1[WORD_WIDTH-1:DATA_WIDTH*2]), // Second two elements of vector 1
-    .data_vctr_2(data_vctr_2[WORD_WIDTH-1:DATA_WIDTH*2]), // Second two elements of vector 2
+    .data_vctr_1(data_vctr_1[WORD_WIDTH-1:DATA_WIDTH*2]), // Second two bands of vector 1
+    .data_vctr_2(data_vctr_2[WORD_WIDTH-1:DATA_WIDTH*2]), // Second two bands of vector 2
     .data_sum_out(mse_2_r2) // Output for second squared difference
   );
 

@@ -19,10 +19,10 @@
 @28
 hsid_mse_reg_tb.clk
 @22
-hsid_mse_reg_tb.element_a[31:0]
-hsid_mse_reg_tb.element_b[31:0]
+hsid_mse_reg_tb.band_pack_a[31:0]
+hsid_mse_reg_tb.band_pack_b[31:0]
 @28
-hsid_mse_reg_tb.element_valid
+hsid_mse_reg_tb.band_pack_valid
 @24
 hsid_mse_reg_tb.mse_ref[7:0]
 @28
@@ -35,7 +35,7 @@ hsid_mse_reg_tb.vctr_last
 @22
 hsid_mse_reg_tb.vctr_ref[7:0]
 @28
-hsid_mse_reg_tb.element_start
+hsid_mse_reg_tb.band_pack_start
 @200
 -DUT
 @22

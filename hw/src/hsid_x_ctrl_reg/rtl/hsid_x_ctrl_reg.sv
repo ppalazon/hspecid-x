@@ -4,7 +4,7 @@ import hsid_pkg::*;
 
 module hsid_x_ctrl_reg #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSI bands
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
     input logic clk,
