@@ -210,6 +210,7 @@ module hsid_sq_df_acc_tb #(
           initial_acc = sq_df_acc_gen.initial_acc; // Set initial accumulator value
         end else begin
           initial_acc_en = 0; // Disable initial accumulator value
+          initial_acc = 0; // Reset initial accumulator value
         end
 
         // Set input data valid signal

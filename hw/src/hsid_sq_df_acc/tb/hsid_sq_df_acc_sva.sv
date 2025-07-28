@@ -103,20 +103,20 @@ module hsid_sq_df_acc_sva #(
 
   // Assert initial accumulator value is set correctly
   property initial_acc_value;
-    @(posedge clk) disable iff (!rst_n) data_in_valid && initial_acc_en |-> ##3
-      acc_3 == $past(initial_acc, 3) + $past(mult);
+    @(posedge clk) disable iff (!rst_n) data_in_valid && initial_acc_en |-> ##4
+      acc_value == $past(initial_acc, 4) + $past(mult, 2);
   endproperty
 
-  assert property (initial_acc_value) else $error("Initial accumulator value is set correctly: acc_3 = %0h != %0h", acc_3, $past(initial_acc, 3) + $past(mult));
+  assert property (initial_acc_value) else $error("Initial accumulator value is set correctly: acc_value = %0h != %0h", acc_value, $past(initial_acc, 3) + $past(mult));
   cover property (initial_acc_value); // $display("Checked: Initial accumulator value is set correctly");
 
   // Assert keep accumulating when initial accumulator is not enabled
   property accumulate_without_initial;
-    @(posedge clk) disable iff (!rst_n) data_in_valid && !initial_acc_en |-> ##3
-      acc_3 == $past(acc_3) + $past(mult);
+    @(posedge clk) disable iff (!rst_n) data_in_valid && !initial_acc_en |-> ##4
+      acc_value == $past(acc_value) + $past(mult, 2);
   endproperty
 
-  assert property (accumulate_without_initial) else $error("Accumulator keeps accumulating when initial accumulator is not enabled: acc_3 = %0h != %0h", acc_3, $past(acc_3) + $past(mult));
+  assert property (accumulate_without_initial) else $error("Accumulator keeps accumulating when initial accumulator is not enabled: acc_value = %0h != %0h", acc_value, $past(acc_3) + $past(mult));
   cover property (accumulate_without_initial); // $display("Checked: Accumulator keeps accumulating when initial accumulator is not enabled");
 
 
