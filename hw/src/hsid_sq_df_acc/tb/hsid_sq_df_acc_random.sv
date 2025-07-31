@@ -2,7 +2,7 @@
 
 import hsid_pkg::*;
 
-class HsidSqDfAccGen #(
+class HsidHSPixelGen #(
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // 16 bits by default
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than DATA_WIDTH
@@ -10,12 +10,11 @@ class HsidSqDfAccGen #(
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   );
 
-  localparam int MAX_DATA = (1 << DATA_WIDTH) - 1; // Maximum value for data vectors
+  localparam int                       MAX_DATA = (1 << DATA_WIDTH) - 1; // Maximum value for data vectors
   localparam logic[DATA_WIDTH_ACC-1:0] MAX_DATA_ACC = (1 << DATA_WIDTH_ACC) - 1; // Maximum value for accumulator, it's wider than 32 bits
-  localparam int MAX_HSP_BANDS = (1 << HSP_BANDS_WIDTH) - 1; // Maximum value for HSP bands
-  localparam int MAX_HSP_LIBRARY = (1 << HSP_LIBRARY_WIDTH) - 1; // Maximum value for HSI library
+  localparam int                       MAX_HSP_BANDS = (1 << HSP_BANDS_WIDTH) - 1; // Maximum value for HSP bands
+  localparam int                       MAX_HSP_LIBRARY = (1 << HSP_LIBRARY_WIDTH) - 1; // Maximum value for HSI library
 
-  rand logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref; // Reference vector, avoid repetition
   rand logic [HSP_BANDS_WIDTH-1:0] hsp_bands; // Number of HSP bands
   rand logic [DATA_WIDTH-1:0] vctr1 [];
   rand logic [DATA_WIDTH-1:0] vctr2 [];
@@ -24,6 +23,7 @@ class HsidSqDfAccGen #(
   // Generate random vectors
   constraint c_hsp_bands {
     hsp_bands dist {1:=15, MAX_HSP_BANDS:=15, [2:MAX_HSP_BANDS-1]:/70};
+    // hsp_bands == 16;
   }
 
   constraint c_vctrs {
@@ -34,20 +34,15 @@ class HsidSqDfAccGen #(
 
     // foreach (vctr1[i]) vctr1[i] inside {[0:10]};
     // foreach (vctr2[i]) vctr2[i] inside {[0:10]};
-    // initial_acc inside {[0:10]};
-  }
-
-  constraint c_vctr_ref {
-    vctr_ref dist {0:=15, MAX_HSP_LIBRARY:=15,  [1:MAX_HSP_LIBRARY-1]:/70};
   }
 
   constraint c_initial_acc {
     initial_acc dist {0:=15, MAX_DATA_ACC:=15, [1:MAX_DATA_ACC-1]:/70};
+    // initial_acc inside {[0:10]};
   }
 
   function void sq_df_acc_vctr(
-      output logic [DATA_WIDTH_ACC-1:0]   acc[], // wider to hold overflow
-      output logic overflow // overflow flag
+      output logic [DATA_WIDTH_ACC:0]   acc[] // Intermediate accumulator with overflow
     );
     logic signed [DATA_WIDTH:0] diff; // Difference between elements
     logic [DATA_WIDTH_MUL-1:0] mult; // Multiplication result
@@ -59,7 +54,31 @@ class HsidSqDfAccGen #(
       acc_aux += mult; // Accumulate the result
       acc[i] = acc_aux; // Store the accumulated value
     end
-    overflow = acc_aux[DATA_WIDTH_ACC]; // Check for overflow in the last bit
   endfunction
+
+  function void set_worst_case_for_acc(
+      input logic [HSP_BANDS_WIDTH-1:0] hsp_bands_i // Number of HSP bands
+    );
+    hsp_bands = hsp_bands_i; // Set maximum number of HSP bands
+    vctr1 = new[hsp_bands];
+    vctr2 = new[hsp_bands];
+    foreach (vctr1[i]) vctr1[i] = MAX_DATA; // Set all elements to maximum value
+    foreach (vctr2[i]) vctr2[i] = 0;
+  endfunction
+
+endclass
+
+class HsidSQDFAccRandom #(
+    parameter DATA_WIDTH = HSID_DATA_WIDTH, // 16 bits by default
+    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC // Data width for accumulator, larger than DATA_WIDTH
+  );
+
+  rand logic clear;
+  rand logic initial_acc_en; // Enable initial accumulator value
+  rand logic [DATA_WIDTH_ACC-1:0] initial_acc; // Initial accumulator value
+  rand logic data_in_valid; // Valid input values
+  rand logic [DATA_WIDTH-1:0] data_in_a; // Input vector 1
+  rand logic [DATA_WIDTH-1:0] data_in_b; // Input vector 2
+  rand logic data_in_last;
 
 endclass

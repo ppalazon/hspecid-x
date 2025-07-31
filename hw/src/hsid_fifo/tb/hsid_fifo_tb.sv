@@ -45,29 +45,10 @@ module hsid_fifo_tb #(
   );
 
   // bind verification to the DUT instance
-  bind dut hsid_fifo_sva #(
+  bind hsid_fifo hsid_fifo_sva #(
     .DATA_WIDTH(DATA_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
-  ) hsid_fifo_abv_inst (
-    .clk(dut.clk),
-    .rst_n(dut.rst_n),
-    .loop_en(dut.loop_en),
-    .wr_en(dut.wr_en),
-    .rd_en(dut.rd_en),
-    .data_in(dut.data_in),
-    .almost_full_threshold(dut.almost_full_threshold),
-    .data_out(dut.data_out),
-    .full(dut.full),
-    .almost_full(dut.almost_full),
-    .empty(dut.empty),
-    .clear(dut.clear),
-    // Internal signals
-    .fifo_mem(dut.fifo_mem),
-    .wr_ptr(dut.wr_ptr),
-    .rd_ptr(dut.rd_ptr),
-    .fifo_count(dut.fifo_count),
-    .fifo_request(dut.fifo_request)
-  );
+  ) dut_sva (.*);
 
   // covergroup for FIFO
   covergroup fifo_cg @(posedge clk);

@@ -115,7 +115,7 @@ module hsid_main #(
     .band_pack_a(fifo_measure_data_out),
     .band_pack_b(fifo_ref_data_out),
     .band_pack_valid(band_pack_valid),
-    .hsi_bands(hsi_bands_in),
+    .hsp_bands(hsi_bands_in),
     .mse_value(mse_out),
     .mse_ref(mse_ref),
     .mse_valid(mse_valid)

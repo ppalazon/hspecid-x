@@ -12,7 +12,7 @@ package hsid_pkg;
 
   // Test parameters
   localparam int HSID_TEST_BANDS = 16; // Number of HSP bands to test
-  localparam int HSID_TEST_LIBRARY_SIZE = 10; // Size of the HSI library to test
+  localparam int HSID_TEST_LIBRARY_SIZE = 25; // Size of the HSI library to test
   localparam int HSID_TEST_BAND_PACKS = HSID_TEST_BANDS / 2; // Number of band packs in the vector for testbench
 
   // HSI MSE library state machine states
