@@ -37,6 +37,7 @@ module hsid_mse_tb #(
   // wire mse_of; // Overflow flag for mean square error
   wire acc_of; // Overflow flag for the accumulated vector
 
+  // DUT instantiation
   hsid_mse #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
@@ -105,7 +106,6 @@ module hsid_mse_tb #(
       bins max = {MAX_HSP_LIBRARY};
       bins middle = {[1:MAX_HSP_LIBRARY-1]};
     }
-    // coverpoint mse_of iff(mse_valid);
     coverpoint acc_of iff(mse_valid);
   endgroup
   hsid_mse_cg mse_cg = new();

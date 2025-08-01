@@ -52,6 +52,7 @@ module hsid_main #(
   wire [WORD_WIDTH-1:0] fifo_measure_data_out, fifo_ref_data_out;
 
   wire mse_valid;  // MSE valid signal
+  wire acc_of;  // Overflow flag for the accumulated vector
   wire mse_comparison_valid;  // MSE valid signal
   wire band_pack_start;  // Start vector processing signal
   wire band_pack_last;  // Last vector processing signal
@@ -83,8 +84,8 @@ module hsid_main #(
     .fifo_measure_empty(fifo_measure_empty),
     .fifo_ref_empty(fifo_ref_empty),
     .fifo_ref_full(fifo_ref_full),
-    .msi_valid(mse_valid),  // MSE valid signal
-    .msi_comparison_valid(mse_comparison_valid),  // MSE comparison valid signal
+    .mse_valid(mse_valid),  // MSE valid signal
+    .mse_comparison_valid(mse_comparison_valid),  // MSE comparison valid signal
     .state(state),
     .vctr_count(vctr_ref),  // Not used in this module
     .band_pack_threshold(band_pack_threshold),
@@ -109,6 +110,7 @@ module hsid_main #(
   ) hsi_mse (
     .clk(clk),
     .rst_n(rst_n),
+    .clear(clear),
     .band_pack_start(band_pack_start),
     .band_pack_last(band_pack_last),
     .vctr_ref(vctr_ref),
@@ -118,7 +120,8 @@ module hsid_main #(
     .hsp_bands(hsi_bands_in),
     .mse_value(mse_out),
     .mse_ref(mse_ref),
-    .mse_valid(mse_valid)
+    .mse_valid(mse_valid),
+    .acc_of(acc_of)
   );
 
   hsid_mse_comp #(
@@ -127,7 +130,7 @@ module hsid_main #(
   ) hsi_mse_comp (
     .clk(clk),
     .rst_n(rst_n),
-    .mse_in_valid(mse_valid),
+    .mse_in_valid(mse_valid && !acc_of),  // Valid MSE output and no overflow
     .mse_in_value(mse_out),
     .mse_in_ref(mse_ref),
     .clear(clear),

@@ -24,8 +24,8 @@ module hsid_main_fsm #(
     input logic fifo_ref_full,  // Full signal for output data FIFO
 
     // MSE signals
-    input logic msi_valid,
-    input logic msi_comparison_valid,
+    input logic mse_valid,
+    input logic mse_comparison_valid,
 
     // Current state
     output hsid_main_state_t state,
@@ -100,11 +100,11 @@ module hsid_main_fsm #(
       end
       WAIT_MSE: begin
         idle = 0; ready = 0; done = 0;
-        next_state = msi_valid ? COMPARE_MSE : WAIT_MSE;
+        next_state = mse_valid ? COMPARE_MSE : WAIT_MSE;
       end
       COMPARE_MSE: begin
         idle = 0; ready = 0; done = 0;
-        next_state = msi_comparison_valid ? DONE : COMPARE_MSE;
+        next_state = mse_comparison_valid ? DONE : COMPARE_MSE;
       end
       DONE: begin
         idle = 0; ready = 0; done = 1;

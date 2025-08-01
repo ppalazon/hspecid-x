@@ -9,12 +9,18 @@ filesets:
     file_type: systemVerilogSource
     depend:
       - "uclm:hspecidx:hsid_pkg"
-      - "uclm:hspecidx:hsid_sq_df_acc" # sq_df_acc.core
 
   tb:
     files:
+      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_random.sv
+      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_sva.sv
       - hw/src/hsid_mse_comp/tb/hsid_mse_comp_tb.sv
     file_type: systemVerilogSource
+
+  tcl_modelsim:
+    files:
+      - hw/tcl/modelsim-do/hsid_mse_comp_debug.do
+    file_type: tclSource
 
 targets:
   default: &default
@@ -28,9 +34,10 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
+      - tool_modelsim? (tcl_modelsim)
     toplevel: hsid_mse_comp_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common
-        #xelab_options:
-        #xsim_options:
+      modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
+        compilation_mode: common

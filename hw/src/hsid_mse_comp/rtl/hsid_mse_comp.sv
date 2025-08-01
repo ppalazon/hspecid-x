@@ -12,6 +12,7 @@ module hsid_mse_comp #(
     // Input mse data
     input logic clear,
     input logic mse_in_valid,  // Enable input MSE data
+    input logic mse_in_of,
     input logic [WORD_WIDTH-1:0] mse_in_value,  // Input MSE
     input logic [HSP_LIBRARY_WIDTH-1:0] mse_in_ref,
 
@@ -34,19 +35,24 @@ module hsid_mse_comp #(
       end else begin
         if (mse_in_valid) begin
           mse_out_valid <= 1;
-          if (mse_in_value <= mse_min_value) begin
-            mse_min_changed <= 1;  // Set min changed flag
-            mse_min_ref <= mse_in_ref;  // Update min reference MSE
-            mse_min_value <= mse_in_value;  // Update min MSE
+          if (!mse_in_of) begin
+            if (mse_in_value <= mse_min_value) begin
+              mse_min_changed <= 1;  // Set min changed flag
+              mse_min_ref <= mse_in_ref;  // Update min reference MSE
+              mse_min_value <= mse_in_value;  // Update min MSE
+            end else begin
+              mse_min_changed <= 0;  // Reset min changed flag
+            end
+            if (mse_in_value >= mse_max_value) begin
+              mse_max_changed <= 1;  // Set max changed flag
+              mse_max_ref <= mse_in_ref;  // Update max reference MSE
+              mse_max_value <= mse_in_value;  // Update max MSE
+            end else begin
+              mse_max_changed <= 0;  // Reset max changed flag
+            end
           end else begin
-            mse_min_changed <= 0;  // Reset min changed flag
-          end
-          if (mse_in_value >= mse_max_value) begin
-            mse_max_changed <= 1;  // Set max changed flag
-            mse_max_ref <= mse_in_ref;  // Update max reference MSE
-            mse_max_value <= mse_in_value;  // Update max MSE
-          end else begin
-            mse_max_changed <= 0;  // Reset max changed flag
+            mse_min_changed <= 0;
+            mse_max_changed <= 0;
           end
         end else begin
           mse_out_valid <= 0;  // Disable output MSE valid signal
