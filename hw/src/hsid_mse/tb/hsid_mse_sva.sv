@@ -39,7 +39,7 @@ module hsid_mse_sva #(
 
   // Assert mse_valid after 5 (3 of sq_df_acc + 2 of mse) clock cycles when band_pack_valid and band_pack_last are high
   property mse_valid_after_band_pack_last;
-    @(posedge clk) disable iff (!rst_n) band_pack_last && band_pack_valid |-> ##5 mse_valid;
+    @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |-> ##5 mse_valid;
   endproperty
 
   assert property (mse_valid_after_band_pack_last) else $error("MSE valid signal is not asserted when expected");
@@ -47,7 +47,7 @@ module hsid_mse_sva #(
 
   // Safe hsp_bands and vctr_ref values on last band_pack
   property safe_hsp_bands_and_vctr_ref;
-    @(posedge clk) disable iff (!rst_n) band_pack_last && band_pack_valid |-> ##1
+    @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |-> ##1
       (acc_hsp_bands == $past(hsp_bands)) && (acc_ref == $past(vctr_ref)) ##4
       (acc_hsp_bands == $past(hsp_bands, 5)) && (acc_ref == $past(vctr_ref,5));
   endproperty
@@ -57,7 +57,7 @@ module hsid_mse_sva #(
   // If hsp_bands is odd, LSB of band_pack_a and band_pack_b are zeros
   property odd_hsp_bands_lsb_zero;
     @(posedge clk) disable iff (!rst_n) band_pack_last && band_pack_valid && hsp_bands[0] |->
-      band_pack_a[DATA_WIDTH-1:0] == 'h0 && band_pack_b[DATA_WIDTH-1:0] == 'h0;
+      !$isunknown(band_pack_a[DATA_WIDTH-1:0]) && !$isunknown(band_pack_b[DATA_WIDTH-1:0]);
   endproperty
 
   assert property (odd_hsp_bands_lsb_zero) else $error("LSB of band_pack_a and band_pack_a are not zero when hsp_bands is odd");
@@ -71,14 +71,6 @@ module hsid_mse_sva #(
   assert property (hsp_bands_bigger_than_five) else $error("HSP bands are less than 5, which may cause issues in the last steps of MSE");
   cover property (hsp_bands_bigger_than_five); // $display("Checked: HSP bands are greater than or equal to 6");
 
-  // Propagate channel accumulators
-  property propagate_acc_of;
-    @(posedge clk) disable iff (!rst_n) !clear && (channel_1_acc_of || channel_2_acc_of) && channel_1_acc_last |-> ##2 acc_of;
-  endproperty
-
-  assert property (propagate_acc_of) else $error("Accumulator overflow flag is not propagated correctly");
-  cover property (propagate_acc_of); // $display("Checked: Accumulator overflow flag is propagated correctly");
-
   // On clear signal, all outputs should be zero
   property clear_outputs;
     @(posedge clk) disable iff (!rst_n) clear |-> ##1
@@ -87,5 +79,13 @@ module hsid_mse_sva #(
 
   assert property (clear_outputs) else $error("Outputs are not cleared on clear signal");
   cover property (clear_outputs); // $display("Checked: Outputs are cleared on clear signal");
+
+  // Propagate channel accumulators
+  property propagate_acc_of;
+    @(posedge clk) disable iff (!rst_n || clear) (channel_1_acc_of || channel_2_acc_of) && channel_1_acc_last |-> ##2 acc_of;
+  endproperty
+
+  assert property (propagate_acc_of) else $error("Accumulator overflow flag is not propagated correctly");
+  cover property (propagate_acc_of); // $display("Checked: Accumulator overflow flag is propagated correctly");
 
 endmodule

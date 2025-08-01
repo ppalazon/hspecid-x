@@ -23,8 +23,8 @@ class HsidHSPixelMseGen#(
     vctr_ref dist {0:=15, MAX_HSP_LIBRARY:=15,  [1:MAX_HSP_LIBRARY-1]:/70};
   }
 
-  // Ensure HSP bands are at least 6, to avoid problems with the latest steps of mse (4 of sq_df_acc + 2 of mse)
-  constraint c_hsp_bands_bigger_than_six {
+  // Ensure HSP bands are at least 5, to avoid problems with the latest steps of mse (3 of sq_df_acc + 2 of mse)
+  constraint c_hsp_bands_bigger_than_five {
     hsp_bands >= 5;
     hsp_bands dist {5:=15, MAX_HSP_BANDS:=15, [6:MAX_HSP_BANDS-1]:/70};
   }
@@ -78,5 +78,9 @@ class HsidMSERandom #(
   rand logic [WORD_WIDTH-1:0] band_pack_b;
   rand logic band_pack_valid;
   rand logic [HSP_BANDS_WIDTH-1:0] hsp_bands;
+
+  constraint c_hsp_bands_bigger_than_six {
+    hsp_bands >= 5;
+  }
 
 endclass

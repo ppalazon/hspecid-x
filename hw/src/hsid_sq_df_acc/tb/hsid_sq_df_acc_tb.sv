@@ -9,7 +9,8 @@ module hsid_sq_df_acc_tb #(
     // parameter TEST_BANDS = HSID_TEST_BANDS, // Length of the vector
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
-    parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
+    parameter TEST_RND_INSERT = 1, // Enable random insertion of test vectors
+    parameter TEST_OVERFLOW = 1 // Enable overflow test
   );
 
   localparam logic[DATA_WIDTH_ACC-1:0]    MAX_DATA_ACC = {DATA_WIDTH_ACC{1'b1}}; // Maximum value for accumulator, it's wider than 32 bits
@@ -235,31 +236,8 @@ module hsid_sq_df_acc_tb #(
     a_zero_acc_of: assert (!acc_of) else $error("Overflow flag should be not set, but it is");
     a_zero_acc_value: assert (acc_value == 0) else $error("Accumulator value should be zero, but it is %0h", acc_value);
 
-    $display("Case 4: Trying overflow of overflow values for accumulator...");
-    // Initialize values
-    // Overflow when 10003 × (ffff × ffff)
-    // Overflow of overflow 20005 × (ffff × ffff)
-    cycle_count = 'h20007; // It's a huge number to overflow the overflow bit
-    for(int i=0; i < cycle_count; i++) begin
-      if (i==0) begin
-        initial_acc_en = 1;
-        initial_acc = '0;
-      end else begin
-        initial_acc_en = 0;
-        initial_acc = 0;
-      end
-      data_in_valid = 1;
-      data_in_a = MAX_DATA;
-      data_in_b = '0;
-      data_in_last = (i == cycle_count-1);
-      #10; // Wait for one clock cycle
-    end
-    data_in_valid = 0;
-    #20; // Wait for the last cycle to complete
-    a_max_acc_last: assert (acc_last) else $error("Low `acc_last`: %b on last cycle, check waiting clock", acc_last);
-    a_max_acc_of: assert (acc_of) else $error("Overflow flag should be set, but it is not");
 
-    $display("Case 5: Complete random test for sq_df_acc...");
+    $display("Case 4: Complete random test for sq_df_acc...");
     for (int i = 0; i < 100; i++) begin
       if (!sq_df_acc_random.randomize()) $fatal(0, "Failed to randomize values");
       clear = sq_df_acc_random.clear;
@@ -271,9 +249,34 @@ module hsid_sq_df_acc_tb #(
       data_in_last = sq_df_acc_random.data_in_last;
       #10; // Wait for one clock cycle
     end
-
-    #20; // Wait for the last cycle to complete
     data_in_valid = 0;
+    #20; // Wait for the last cycle to complete
+
+    if (TEST_OVERFLOW) begin
+      $display("Case 5: Trying overflow of overflow values for accumulator...");
+      // Initialize values
+      // Overflow when 10003 × (ffff × ffff)
+      // Overflow of overflow 20005 × (ffff × ffff)
+      cycle_count = 'h20007; // It's a huge number to overflow the overflow bit
+      for(int i=0; i < cycle_count; i++) begin
+        if (i==0) begin
+          initial_acc_en = 1;
+          initial_acc = '0;
+        end else begin
+          initial_acc_en = 0;
+          initial_acc = 0;
+        end
+        data_in_valid = 1;
+        data_in_a = MAX_DATA;
+        data_in_b = '0;
+        data_in_last = (i == cycle_count-1);
+        #10; // Wait for one clock cycle
+      end
+      data_in_valid = 0;
+      #20; // Wait for the last cycle to complete
+      a_max_acc_last: assert (acc_last) else $error("Low `acc_last`: %b on last cycle, check waiting clock", acc_last);
+      a_max_acc_of: assert (acc_of) else $error("Overflow flag should be set, but it is not");
+    end
 
     $finish;
   end

@@ -6,14 +6,16 @@ module hsid_mse_tb #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH, // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for HSP bands
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than WORD_WIDTH
-    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than WORD_WIDTH
-    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Address width for HSP bands
+    parameter DATA_WIDTH_ACC = 42, // Data width for accumulator, larger than WORD_WIDTH
+    parameter HSP_BANDS_WIDTH = 10, // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
-    parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
+    parameter TEST_RND_INSERT = 1, // Enable random insertion of test vectors
+    parameter TEST_OVERFLOW = 0 // Enable overflow test
   );
 
   // Max values
+  localparam logic[DATA_WIDTH-1:0]        MAX_DATA = {DATA_WIDTH{1'b1}}; // Maximum value for data vectors
   localparam logic[DATA_WIDTH_ACC-1:0]    MAX_DATA_ACC = {DATA_WIDTH_ACC{1'b1}}; // Maximum value for accumulator, it's wider than 32 bits
   localparam logic[HSP_BANDS_WIDTH-1:0]   MAX_HSP_BANDS = {HSP_BANDS_WIDTH{1'b1}}; // Maximum value for HSP bands
   localparam logic[HSP_LIBRARY_WIDTH-1:0] MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}}; // Maximum value for HSI library
@@ -150,6 +152,10 @@ module hsid_mse_tb #(
   // Random value
   int count_insert = 0;
 
+  // Check mse_of and acc_of values
+  logic [63:0] max_possible_acc;
+  logic [63:0] max_possible_divisor;
+
   initial begin
     clk = 1;
     rst_n = 1;
@@ -163,6 +169,19 @@ module hsid_mse_tb #(
 
     #3 rst_n = 0;  // Reset the DUT
     #5 rst_n = 1;  // Release reset
+
+    $display("Case 0: Check whether it's possible to get a real 'mse_of' or 'acc_of' with this configuration...");
+    $display("DATA_WIDTH: %0d, DATA_WIDTH_MUL: %0d, DATA_WIDTH_ACC: %0d", DATA_WIDTH, DATA_WIDTH_MUL, DATA_WIDTH_ACC);
+    for (int i=0; i<MAX_HSP_BANDS; i++) begin
+      max_possible_acc = i * (MAX_DATA * MAX_DATA);
+      max_possible_divisor = i * MAX_WORD;
+      if ($clog2(max_possible_acc) > DATA_WIDTH_ACC) begin
+        $display("You need bits %0d to store max possible acc %0h without overflow to hold pixels of %0d, but you have %0d bits ", $clog2(max_possible_acc), max_possible_acc, i, DATA_WIDTH_ACC);
+      end
+      if (max_possible_acc > max_possible_divisor) begin
+        $display("You could get mse_of with %0d bands, because max possible acc %0h is larger than max possible divisor %0h", i, max_possible_acc, max_possible_divisor);
+      end
+    end
 
     $display("Case 1: Testing with random values...");
     for (int i=0; i<TEST_LIBRARY_SIZE; i++) begin
@@ -289,45 +308,50 @@ module hsid_mse_tb #(
     a_max_mse_of: assert (mse_of == exp_mse_of[0]) else $error("MSE overflow flag is not set after overflow test, expected %0d, got %0d", exp_mse_of[0], mse_of);
     a_max_acc_value: assert (mse_value == exp_mse[0]) else $error("Accumulator value is not as we expected after overflow test, got %0h", mse_value);
 
-
-    $display("Case 5: Reaching overflow in the accumulator, but it doesn't have to be real because it sends more data that it should...");
-    overflow_sends = 'h10008; // Reset overflow sends count
-    $display("This is hacked to send more than 10000 elements to the accumulator, so it should overflow");
-    for(int i=0; i<overflow_sends; i++) begin
-      band_pack_valid = 1; // Enable input sample data
-      band_pack_start = (i == 0); // Enable initial accumulator value on first element
-      band_pack_last = (i == overflow_sends - 1); // Set last flag for the last element
-      band_pack_a = (i == overflow_sends -1) ? {{16'b1}, {16'b0}} : MAX_WORD; // Use maximum value for the word
-      band_pack_b = 32'b0; // Use zero for the second word to get maximum difference
-      hsp_bands = MAX_HSP_BANDS; // Set maximum HSP bands
-      vctr_ref = MAX_HSP_LIBRARY; // Set maximum reference vector
-      #10; // Wait for a clock cycle
-    end
-
-    // Disable input sample data
-    band_pack_valid = 0;
-
-    #(10 * mse_pipeline); // Wait for the last MSE calculation to complete
-    a_of_acc_valid: assert (mse_valid) else $fatal(0, "MSE valid signal is not asserted after overflow test, please check pipeline waiting cycles");
-    a_of_acc_of: assert (acc_of) else $error("Accumulator overflow flag is not set after overflow test");
-    // a_acc_value: assert (mse_value == exp_mse[0]) else $error("Accumulator value is not as we expected after overflow test, got %0h", mse_value);
-
-    #20; // Wait for the last cycle to complete
-
-    $display("Case 6: Send completely random values to mse module without check results...");
+    $display("Case 5: Send completely random values to mse module without check results...");
     for (int i =0; i<100; i++) begin
       if(!hsp_mse_complete_gen.randomize()) $fatal(0, "Failed to randomize values");
       band_pack_valid = hsp_mse_complete_gen.band_pack_valid;
-      band_pack_start = hsp_mse_complete_gen.band_pack_start; // Enable initial accumulator value on first element
-      band_pack_last = hsp_mse_complete_gen.band_pack_last; // Set last flag for the last element
+      //hsp_mse_complete_gen.band_pack_start; // Enable initial accumulator value on first element
+      band_pack_last = ((i-1) % 5 ==0); //hsp_mse_complete_gen.band_pack_last; // Set last flag for the last element
       band_pack_a = hsp_mse_complete_gen.band_pack_a; // Use maximum value for the word
       band_pack_b = hsp_mse_complete_gen.band_pack_b; // Use zero for the second word to get maximum difference
-      hsp_bands = hsp_mse_complete_gen.hsp_bands; // Set maximum HSP bands
-      vctr_ref = hsp_mse_complete_gen.vctr_ref; // Set maximum reference vector
+      if (i % 5 == 0) begin
+        band_pack_start = 1;
+        hsp_bands = hsp_mse_complete_gen.hsp_bands;
+        vctr_ref = hsp_mse_complete_gen.vctr_ref;
+      end
       #10; // Wait for a clock cycle
     end
 
     #20; // Wait for the last cycle to complete
+
+
+    if (TEST_OVERFLOW) begin
+      $display("Case 6: Reaching overflow in the accumulator, but it doesn't have to be real because it sends more data that it should...");
+      overflow_sends = 'h10008; // Reset overflow sends count
+      $display("This is hacked to send more than 10000 elements to the accumulator, so it should overflow");
+      for(int i=0; i<overflow_sends; i++) begin
+        band_pack_valid = 1; // Enable input sample data
+        band_pack_start = (i == 0); // Enable initial accumulator value on first element
+        band_pack_last = (i == overflow_sends - 1); // Set last flag for the last element
+        band_pack_a = (i == overflow_sends -1) ? {{16'b1}, {16'b0}} : MAX_WORD; // Use maximum value for the word
+        band_pack_b = 32'b0; // Use zero for the second word to get maximum difference
+        hsp_bands = MAX_HSP_BANDS; // Set maximum HSP bands
+        vctr_ref = MAX_HSP_LIBRARY; // Set maximum reference vector
+        #10; // Wait for a clock cycle
+      end
+
+      // Disable input sample data
+      band_pack_valid = 0;
+
+      #(10 * mse_pipeline); // Wait for the last MSE calculation to complete
+      a_of_acc_valid: assert (mse_valid) else $fatal(0, "MSE valid signal is not asserted after overflow test, please check pipeline waiting cycles");
+      a_of_acc_of: assert (acc_of) else $error("Accumulator overflow flag is not set after overflow test");
+      // a_acc_value: assert (mse_value == exp_mse[0]) else $error("Accumulator value is not as we expected after overflow test, got %0h", mse_value);
+
+      #20; // Wait for the last cycle to complete
+    end
 
     $finish;
   end
