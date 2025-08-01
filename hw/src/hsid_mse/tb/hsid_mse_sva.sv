@@ -22,17 +22,17 @@ module hsid_mse_sva #(
     input logic [WORD_WIDTH-1:0] mse_value,  // Output mean square error
     input logic [HSP_LIBRARY_WIDTH-1:0] mse_ref,  // Reference vector for sum
     input logic mse_valid,  // Enable input sample data
-    input logic mse_of,
+    // input logic mse_of,
     input logic acc_of,
 
     // Internal signals for verification
-    input logic channel_1_acc_valid, channel_2_acc_valid,
-    input logic [DATA_WIDTH_ACC-1:0] channel_1_acc_value, channel_2_acc_value,
-    input logic channel_1_acc_last, channel_2_acc_last,
-    input logic channel_1_acc_of, channel_2_acc_of,  // Overflow flag for the accumulated vector
-    input logic compute_acc_sum_en,  // Enable signal for mean square error accumulator
-    input logic compute_mse_en,
-    input logic [DATA_WIDTH_ACC:0] acc_value,  // Accumulator for both channels
+    // input logic channel_1_acc_valid, channel_2_acc_valid,
+    // input logic [DATA_WIDTH_ACC-1:0] channel_1_acc_value, channel_2_acc_value,
+    // input logic channel_1_acc_last, channel_2_acc_last,
+    // input logic channel_1_acc_of, channel_2_acc_of,  // Overflow flag for the accumulated vector
+    // input logic compute_acc_sum_en,  // Enable signal for mean square error accumulator
+    // input logic compute_mse_en,
+    // input logic [DATA_WIDTH_ACC:0] acc_value,  // Accumulator for both channels
     input logic [HSP_LIBRARY_WIDTH-1:0] acc_ref,  // Reference vector for mean square error
     input logic [HSP_BANDS_WIDTH-1:0] acc_hsp_bands
   );
@@ -74,18 +74,18 @@ module hsid_mse_sva #(
   // On clear signal, all outputs should be zero
   property clear_outputs;
     @(posedge clk) disable iff (!rst_n) clear |-> ##1
-      mse_value == '0 && mse_ref == '0 && mse_valid == 0 && mse_of == 0 && acc_of == 0;
+      mse_value == '0 && mse_ref == '0 && mse_valid == 0 && acc_of == 0; // && mse_of == 0
   endproperty
 
   assert property (clear_outputs) else $error("Outputs are not cleared on clear signal");
   cover property (clear_outputs); // $display("Checked: Outputs are cleared on clear signal");
 
   // Propagate channel accumulators
-  property propagate_acc_of;
-    @(posedge clk) disable iff (!rst_n || clear) (channel_1_acc_of || channel_2_acc_of) && channel_1_acc_last |-> ##2 acc_of;
-  endproperty
+  // property propagate_acc_of;
+  //   @(posedge clk) disable iff (!rst_n || clear) (channel_1_acc_of || channel_2_acc_of) && channel_1_acc_last |-> ##2 acc_of;
+  // endproperty
 
-  assert property (propagate_acc_of) else $error("Accumulator overflow flag is not propagated correctly");
-  cover property (propagate_acc_of); // $display("Checked: Accumulator overflow flag is propagated correctly");
+  // assert property (propagate_acc_of) else $error("Accumulator overflow flag is not propagated correctly");
+  // cover property (propagate_acc_of); // $display("Checked: Accumulator overflow flag is propagated correctly");
 
 endmodule

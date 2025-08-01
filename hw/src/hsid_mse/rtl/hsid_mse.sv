@@ -24,8 +24,8 @@ module hsid_mse #(
     output logic [WORD_WIDTH-1:0] mse_value,  // Output mean square error
     output logic [HSP_LIBRARY_WIDTH-1:0] mse_ref,  // Reference vector for sum
     output logic mse_valid,  // Enable input sample data
-    output logic acc_of,
-    output logic mse_of
+    output logic acc_of
+    // output logic mse_of
   );
 
   localparam HALF_WORD_WIDTH = WORD_WIDTH / 2; // Half of the word width
@@ -75,7 +75,7 @@ module hsid_mse #(
       if (compute_mse_en) begin: compute_mse
         // Compute mean square error
         mse_valid <=1;  // Enable output
-        mse_of <= acc_value > (acc_hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of result
+        // mse_of <= acc_value > (acc_hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of result
         mse_value <= acc_value / acc_hsp_bands;  // Divide by the number of bands
         acc_of <= acc_value[DATA_WIDTH_ACC] || acc_channel_of;  // Propagate overflow flag from square difference accumulator
         mse_ref <= acc_ref;  // Set reference vector for mean square error
@@ -130,7 +130,7 @@ module hsid_mse #(
       mse_ref <= 0;  // Reset reference vector
       mse_value <= 0;  // Reset mean square error
       mse_valid <= 0;  // Disable output
-      mse_of <= 0;  // Reset overflow flag for mean square error
+      // mse_of <= 0;  // Reset overflow flag for mean square error
       acc_channel_of <= 0;  // Reset overflow flag for the accumulated vector
       acc_hsp_bands <= 0; // Reset HSP bands to process
       compute_mse_en <= 0;  // Disable mean square error accumulator

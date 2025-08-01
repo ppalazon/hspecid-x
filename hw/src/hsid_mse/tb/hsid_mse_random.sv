@@ -46,8 +46,8 @@ class HsidHSPixelMseGen#(
   function automatic void mse(
       input logic [DATA_WIDTH_ACC:0] acc [], // Intermediate accumulator with overflow
       output logic [WORD_WIDTH-1:0] mse,
-      output logic mse_of,
       output logic acc_of
+      // output logic mse_of
     );
     logic [DATA_WIDTH_ACC:0] last_acc_sum = 0; // Accumulator for the sum
     acc_of = 0;
@@ -58,7 +58,7 @@ class HsidHSPixelMseGen#(
       end
     end
     last_acc_sum = acc[hsp_bands - 1];
-    mse_of = last_acc_sum > (hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of the divisor
+    // mse_of = last_acc_sum > (hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of the divisor
     mse = last_acc_sum / hsp_bands; // Compute mean square error
   endfunction
 

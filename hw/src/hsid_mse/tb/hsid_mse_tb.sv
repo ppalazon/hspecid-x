@@ -6,8 +6,8 @@ module hsid_mse_tb #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH, // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for HSP bands
     parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than WORD_WIDTH
-    parameter DATA_WIDTH_ACC = 42, // Data width for accumulator, larger than WORD_WIDTH
-    parameter HSP_BANDS_WIDTH = 10, // Address width for HSP bands
+    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than WORD_WIDTH
+    parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
     parameter TEST_RND_INSERT = 1, // Enable random insertion of test vectors
@@ -34,7 +34,7 @@ module hsid_mse_tb #(
   wire [WORD_WIDTH-1:0] mse_value;
   wire [HSP_LIBRARY_WIDTH-1:0] mse_ref; // Reference vector for MSE
   wire mse_valid;
-  wire mse_of; // Overflow flag for mean square error
+  // wire mse_of; // Overflow flag for mean square error
   wire acc_of; // Overflow flag for the accumulated vector
 
   hsid_mse #(
@@ -58,7 +58,7 @@ module hsid_mse_tb #(
     .mse_value(mse_value),
     .mse_ref(mse_ref),
     .mse_valid(mse_valid),
-    .mse_of(mse_of),
+    // .mse_of(mse_of),
     .acc_of(acc_of)
   );
 
@@ -105,7 +105,7 @@ module hsid_mse_tb #(
       bins max = {MAX_HSP_LIBRARY};
       bins middle = {[1:MAX_HSP_LIBRARY-1]};
     }
-    coverpoint mse_of iff(mse_valid);
+    // coverpoint mse_of iff(mse_valid);
     coverpoint acc_of iff(mse_valid);
   endgroup
   hsid_mse_cg mse_cg = new();
@@ -145,7 +145,7 @@ module hsid_mse_tb #(
   logic [WORD_WIDTH-1:0] vctr2 [];
   logic [WORD_WIDTH-1:0] exp_id [TEST_LIBRARY_SIZE];
   logic [WORD_WIDTH-1:0] exp_mse [TEST_LIBRARY_SIZE];
-  logic exp_mse_of [TEST_LIBRARY_SIZE];
+  // logic exp_mse_of [TEST_LIBRARY_SIZE];
   logic exp_acc_of [TEST_LIBRARY_SIZE];
   logic [DATA_WIDTH_ACC:0] acc_inter [TEST_LIBRARY_SIZE][];
 
@@ -190,12 +190,12 @@ module hsid_mse_tb #(
         hsp_mse_gen.band_packer(hsp_mse_gen.vctr1, vctr1);
         hsp_mse_gen.band_packer(hsp_mse_gen.vctr2, vctr2);
         hsp_mse_gen.sq_df_acc_vctr(acc_inter[i]);
-        hsp_mse_gen.mse(acc_inter[i], exp_mse[i], exp_mse_of[i], exp_acc_of[i]);
+        hsp_mse_gen.mse(acc_inter[i], exp_mse[i], exp_acc_of[i]); // exp_mse_of[i]
         exp_id[i] = hsp_mse_gen.vctr_ref;
 
         hsp_band_packs = (hsp_mse_gen.hsp_bands + 1) / 2; // Number of HSP band packs, each pack contains two bands
 
-        $display("Test %0d: Id: %0d, Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d, Expected mse_of: %0d", i, hsp_mse_gen.vctr_ref, hsp_mse_gen.hsp_bands, exp_mse[i], exp_acc_of[i], exp_mse_of[i]);
+        $display("Test %0d: Id: %0d, Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d", i, hsp_mse_gen.vctr_ref, hsp_mse_gen.hsp_bands, exp_mse[i], exp_acc_of[i]);
         // $display("Test %0d: Vctr1: %p", i, hsp_mse_gen.vctr1);
         // $display("Test %0d: Vctr2: %p", i, hsp_mse_gen.vctr2);
         // $display("Test %0d: Intermediate Accumulated: %p", i, acc_inter[i]);
@@ -275,7 +275,7 @@ module hsid_mse_tb #(
     #(10 * mse_pipeline); // Wait for the last MSE calculation to complete
     a_zero_acc_of_valid: assert (mse_valid) else $fatal(0, "MSE valid signal is not asserted after zero test, please check pipeline waiting cycles");
     a_zerp_acc_of: assert (!acc_of) else $error("Accumulator overflow flag is set after zero test");
-    a_zero_mse_of: assert (!mse_of) else $error("MSE overflow flag is set after zero test");
+    // a_zero_mse_of: assert (!mse_of) else $error("MSE overflow flag is set after zero test");
     a_zero_acc_value: assert (mse_value == '0) else $error("Accumulator value is not as we expected after zero test, got %0h", mse_value);
 
 
@@ -285,9 +285,9 @@ module hsid_mse_tb #(
     hsp_mse_gen.band_packer(hsp_mse_gen.vctr1, vctr1);
     hsp_mse_gen.band_packer(hsp_mse_gen.vctr2, vctr2);
     hsp_mse_gen.sq_df_acc_vctr(acc_inter[0]);
-    hsp_mse_gen.mse(acc_inter[0], exp_mse[0], exp_mse_of[0], exp_acc_of[0]);
+    hsp_mse_gen.mse(acc_inter[0], exp_mse[0], exp_acc_of[0]); //exp_mse_of[0]
     hsp_band_packs = (hsp_mse_gen.hsp_bands + 1) / 2;
-    $display("Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d, Expected mse_of: %0d", hsp_mse_gen.hsp_bands, exp_mse[0], exp_acc_of[0], exp_mse_of[0]);
+    $display("Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d", hsp_mse_gen.hsp_bands, exp_mse[0], exp_acc_of[0]);
     for(int i=0; i<hsp_band_packs; i++) begin
       band_pack_valid = 1; // Enable input sample data
       band_pack_start = (i == 0); // Enable initial accumulator value on first element
@@ -305,7 +305,7 @@ module hsid_mse_tb #(
     #(10 * mse_pipeline); // Wait for the last MSE calculation to complete
     a_max_acc_of_valid: assert (mse_valid) else $fatal(0, "MSE valid signal is not asserted after overflow test, please check pipeline waiting cycles");
     a_max_acc_of: assert (!acc_of) else $error("Accumulator overflow flag is not set after overflow test");
-    a_max_mse_of: assert (mse_of == exp_mse_of[0]) else $error("MSE overflow flag is not set after overflow test, expected %0d, got %0d", exp_mse_of[0], mse_of);
+    // a_max_mse_of: assert (mse_of == exp_mse_of[0]) else $error("MSE overflow flag is not set after overflow test, expected %0d, got %0d", exp_mse_of[0], mse_of);
     a_max_acc_value: assert (mse_value == exp_mse[0]) else $error("Accumulator value is not as we expected after overflow test, got %0h", mse_value);
 
     $display("Case 5: Send completely random values to mse module without check results...");
@@ -361,7 +361,7 @@ module hsid_mse_tb #(
 
   task check_mse;
     a_mse_valid: assert (mse_valid) else $fatal(0, "Test %0d: MSE valid signal is not asserted when expected, check compute waiting cycles", mse_order);
-    a_mse_of: assert (mse_of == exp_mse_of[mse_order]) else $error("Test %0d: MSE overflow flag is incorrect: expected %0d, got %0d", mse_order, exp_mse_of[mse_order], mse_of);
+    // a_mse_of: assert (mse_of == exp_mse_of[mse_order]) else $error("Test %0d: MSE overflow flag is incorrect: expected %0d, got %0d", mse_order, exp_mse_of[mse_order], mse_of);
     a_acc_of: assert (acc_of == exp_acc_of[mse_order]) else $error("Test %0d: Accumulator overflow flag is incorrect: expected %0d, got %0d", mse_order, exp_acc_of[mse_order], acc_of);
     a_mse_value: assert (mse_value == exp_mse[mse_order]) else begin
       $error("Test %0d: MSE is incorrect: expected %0h, got %0h", mse_order, exp_mse[mse_order], mse_value);
