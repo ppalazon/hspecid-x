@@ -1,11 +1,15 @@
+`timescale 1ns / 1ps
+
+import hsid_pkg::*;
+
 class hsid_fifo_op #(
-    parameter DATA_WIDTH = 32,  // Width of the data in bits
-    parameter FIFO_ADDR_WIDTH = 3 // Address width for FIFO depth
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the data in bits
+    parameter FIFO_ADDR_WIDTH = HSID_FIFO_ADDR_WIDTH // Address width for FIFO depth
   );
 
   localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH; // Define FIFO depth based on address width
 
-  rand logic [DATA_WIDTH-1:0] data_in;
+  rand logic [WORD_WIDTH-1:0] data_in;
   rand logic wr_en;
   rand logic rd_en;
   rand logic clear;

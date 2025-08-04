@@ -15,7 +15,7 @@ module hsid_mse #(
     input logic clear,
     input logic band_pack_start,
     input logic band_pack_last,
-    input logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref,
+    input logic [HSP_LIBRARY_WIDTH-1:0] hsp_ref,
     input logic [WORD_WIDTH-1:0] band_pack_a, // Input sample word data
     input logic [WORD_WIDTH-1:0] band_pack_b, // Input sample word data
     input logic band_pack_valid,  // Enable input sample data
@@ -60,7 +60,7 @@ module hsid_mse #(
     end else begin
       // Pipeline stage for square difference accumulator between two channels
       if (band_pack_valid && band_pack_last) begin: last_band_pack
-        acc_ref <= vctr_ref; // Set vector reference for sum
+        acc_ref <= hsp_ref; // Set vector reference for sum
         acc_hsp_bands <= hsp_bands; // Set HSP bands to process
       end
       if (compute_acc_sum_en) begin: compute_acc_sum

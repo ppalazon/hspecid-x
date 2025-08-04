@@ -3,7 +3,7 @@
 import hsid_pkg::*;
 
 module vctr_fifo_full_tb #(
-    parameter DATA_WIDTH = HSID_DATA_WIDTH,
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,
     parameter HSP_BANDS_WIDTH = 3  // 8 entries by default
   );
 
@@ -12,19 +12,19 @@ module vctr_fifo_full_tb #(
   reg clk;
   reg rst_n;
   reg data_in_en;
-  reg [DATA_WIDTH-1:0] data_in;
+  reg [WORD_WIDTH-1:0] data_in;
   reg data_out_en;
-  wire [DATA_WIDTH-1:0] data_out;
+  wire [WORD_WIDTH-1:0] data_out;
   reg start;
   wire done;
   wire idle;
   wire ready;
 
 // Generate 2 simple vectors with 8 values each
-  reg [DATA_WIDTH-1:0] vctr_sum [];
+  reg [WORD_WIDTH-1:0] vctr_sum [];
 
   vctr_fifo_full #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
   ) dut (
     .clk(clk),
@@ -41,7 +41,7 @@ module vctr_fifo_full_tb #(
 
 // Random class to generate test vectors
   VctrFifoFullGen #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
   ) vffg;
 

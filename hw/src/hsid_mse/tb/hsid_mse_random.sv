@@ -23,10 +23,11 @@ class HsidHSPixelMseGen#(
     vctr_ref dist {0:=15, MAX_HSP_LIBRARY:=15,  [1:MAX_HSP_LIBRARY-1]:/70};
   }
 
-  // Ensure HSP bands are at least 5, to avoid problems with the latest steps of mse (3 of sq_df_acc + 2 of mse)
-  constraint c_hsp_bands_bigger_than_five {
-    hsp_bands >= 5;
-    hsp_bands dist {5:=15, MAX_HSP_BANDS:=15, [6:MAX_HSP_BANDS-1]:/70};
+  // Ensure HSP bands are at least 8, to avoid problems with the latest steps of mse (3 of sq_df_acc + 1 of first mse pipeline)
+  // I need 8 pixel because it will be packed in 2 pixels per word, so I need 6 (3x2 sq_df_acc) + 1 (mse of first mse pipelin) = 7
+  constraint c_hsp_bands_bigger_than_six {
+    hsp_bands >= 7;
+    hsp_bands dist {7:=15, MAX_HSP_BANDS:=15, [6:MAX_HSP_BANDS-1]:/70};
   }
 
   function automatic void band_packer(

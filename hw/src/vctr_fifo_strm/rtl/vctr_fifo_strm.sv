@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module vctr_fifo_strm #(
-    parameter DATA_WIDTH = 16,  // 16 bits by default
+    parameter WORD_WIDTH = 16,  // 16 bits by default
     parameter HSP_BANDS_WIDTH = 8,  // Number of bits to represent vector length
     parameter BUFFER_WIDTH = 2  // Width of the buffer for vector operations
   ) (
@@ -9,15 +9,15 @@ module vctr_fifo_strm #(
     input logic rst_n,
 
     input logic data_in_v1_en,  // Enable input data for vector 1
-    input logic [DATA_WIDTH-1:0] data_in_v1,
+    input logic [WORD_WIDTH-1:0] data_in_v1,
     output logic data_in_v1_full,  // Full signal for vector 1 input FIFO
 
     input logic data_in_v2_en,  // Enable input data for vector 2
-    input logic [DATA_WIDTH-1:0] data_in_v2,
+    input logic [WORD_WIDTH-1:0] data_in_v2,
     output logic data_in_v2_full,  // Full signal for vector 2 input FIFO
 
     input logic data_out_en,  // Ready signal for output data
-    output logic [DATA_WIDTH-1:0] data_out,
+    output logic [WORD_WIDTH-1:0] data_out,
     output logic data_out_empty,  // Empty signal for output FIFO
 
     input logic [HSP_BANDS_WIDTH-1:0] vector_length,  // Length of the vectors
@@ -42,7 +42,7 @@ module vctr_fifo_strm #(
   logic vctr_out_almost_full;
 
   // Operands for vector operations
-  logic [DATA_WIDTH-1:0] read_v1_data, read_v2_data, vctr_out_data;
+  logic [WORD_WIDTH-1:0] read_v1_data, read_v2_data, vctr_out_data;
   logic vctr_out_en, compute_en; // Pipeline control signals
   logic [HSP_BANDS_WIDTH-1:0] processed;
 
@@ -100,7 +100,7 @@ module vctr_fifo_strm #(
   end
 
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(BUFFER_WIDTH)
   ) vctr_in_1 (
     .clk(clk),
@@ -118,7 +118,7 @@ module vctr_fifo_strm #(
   );
 
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(BUFFER_WIDTH)
   ) vctr_in_2 (
     .clk(clk),
@@ -136,7 +136,7 @@ module vctr_fifo_strm #(
   );
 
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(BUFFER_WIDTH)
   ) vctr_out (
     .clk(clk),

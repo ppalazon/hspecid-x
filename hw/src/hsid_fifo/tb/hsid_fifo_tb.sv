@@ -3,8 +3,8 @@
 import hsid_pkg::*;
 
 module hsid_fifo_tb #(
-    parameter DATA_WIDTH = 32,  // 32 bits by default
-    parameter FIFO_ADDR_WIDTH = 4, // Address width for FIFO depth
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // 32 bits by default
+    parameter FIFO_ADDR_WIDTH = HSID_FIFO_ADDR_WIDTH, // Address width for FIFO depth
     parameter FIFO_ALMOST_FULL_THRESHOLD = 10 // Optional threshold for almost full
   );
 
@@ -17,9 +17,9 @@ module hsid_fifo_tb #(
   reg wr_en;
   reg rd_en;
   reg loop_en = 0;
-  reg [DATA_WIDTH-1:0] fifo_data_in;
+  reg [WORD_WIDTH-1:0] fifo_data_in;
   reg [FIFO_ADDR_WIDTH-1:0] almost_full_threshold = FIFO_ALMOST_FULL_THRESHOLD; // Element to process
-  wire [DATA_WIDTH-1:0] fifo_data_out;
+  wire [WORD_WIDTH-1:0] fifo_data_out;
   wire full;
   wire almost_full;
   wire empty;
@@ -27,7 +27,7 @@ module hsid_fifo_tb #(
 
   // Instantiate the FIFO module
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) dut (
     .clk(clk),
@@ -46,7 +46,7 @@ module hsid_fifo_tb #(
 
   // bind verification to the DUT instance
   bind hsid_fifo hsid_fifo_sva #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) dut_sva (.*);
 
@@ -76,13 +76,13 @@ module hsid_fifo_tb #(
   fifo_cg fifo_cov = new;
 
   hsid_fifo_op #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) random_op = new();
 
   // Generate a queue
-  logic [DATA_WIDTH-1:0] fifo_values[$];
-  logic [DATA_WIDTH-1:0] fifo_value_expected;
+  logic [WORD_WIDTH-1:0] fifo_values[$];
+  logic [WORD_WIDTH-1:0] fifo_value_expected;
   logic fifo_value_check_read;
   logic fifo_value_check_loop;
 

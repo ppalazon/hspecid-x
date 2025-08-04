@@ -17,9 +17,21 @@ filesets:
 
   tb:
     files:
-      - hw/src/hsid_main/tb/hsid_main_tb_random.sv
+      - hw/src/hsid_fifo/tb/hsid_fifo_sva.sv
+      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_sva.sv
+      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_random.sv
+      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_sva.sv
+      - hw/src/hsid_mse/tb/hsid_mse_sva.sv
+      - hw/src/hsid_mse/tb/hsid_mse_random.sv
+      - hw/src/hsid_main/tb/hsid_main_random.sv
+      - hw/src/hsid_main/tb/hsid_main_fsm_sva.sv
       - hw/src/hsid_main/tb/hsid_main_tb.sv
     file_type: systemVerilogSource
+
+  tcl_modelsim:
+    files:
+      - hw/tcl/modelsim-do/hsid_main_debug.do
+    file_type: tclSource
 
   nexys_a7_100t:
     files:
@@ -30,12 +42,12 @@ targets:
     filesets:
       - rtl
     toplevel: hsid_main
-    parameters:
-      - WORD_WIDTH
-      - DATA_WIDTH
-      - HSI_BANDS
-      - BUFFER_LENGTH
-      - HSI_LIBRARY_SIZE
+    # parameters:
+    #   - WORD_WIDTH
+    #   - DATA_WIDTH
+    #   - HSI_BANDS
+    #   - BUFFER_LENGTH
+    #   - HSI_LIBRARY_SIZE
 
   sim:
     <<: *default
@@ -43,9 +55,12 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
+      - tool_modelsim? (tcl_modelsim)
     toplevel: hsid_main_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+      modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
         #xelab_options:
         #xsim_options:
@@ -63,25 +78,24 @@ targets:
   #   tools:
   #     vivado:
   #       part: xc7a100tcsg324-1
-
-parameters:
-  WORD_WIDTH:
-    datatype: int
-    description: Width of the word in bits
-    paramtype: vlogparam
-  DATA_WIDTH:
-    datatype: int
-    description: Pixel information
-    paramtype: vlogparam
-  HSI_BANDS:
-    datatype: int
-    description: Number of bands per pixel
-    paramtype: vlogparam
-  BUFFER_LENGTH:
-    datatype: int
-    description: FIFO default buffer size
-    paramtype: vlogparam
-  HSI_LIBRARY_SIZE:
-    datatype: int
-    description: Number of hsi refences in library
-    paramtype: vlogparam
+# parameters:
+#   WORD_WIDTH:
+#     datatype: int
+#     description: Width of the word in bits
+#     paramtype: vlogparam
+#   DATA_WIDTH:
+#     datatype: int
+#     description: Pixel information
+#     paramtype: vlogparam
+#   HSI_BANDS:
+#     datatype: int
+#     description: Number of bands per pixel
+#     paramtype: vlogparam
+#   BUFFER_LENGTH:
+#     datatype: int
+#     description: FIFO default buffer size
+#     paramtype: vlogparam
+#   HSI_LIBRARY_SIZE:
+#     datatype: int
+#     description: Number of hsi refences in library
+#     paramtype: vlogparam

@@ -13,7 +13,7 @@ module hsid_mse_sva #(
     input logic clear,
     input logic band_pack_start,
     input logic band_pack_last,
-    input logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref,
+    input logic [HSP_LIBRARY_WIDTH-1:0] hsp_ref,
     input logic [WORD_WIDTH-1:0] band_pack_a, // Input sample word data
     input logic [WORD_WIDTH-1:0] band_pack_b, // Input sample word data
     input logic band_pack_valid,  // Enable input sample data
@@ -45,11 +45,11 @@ module hsid_mse_sva #(
   assert property (mse_valid_after_band_pack_last) else $error("MSE valid signal is not asserted when expected");
   cover property (mse_valid_after_band_pack_last); // $display("Checked: MSE valid signal is asserted when expected");
 
-  // Safe hsp_bands and vctr_ref values on last band_pack
+  // Safe hsp_bands and vctr_ref values on last band_pack (1 cycle before mse_valid)
   property safe_hsp_bands_and_vctr_ref;
     @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |-> ##1
-      (acc_hsp_bands == $past(hsp_bands)) && (acc_ref == $past(vctr_ref)) ##4
-      (acc_hsp_bands == $past(hsp_bands, 5)) && (acc_ref == $past(vctr_ref,5));
+      (acc_hsp_bands == $past(hsp_bands)) && (acc_ref == $past(hsp_ref)) ##3
+      (acc_hsp_bands == $past(hsp_bands, 4)) && (acc_ref == $past(hsp_ref,4));
   endproperty
   assert property (safe_hsp_bands_and_vctr_ref) else $error("HSP bands and vector reference are not safe on last band pack");
   cover property (safe_hsp_bands_and_vctr_ref); // $display("Checked: HSP bands and vector reference are safe on last band pack");

@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 
 module vctr_fifo_full #(
-    parameter DATA_WIDTH = 16,  // 16 bits by default
+    parameter WORD_WIDTH = 16,  // 16 bits by default
     parameter HSP_BANDS_WIDTH = 3  // 8 entries by default
   ) (
     input logic clk,
     input logic rst_n,
     input logic data_in_en,  // Enable signal for input data
-    input logic [DATA_WIDTH-1:0] data_in,
+    input logic [WORD_WIDTH-1:0] data_in,
     input logic data_out_en,  // Ready signal for output data
-    output logic [DATA_WIDTH-1:0] data_out,
+    output logic [WORD_WIDTH-1:0] data_out,
 
     input  logic start,
     output logic done,
@@ -34,7 +34,7 @@ module vctr_fifo_full #(
   logic vctr_out_empty;
 
   // Operands for vector operations
-  logic [DATA_WIDTH-1:0] vctr_in_1_data, vctr_in_2_data, vctr_out_data;
+  logic [WORD_WIDTH-1:0] vctr_in_1_data, vctr_in_2_data, vctr_out_data;
   logic vctr_out_en, compute_en; // Pipeline control signals
 
   always_ff @(posedge clk or negedge rst_n) begin
@@ -93,7 +93,7 @@ module vctr_fifo_full #(
   end
 
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
   ) vctr_in_1 (
     .clk(clk),
@@ -111,7 +111,7 @@ module vctr_fifo_full #(
   );
 
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
   ) vctr_in_2 (
     .clk(clk),
@@ -129,7 +129,7 @@ module vctr_fifo_full #(
   );
 
   hsid_fifo #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
   ) vctr_out (
     .clk(clk),

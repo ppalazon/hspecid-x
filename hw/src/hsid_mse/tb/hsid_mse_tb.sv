@@ -9,7 +9,7 @@ module hsid_mse_tb #(
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than WORD_WIDTH
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
-    parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
+    parameter TEST_LIBRARY_SIZE = 10, // Size of the HSI library to test
     parameter TEST_RND_INSERT = 1, // Enable random insertion of test vectors
     parameter TEST_OVERFLOW = 0 // Enable overflow test
   );
@@ -51,7 +51,7 @@ module hsid_mse_tb #(
     .clear(clear),
     .band_pack_start(band_pack_start),
     .band_pack_last(band_pack_last),
-    .vctr_ref(vctr_ref),
+    .hsp_ref(vctr_ref),
     .band_pack_a(band_pack_a),
     .band_pack_b(band_pack_b),
     .band_pack_valid(band_pack_valid),
@@ -91,7 +91,7 @@ module hsid_mse_tb #(
       bins middle = {[1:MAX_HSP_LIBRARY-1]};
     }
     coverpoint hsp_bands iff(band_pack_valid) {
-      bins zero = {0};
+      bins min = {7};
       bins max = {MAX_HSP_BANDS};
       bins middle = {[1:MAX_HSP_BANDS-1]};
     }
@@ -143,7 +143,7 @@ module hsid_mse_tb #(
   int overflow_sends; // Count of overflow occurrences
   logic [WORD_WIDTH-1:0] vctr1 [];
   logic [WORD_WIDTH-1:0] vctr2 [];
-  logic [WORD_WIDTH-1:0] exp_id [TEST_LIBRARY_SIZE];
+  logic [HSP_LIBRARY_WIDTH-1:0] exp_id [TEST_LIBRARY_SIZE];
   logic [WORD_WIDTH-1:0] exp_mse [TEST_LIBRARY_SIZE];
   // logic exp_mse_of [TEST_LIBRARY_SIZE];
   logic exp_acc_of [TEST_LIBRARY_SIZE];
@@ -189,7 +189,7 @@ module hsid_mse_tb #(
       if (hsp_mse_gen.randomize()) begin
         hsp_mse_gen.band_packer(hsp_mse_gen.vctr1, vctr1);
         hsp_mse_gen.band_packer(hsp_mse_gen.vctr2, vctr2);
-        hsp_mse_gen.sq_df_acc_vctr(acc_inter[i]);
+        hsp_mse_gen.sq_df_acc_vctr(hsp_mse_gen.vctr1, hsp_mse_gen.vctr2, acc_inter[i]);
         hsp_mse_gen.mse(acc_inter[i], exp_mse[i], exp_acc_of[i]); // exp_mse_of[i]
         exp_id[i] = hsp_mse_gen.vctr_ref;
 
@@ -284,7 +284,7 @@ module hsid_mse_tb #(
     hsp_mse_gen.set_worst_case_for_acc(MAX_HSP_BANDS); // Set worst case values for the accumulator
     hsp_mse_gen.band_packer(hsp_mse_gen.vctr1, vctr1);
     hsp_mse_gen.band_packer(hsp_mse_gen.vctr2, vctr2);
-    hsp_mse_gen.sq_df_acc_vctr(acc_inter[0]);
+    hsp_mse_gen.sq_df_acc_vctr(hsp_mse_gen.vctr1, hsp_mse_gen.vctr2, acc_inter[0]);
     hsp_mse_gen.mse(acc_inter[0], exp_mse[0], exp_acc_of[0]); //exp_mse_of[0]
     hsp_band_packs = (hsp_mse_gen.hsp_bands + 1) / 2;
     $display("Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d", hsp_mse_gen.hsp_bands, exp_mse[0], exp_acc_of[0]);

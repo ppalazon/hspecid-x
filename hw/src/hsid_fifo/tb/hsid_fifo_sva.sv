@@ -1,8 +1,10 @@
 `timescale 1ns / 1ps
 
+import hsid_pkg::*;
+
 module hsid_fifo_sva #(
-    parameter DATA_WIDTH = 16,  // 16 bits by default
-    parameter FIFO_ADDR_WIDTH = 4, // Address width for FIFO depth
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // 16 bits by default
+    parameter FIFO_ADDR_WIDTH = HSID_FIFO_ADDR_WIDTH, // Address width for FIFO depth
     localparam FIFO_DEPTH = 2 ** FIFO_ADDR_WIDTH
   ) (
     input logic clk,
@@ -10,16 +12,16 @@ module hsid_fifo_sva #(
     input logic loop_en,
     input logic wr_en,
     input logic rd_en,
-    input logic [DATA_WIDTH-1:0] data_in,
+    input logic [WORD_WIDTH-1:0] data_in,
     input logic [FIFO_ADDR_WIDTH-1:0] almost_full_threshold, // Element to process
-    input logic [DATA_WIDTH-1:0] data_out,
+    input logic [WORD_WIDTH-1:0] data_out,
     input logic full,
     input logic almost_full,
     input logic empty,
     input logic clear,
 
     // Internal signals
-    input logic [DATA_WIDTH-1:0] fifo_mem[0:FIFO_DEPTH-1],
+    input logic [WORD_WIDTH-1:0] fifo_mem[0:FIFO_DEPTH-1],
 
     // Initializing read and write pointers
     input logic [FIFO_ADDR_WIDTH-1:0] wr_ptr = 0,
@@ -27,7 +29,6 @@ module hsid_fifo_sva #(
     input logic [FIFO_ADDR_WIDTH:0] fifo_count = 0, // It has to be one bit larger than the address width to count from 0 to FIFO_DEPTH
     input logic [1:0] fifo_request
   );
-
 
   localparam MAX_PTR_VALUE = FIFO_DEPTH - 1;
 

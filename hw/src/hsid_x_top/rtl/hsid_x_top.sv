@@ -5,9 +5,9 @@ import hsid_pkg::*;
 module hsid_x_top #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
-    parameter DATA_WIDTH_MUL = DATA_WIDTH * 2,  // Data width for multiplication
-    parameter DATA_WIDTH_ACC = DATA_WIDTH * 3,  // Data width for accumulator
-    parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Number of entries in the FIFO buffer
+    parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL,  // Data width for multiplication
+    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC,  // Data width for accumulator
+    parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Number of entries in the FIFO buffer
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
@@ -135,11 +135,11 @@ module hsid_x_top #(
     .clear            (clear),
     .clk              (clk),
     .done             (done),
-    .hsi_bands_in     (pixel_bands),
-    .hsi_vctr_in      (obi_data_out),
-    .hsi_vctr_in_valid(obi_data_out_valid),
+    .hsp_bands_in     (pixel_bands),
+    .band_data_in      (obi_data_out),
+    .band_data_in_valid(obi_data_out_valid),
     .idle             (idle),
-    .library_size_in  (library_size),
+    .hsp_library_size_in  (library_size),
     .mse_max_ref      (mse_max_ref),
     .mse_max_value    (mse_max_value),
     .mse_min_ref      (mse_min_ref),

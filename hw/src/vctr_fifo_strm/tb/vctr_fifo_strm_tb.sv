@@ -4,7 +4,7 @@ import hsid_pkg::*;
 
 module vctr_fifo_strm_tb;
 
-  localparam int DATA_WIDTH = HSID_DATA_WIDTH;
+  localparam int WORD_WIDTH = HSID_WORD_WIDTH;
   localparam int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH;
   localparam int BUFFER_WIDTH = 2;
 
@@ -13,11 +13,11 @@ module vctr_fifo_strm_tb;
   reg clk;
   reg rst_n;
   reg data_in_v1_en;
-  reg [DATA_WIDTH-1:0] data_in_v1;
+  reg [WORD_WIDTH-1:0] data_in_v1;
   reg data_in_v2_en;
-  reg [DATA_WIDTH-1:0] data_in_v2;
+  reg [WORD_WIDTH-1:0] data_in_v2;
   reg data_out_en;
-  wire [DATA_WIDTH-1:0] data_out;
+  wire [WORD_WIDTH-1:0] data_out;
   wire data_out_empty;
   reg [HSP_BANDS_WIDTH-1:0] vector_length;
   reg start;
@@ -26,7 +26,7 @@ module vctr_fifo_strm_tb;
   wire ready;
 
   vctr_fifo_strm #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .BUFFER_WIDTH(BUFFER_WIDTH)
   ) dut (
@@ -49,9 +49,9 @@ module vctr_fifo_strm_tb;
   );
 
   // Generate 2 simple vectors with 8 values each
-  reg [DATA_WIDTH-1:0] vctr_1 [0:HSP_BANDS-1];
-  reg [DATA_WIDTH-1:0] vctr_2 [0:HSP_BANDS-1];
-  reg [DATA_WIDTH-1:0] vctr_sum [0:HSP_BANDS-1];
+  reg [WORD_WIDTH-1:0] vctr_1 [0:HSP_BANDS-1];
+  reg [WORD_WIDTH-1:0] vctr_2 [0:HSP_BANDS-1];
+  reg [WORD_WIDTH-1:0] vctr_sum [0:HSP_BANDS-1];
 
   // Count inserted and processed elements
   integer processed = 0;

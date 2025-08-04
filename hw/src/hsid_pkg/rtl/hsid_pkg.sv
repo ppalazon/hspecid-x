@@ -4,20 +4,15 @@ package hsid_pkg;
 
   localparam int HSID_WORD_WIDTH = 32; // Width of the word in bits
   localparam int HSID_DATA_WIDTH = 16; // 16 bits (but only 14 bits used from hsi pixel)
-  localparam int HSID_DATA_WIDTH_MUL = HSID_DATA_WIDTH * 2; // Data width for multiplication (32 bits)
+  localparam int HSID_DATA_WIDTH_MUL = 32; // Data width for multiplication (32 bits)
   localparam int HSID_DATA_WIDTH_ACC = 40; // Data width for accumulator
-  localparam int HSID_HSP_BANDS_WIDTH = 8; // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
-  localparam int HSID_HSP_LIBRARY_WIDTH = 11 ; // Numer of bits for Hyperspectral Pixels Library (11 bits - 4096 pixels)
-  localparam int HSID_BUFFER_WIDTH = 2; // Number of bits for buffer address (4 entries)
-
-  // Test parameters
-  localparam int HSID_TEST_BANDS = 16; // Number of HSP bands to test
-  localparam int HSID_TEST_LIBRARY_SIZE = 25; // Size of the HSI library to test
-  localparam int HSID_TEST_BAND_PACKS = HSID_TEST_BANDS / 2; // Number of band packs in the vector for testbench
+  localparam int HSID_HSP_BANDS_WIDTH = 7; // Number of bits for Hyperspectral Pixels (7 bits - 127 bands)
+  localparam int HSID_HSP_LIBRARY_WIDTH = 6; // Numer of bits for Hyperspectral Pixels Library (6 bits - 64 pixels)
+  localparam int HSID_FIFO_ADDR_WIDTH = 2; // Number of bits for buffer address (4 entries)
 
   // HSI MSE library state machine states
   typedef enum logic [2:0] {
-    IDLE, READ_MEASURE, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
+    IDLE, READ_HSP_CAPTURED, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
   } hsid_main_state_t;
 
   typedef enum logic [2:0] {

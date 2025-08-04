@@ -11,7 +11,7 @@ module hsid_x_top_tb #(
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
-    parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Length of the buffer
+    parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
     parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSP bands to test
     parameter TEST_BAND_PACKS = TEST_BANDS / 2, // Number of HSP bands to test
     parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test

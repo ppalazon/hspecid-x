@@ -42,6 +42,8 @@ class HsidHSPixelGen #(
   }
 
   function void sq_df_acc_vctr(
+      input logic [DATA_WIDTH-1:0] v1 [], // Input vector 1
+      input logic [DATA_WIDTH-1:0] v2 [], // Input vector
       output logic [DATA_WIDTH_ACC:0]   acc[] // Intermediate accumulator with overflow
     );
     logic signed [DATA_WIDTH:0] diff; // Difference between elements
@@ -49,7 +51,7 @@ class HsidHSPixelGen #(
     logic [DATA_WIDTH_ACC:0] acc_aux = initial_acc; // Accumulator for the output
     acc = new[hsp_bands];
     for (int i = 0; i < hsp_bands; i++) begin
-      diff = vctr1[i] - vctr2[i]; // Compute difference
+      diff = v1[i] - v2[i]; // Compute difference
       mult = diff * diff; // Compute squared difference
       acc_aux += mult; // Accumulate the result
       acc[i] = acc_aux; // Store the accumulated value

@@ -9,20 +9,20 @@ module hsid_main_tb #(
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,  // Number of bits for Hyperspectral Pixels Library (11 bits - 4096 pixels)
-    parameter BUFFER_WIDTH = HSID_BUFFER_WIDTH,  // Length of the buffer
-    parameter TEST_BANDS = HSID_TEST_BANDS, // Number of HSP bands to test
-    parameter TEST_LIBRARY_SIZE = HSID_TEST_LIBRARY_SIZE, // Size of the HSI library to test
+    parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
     parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
   ) ();
 
-  localparam TEST_BAND_PACKS = TEST_BANDS / 2; // Number of band packs in the vector for testbench
+  localparam MAX_WORD = {WORD_WIDTH{1'b1}};
+  localparam MAX_HSP_BANDS = {HSP_BANDS_WIDTH{1'b1}};
+  localparam MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}};
 
   reg clk;
   reg rst_n;
-  reg hsi_vctr_in_valid;
-  reg [WORD_WIDTH-1:0] hsi_vctr_in;
-  reg [HSP_LIBRARY_WIDTH-1:0] library_size_in;
-  reg [HSP_BANDS_WIDTH-1:0] hsi_bands_in;  // HSP bands to process
+  reg band_data_in_valid;
+  reg [WORD_WIDTH-1:0] band_data_in;
+  reg [HSP_LIBRARY_WIDTH-1:0] hsp_library_size_in;
+  reg [HSP_BANDS_WIDTH-1:0] hsp_bands_in;  // HSP bands to process
   wire [HSP_LIBRARY_WIDTH-1:0] mse_min_ref;
   wire [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;
   wire [WORD_WIDTH-1:0] mse_min_value;
@@ -35,6 +35,7 @@ module hsid_main_tb #(
   wire idle;
   wire ready;
 
+  // DUT instantiation
   hsid_main #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
@@ -44,10 +45,10 @@ module hsid_main_tb #(
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
-    .hsi_vctr_in_valid(hsi_vctr_in_valid),
-    .hsi_vctr_in(hsi_vctr_in),
-    .library_size_in(library_size_in),
-    .hsi_bands_in(hsi_bands_in),
+    .band_data_in_valid(band_data_in_valid),
+    .band_data_in(band_data_in),
+    .hsp_library_size_in(hsp_library_size_in),
+    .hsp_bands_in(hsp_bands_in),
     .mse_min_ref(mse_min_ref),
     .mse_max_ref(mse_max_ref),
     .mse_min_value(mse_min_value),
@@ -59,33 +60,102 @@ module hsid_main_tb #(
     .ready(ready)
   );
 
+  // Constraint randomization for the HSI vector
   HsidMainGen #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
-    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),  // Data width for multiplication, larger than DATA_WIDTH
-    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),  // Data width for accumulator, larger than DATA_WIDTH
-    .TEST_BANDS(TEST_BANDS),
-    .TEST_LIBRARY_SIZE(TEST_LIBRARY_SIZE)
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsid_main_gen = new();
 
+  HsidHSPReferenceGen #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
+  ) hsid_hsp_ref_gen = new();
+
+  // Covergroup to coverage the MSE values
+  covergroup hsid_main_cg @(posedge clk);
+    coverpoint band_data_in_valid;
+    coverpoint band_data_in iff (band_data_in_valid) {
+      bins zero = {0};
+      bins max = {MAX_WORD};
+      bins mid = {[1:MAX_WORD-1]};
+    }
+    coverpoint hsp_bands_in iff (band_data_in_valid) {
+      bins min = {7};
+      bins max = {MAX_HSP_BANDS};
+      bins mid = {[1:MAX_HSP_BANDS-1]};
+    }
+    coverpoint hsp_library_size_in iff (band_data_in_valid) {
+      bins min = {1};
+      bins max = {MAX_HSP_LIBRARY};
+      bins mid = {[1:MAX_HSP_LIBRARY-1]};
+    }
+    coverpoint clear;
+  endgroup
+
+  hsid_main_cg hsid_main_cov = new();
+
+  // Binding SVA assertions to the DUT
+  bind hsid_main_fsm hsid_main_fsm_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_main_fsm_sva_inst (.*);
+
+  bind hsid_mse hsid_mse_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_mse_sva_inst (.*);
+
+  bind hsid_sq_df_acc hsid_sq_df_acc_sva #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
+  ) hsid_sq_df_acc_sva_inst (.*);
+
+  bind hsid_mse_comp hsid_mse_comp_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_mse_comp_sva_inst (.*);
+
+  bind hsid_fifo hsid_fifo_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
+  ) hsid_fifo_sva_inst (.*);
+
+  // bind hsid_fifo hsid_fifo_sva #(
+  //   .DATA_WIDTH(WORD_WIDTH),
+  //   .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
+  // ) hsid_fifo_sva_inst (.*);
+
   // Test vectors
-  logic [DATA_WIDTH-1:0] captured [TEST_BANDS];
-  logic [DATA_WIDTH-1:0] lib [TEST_LIBRARY_SIZE][TEST_BANDS];
-  logic [WORD_WIDTH-1:0] acc_in [TEST_LIBRARY_SIZE][TEST_BANDS];
-  logic [WORD_WIDTH-1:0] expected_mse [TEST_LIBRARY_SIZE];
+  logic [DATA_WIDTH-1:0] captured [];
+  logic [DATA_WIDTH-1:0] lib [][];
+  logic [DATA_WIDTH_ACC:0] acc_int [][];
+  logic [WORD_WIDTH-1:0] expected_mse [];
+  logic expected_mse_of [];
 
   logic [WORD_WIDTH-1:0] min_mse_value_expected;
   logic [WORD_WIDTH-1:0] max_mse_value_expected;
   logic [HSP_LIBRARY_WIDTH-1:0] min_mse_ref_expected;
   logic [HSP_LIBRARY_WIDTH-1:0] max_mse_ref_expected;
 
-  logic [WORD_WIDTH-1:0] fusion_vctr [TEST_BAND_PACKS];
+  int hsp_band_packs = 0;
+  logic [WORD_WIDTH-1:0] hsp_packed [];
 
-  // Count for the number of inserted band packs
+// Count for the number of inserted band packs
   int count_insert;
   logic insert_en;
 
-  // Waveform generation for debugging
+// Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
     $dumpvars(0, hsid_main_tb);
@@ -94,117 +164,143 @@ module hsid_main_tb #(
   initial begin
     clk = 1;
     rst_n = 1;
-    hsi_vctr_in_valid = 0;
-    hsi_vctr_in = 0;
-    library_size_in = 0;
+    band_data_in_valid = 0;
+    band_data_in = 0;
+    hsp_bands_in = '0;
+    hsp_library_size_in = 0;
     start = 0;
     clear = 0;
-    hsi_bands_in = TEST_BANDS;  // Set HSP bands to maximum
-    library_size_in = TEST_LIBRARY_SIZE;  // Set library size to maximum
-
-    // Generate a random vector as a measure
-    if (hsid_main_gen.randomize()) begin : randomize_measure
-      captured = hsid_main_gen.measure;
-    end
-
-    $display("Captured vector: %p", captured[0:TEST_BANDS-1]);
-
-    // Generate random library vectors
-    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin : generate_library
-      if (hsid_main_gen.randomize()) begin
-        lib[i] = hsid_main_gen.measure;
-        hsid_main_gen.mse(captured, lib[i], expected_mse[i]);
-        hsid_main_gen.acc_all(captured, lib[i], acc_in[i]);
-        $display("Library vector %0d: %p, MSE: %d", i, lib[i][0:TEST_BANDS-1], expected_mse[i]);
-        $display("Accumulated %0d:    %p,", i, acc_in[i][0:TEST_BANDS-1]);
-      end
-    end
-
-    // Compute expected min and max MSE values and references
-    hsid_main_gen.min_max_mse(expected_mse,
-      min_mse_value_expected, max_mse_value_expected,
-      min_mse_ref_expected, max_mse_ref_expected);
-
-    $display("Expected min MSE: %0d, ref: %0d", min_mse_value_expected, min_mse_ref_expected);
-    $display("Expected max MSE: %0d, ref: %0d", max_mse_value_expected, max_mse_ref_expected);
 
     // Reset the DUT
     #3 rst_n = 0;
     #5 rst_n = 1;  // Release reset
 
-    // Start the DUT
-    assert (idle == 1) else $fatal(0, "DUT is not idle at start");
-    assert (done == 0) else $fatal(0, "DUT is done before starting");
-    assert (ready == 0) else $fatal(0, "DUT is ready before starting");
+    for (int t = 0; t < 20; t++) begin
 
-    start = 1;
+      // Generate a random vector as a measure
+      if (!hsid_main_gen.randomize()) $fatal(0, "Failed to randomize measure vector");
 
-    #10;
+      $display("Test %0d: Library size: %0d, HSP Bands: %0d", t, hsid_main_gen.library_size, hsid_main_gen.hsp_bands);
+      captured = hsid_main_gen.vctr1;  // Get the measure vector
+      lib = new [hsid_main_gen.library_size];
+      acc_int = new [hsid_main_gen.library_size];
+      expected_mse = new [hsid_main_gen.library_size];
+      expected_mse_of = new [hsid_main_gen.library_size];
+      hsp_band_packs = (hsid_main_gen.hsp_bands + 1) / 2; // Calculate the number of HSP band packs
+      // $display("Captured vector: %p", captured);
 
-    start = 0;
+      // Generate random library vectors
+      lib = new[hsid_main_gen.library_size];
+      hsid_hsp_ref_gen.hsp_bands = hsid_main_gen.hsp_bands;
+      for (int i = 0; i < hsid_main_gen.library_size; i++) begin : generate_library
+        if (!hsid_hsp_ref_gen.randomize()) $fatal(0, "Failed to randomize library vector %0d", i);
+        lib[i] = hsid_hsp_ref_gen.reference_hsp;
+        hsid_main_gen.sq_df_acc_vctr(captured, lib[i], acc_int[i]); // Get intermediate accumulator values
+        hsid_main_gen.mse(acc_int[i], expected_mse[i], expected_mse_of[i]);
+        $display("  - Id: %0d, Accumulated value: %p, MSE: %d, Overflow: %0d", i, acc_int[i][hsid_main_gen.hsp_bands-1], expected_mse[i], expected_mse_of[i]);
+        // $display("  - Library vector %0d: %p, MSE: %d", i, lib[i], expected_mse[i]);
+        // $display("  - Intermediate accumulator %0d: %p", i, acc_int[i]);
+      end
 
-    assert (idle == 0) else $fatal(0, "DUT is idle after starting");
-    assert (done == 0) else $fatal(0, "DUT is done after starting");
-    assert (ready == 1) else $fatal(0, "DUT is not ready after starting");
+      // Compute expected min and max MSE values and references
+      hsid_main_gen.min_max_mse(expected_mse,
+        min_mse_value_expected, max_mse_value_expected,
+        min_mse_ref_expected, max_mse_ref_expected);
 
-    // Send the measure vector
-    hsid_main_gen.fusion_vctr(captured, fusion_vctr);
-    count_insert = 0;
-    while (count_insert < TEST_BAND_PACKS) begin
-      insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
-      hsi_vctr_in = fusion_vctr[count_insert];
-      hsi_vctr_in_valid = insert_en;
+      $display(" - Expected min MSE: %0d, ref: %0d", min_mse_value_expected, min_mse_ref_expected);
+      $display(" - Expected max MSE: %0d, ref: %0d", max_mse_value_expected, max_mse_ref_expected);
+
+      // Configure the DUT
+      hsp_library_size_in = hsid_main_gen.library_size;
+      hsp_bands_in = hsid_main_gen.hsp_bands;
+
+      // Start the DUT
+      assert (idle == 1) else $error("DUT is not idle at start");
+      assert (done == 0) else $error("DUT is done before starting");
+      assert (ready == 0) else $error("DUT is ready before starting");
+
+      start = 1;
+
       #10;
-      assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
-      if (insert_en) count_insert++;
-    end
 
-    hsi_vctr_in_valid = 0;  // Disable input vector valid signal
-    hsi_vctr_in = 0;  // Reset input vector
+      assert (idle == 0) else $error("DUT is idle after starting");
+      assert (done == 0) else $error("DUT is done after starting");
+      assert (ready == 1) else $error("DUT is not ready after starting");
 
-    #10;
-    $display("Sending library vectors...");
+      start = 0;
 
-    // Send the library vectors
-    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
-      hsid_main_gen.fusion_vctr(lib[i], fusion_vctr);
+      // Send the measure vector (packed)
+      $display(" - Sending captured vector...");
+      hsid_main_gen.band_packer(captured, hsp_packed);
       count_insert = 0;
-      for (int j = 0; j < TEST_BAND_PACKS; j++) begin
+      while (count_insert < hsp_band_packs) begin
         insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
-        hsi_vctr_in = fusion_vctr[j];
-        hsi_vctr_in_valid = insert_en;
+        band_data_in = hsp_packed[count_insert];
+        band_data_in_valid = insert_en;
         #10;
-        if (!(i == TEST_LIBRARY_SIZE - 1 && j == TEST_BAND_PACKS - 1)) begin
-          assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
-        end
+        assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
         if (insert_en) count_insert++;
       end
+
+      band_data_in_valid = 0;  // Disable input vector valid signal
+      band_data_in = 0;  // Reset input vector
+
+      #10;
+
+      $display(" - Sending library vectors...");
+      // Send the library vectors
+      for (int i = 0; i < hsid_main_gen.library_size; i++) begin
+        hsid_main_gen.band_packer(lib[i], hsp_packed);
+        count_insert = 0;
+        // $display("  - Sending library vector: %p", hsp_packed);
+        while (count_insert < hsp_band_packs) begin
+          insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
+          band_data_in = hsp_packed[count_insert];
+          band_data_in_valid = insert_en;
+          // $display("     - Sending band pack %0d of %0d hsp: %h", count_insert, i, band_data_in);
+          #10;
+          if (!(i == hsid_main_gen.library_size - 1 && count_insert == hsp_band_packs - 1)) begin
+            assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
+          end
+          if (insert_en) count_insert++;
+        end
+      end
+
+      band_data_in_valid = 0;  // Disable input vector valid signal
+      band_data_in = 0;  // Reset input vector
+
+      $display(" - Waiting 8 cycles to finish processing (2 to write and read fifo, 5 mse, 1 change state)...");
+      #80;
+      assert (done == 1) else $error("DUT is not done after processing, you should check waiting cycles");
+      assert (idle == 0) else $error("DUT is idle after processing");
+      assert (ready == 0) else $error("DUT is ready after processing");
+
+      // wait(done);  // Wait for the DUT to finish processing
+      // $display("DUT is done processing");
+
+      // Check the results
+      assert (mse_min_value == min_mse_value_expected) else
+        $error(0, "Minimum MSE value is incorrect: expected %0d, got %0d", min_mse_value_expected, mse_min_value);
+      assert (mse_max_value == max_mse_value_expected) else
+        $error(0, "Maximum MSE value is incorrect: expected %0d, got %0d", max_mse_value_expected, mse_max_value);
+      assert (mse_min_ref == min_mse_ref_expected) else
+        $error(0, "Minimum MSE reference is incorrect: expected %0d, got %0d", min_mse_ref_expected, mse_min_ref);
+      assert (mse_max_ref == max_mse_ref_expected) else
+        $error(0, "Maximum MSE reference is incorrect: expected %0d, got %0d", max_mse_ref_expected, mse_max_ref);
+
+      #10;
+
+      assert (idle == 1) else $error("DUT is not idle after processing");
+      assert (done == 0) else $error("DUT is done after processing");
+      assert (ready == 0) else $error("DUT is ready after processing");
     end
-
-    hsi_vctr_in_valid = 0;  // Disable input vector valid signal
-    hsi_vctr_in = 0;  // Reset input vector
-
-    wait(done);  // Wait for the DUT to finish processing
-    $display("DUT is done processing");
-
-    // Check the results
-    assert (mse_min_value == min_mse_value_expected) else
-      $error(0, "Minimum MSE value is incorrect: expected %0d, got %0d", min_mse_value_expected, mse_min_value);
-    assert (mse_max_value == max_mse_value_expected) else
-      $error(0, "Maximum MSE value is incorrect: expected %0d, got %0d", max_mse_value_expected, mse_max_value);
-    assert (mse_min_ref == min_mse_ref_expected) else
-      $error(0, "Minimum MSE reference is incorrect: expected %0d, got %0d", min_mse_ref_expected, mse_min_ref);
-    assert (mse_max_ref == max_mse_ref_expected) else
-      $error(0, "Maximum MSE reference is incorrect: expected %0d, got %0d", max_mse_ref_expected, mse_max_ref);
-
-    #20;
 
     $finish;
   end
 
-  initial begin
-    #2000; $finish;  // Timeout to prevent infinite simulation
-  end
+// initial begin
+//   #2000; $finish;  // Timeout to prevent infinite simulation
+// end
 
   always
     #5 clk = ! clk;

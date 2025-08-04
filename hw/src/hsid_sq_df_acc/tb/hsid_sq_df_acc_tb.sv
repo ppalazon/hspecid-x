@@ -151,7 +151,7 @@ module hsid_sq_df_acc_tb #(
 
       // Compute the expected accumulated vector
       cycle_count = sq_df_acc_gen.hsp_bands + pipeline_stages; // Reset cycle count for each test
-      sq_df_acc_gen.sq_df_acc_vctr(acc_vctr);
+      sq_df_acc_gen.sq_df_acc_vctr(sq_df_acc_gen.vctr1, sq_df_acc_gen.vctr2, acc_vctr);
       expected_overflow = acc_vctr[sq_df_acc_gen.hsp_bands-1][DATA_WIDTH_ACC];
       $display("Test %0d: HSP bands: %0d, Initial acc: %0h, Final acc: %0h, Expected Overflow: %0d", i, sq_df_acc_gen.hsp_bands,
         sq_df_acc_gen.initial_acc, acc_vctr[sq_df_acc_gen.hsp_bands-1], expected_overflow);
