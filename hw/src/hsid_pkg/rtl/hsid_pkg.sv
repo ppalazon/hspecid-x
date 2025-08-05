@@ -11,8 +11,8 @@ package hsid_pkg;
   localparam int HSID_FIFO_ADDR_WIDTH = 2; // Number of bits for buffer address (4 entries)
 
   // HSI MSE library state machine states
-  typedef enum logic [2:0] {
-    IDLE, READ_HSP_CAPTURED, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
+  typedef enum logic [3:0] {
+    MAIN_IDLE, MAIN_CLEAR, MAIN_CONFIG, READ_HSP_CAPTURED, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
   } hsid_main_state_t;
 
   typedef enum logic [2:0] {

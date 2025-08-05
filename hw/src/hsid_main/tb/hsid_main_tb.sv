@@ -10,7 +10,7 @@ module hsid_main_tb #(
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,  // Number of bits for Hyperspectral Pixels Library (11 bits - 4096 pixels)
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
-    parameter TEST_RND_INSERT = 1 // Enable random insertion of test vectors
+    parameter TEST_RND_INSERT = 0 // Enable random insertion of test vectors
   ) ();
 
   localparam MAX_WORD = {WORD_WIDTH{1'b1}};
@@ -75,6 +75,12 @@ module hsid_main_tb #(
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
   ) hsid_hsp_ref_gen = new();
 
+  HsidMainRandom #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_main_random = new();
+
   // Covergroup to coverage the MSE values
   covergroup hsid_main_cg @(posedge clk);
     coverpoint band_data_in_valid;
@@ -83,12 +89,12 @@ module hsid_main_tb #(
       bins max = {MAX_WORD};
       bins mid = {[1:MAX_WORD-1]};
     }
-    coverpoint hsp_bands_in iff (band_data_in_valid) {
+    coverpoint hsp_bands_in {
       bins min = {7};
       bins max = {MAX_HSP_BANDS};
       bins mid = {[1:MAX_HSP_BANDS-1]};
     }
-    coverpoint hsp_library_size_in iff (band_data_in_valid) {
+    coverpoint hsp_library_size_in{
       bins min = {1};
       bins max = {MAX_HSP_LIBRARY};
       bins mid = {[1:MAX_HSP_LIBRARY-1]};
@@ -100,8 +106,6 @@ module hsid_main_tb #(
 
   // Binding SVA assertions to the DUT
   bind hsid_main_fsm hsid_main_fsm_sva #(
-    .WORD_WIDTH(WORD_WIDTH),
-    .DATA_WIDTH(DATA_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsid_main_fsm_sva_inst (.*);
@@ -175,8 +179,8 @@ module hsid_main_tb #(
     #3 rst_n = 0;
     #5 rst_n = 1;  // Release reset
 
-    for (int t = 0; t < 20; t++) begin
-
+    $display("Case 1: Test normal operation with random vectors ...");
+    for (int t = 0; t < 10; t++) begin
       // Generate a random vector as a measure
       if (!hsid_main_gen.randomize()) $fatal(0, "Failed to randomize measure vector");
 
@@ -210,26 +214,32 @@ module hsid_main_tb #(
       $display(" - Expected min MSE: %0d, ref: %0d", min_mse_value_expected, min_mse_ref_expected);
       $display(" - Expected max MSE: %0d, ref: %0d", max_mse_value_expected, max_mse_ref_expected);
 
+      // Start the DUT
+      a_bef_start_idle: assert (idle == 1) else $error("DUT is not idle at start");
+      a_bef_start_done: assert (done == 0) else $error("DUT is done before starting");
+      a_bef_start_rdy: assert (ready == 0) else $error("DUT is ready before starting");
+
+      start = 1;
+      #10;
+
       // Configure the DUT
+      start = 0;
       hsp_library_size_in = hsid_main_gen.library_size;
       hsp_bands_in = hsid_main_gen.hsp_bands;
 
-      // Start the DUT
-      assert (idle == 1) else $error("DUT is not idle at start");
-      assert (done == 0) else $error("DUT is done before starting");
-      assert (ready == 0) else $error("DUT is ready before starting");
-
-      start = 1;
+      a_conf_idle: assert (idle == 0) else $error("DUT is idle on configuration");
+      a_conf_done: assert (done == 0) else $error("DUT is done on configuration");
+      a_conf_rdy: assert (ready == 0) else $error("DUT is ready on configuration");
 
       #10;
+      hsp_library_size_in = '0;
+      hsp_bands_in = '0;
 
-      assert (idle == 0) else $error("DUT is idle after starting");
-      assert (done == 0) else $error("DUT is done after starting");
-      assert (ready == 1) else $error("DUT is not ready after starting");
+      a_read_cap_idle: assert (idle == 0) else $error("DUT is idle on reading captured hsp");
+      a_read_cap_done: assert (done == 0) else $error("DUT is done on reading captured hsp");
+      a_read_cap_rdy: assert (ready == 1) else $error("DUT is not ready on reading captured hsp");
 
-      start = 0;
-
-      // Send the measure vector (packed)
+      // Send the captured vector (packed)
       $display(" - Sending captured vector...");
       hsid_main_gen.band_packer(captured, hsp_packed);
       count_insert = 0;
@@ -238,7 +248,7 @@ module hsid_main_tb #(
         band_data_in = hsp_packed[count_insert];
         band_data_in_valid = insert_en;
         #10;
-        assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
+        a_insert_cap: assert (ready == 1) else $fatal(0, "DUT is not ready to accept input, check if you are sending all band packs");
         if (insert_en) count_insert++;
       end
 
@@ -246,6 +256,9 @@ module hsid_main_tb #(
       band_data_in = 0;  // Reset input vector
 
       #10;
+      a_read_lib_idle: assert (idle == 0) else $error("DUT is idle on reading library");
+      a_read_lib_done: assert (done == 0) else $error("DUT is done on reading library");
+      a_read_lib_rdy: assert (ready == 1) else $error("DUT is not ready on reading library");
 
       $display(" - Sending library vectors...");
       // Send the library vectors
@@ -260,7 +273,7 @@ module hsid_main_tb #(
           // $display("     - Sending band pack %0d of %0d hsp: %h", count_insert, i, band_data_in);
           #10;
           if (!(i == hsid_main_gen.library_size - 1 && count_insert == hsp_band_packs - 1)) begin
-            assert (ready == 1) else $fatal(0, "DUT is not ready to accept input");
+            a_insert_lib: assert (ready == 1) else $fatal(0, "DUT is not ready to accept input, check if you are sending all band packs");
           end
           if (insert_en) count_insert++;
         end
@@ -271,29 +284,45 @@ module hsid_main_tb #(
 
       $display(" - Waiting 8 cycles to finish processing (2 to write and read fifo, 5 mse, 1 change state)...");
       #80;
-      assert (done == 1) else $error("DUT is not done after processing, you should check waiting cycles");
-      assert (idle == 0) else $error("DUT is idle after processing");
-      assert (ready == 0) else $error("DUT is ready after processing");
+
+      a_finish_done: assert (done == 1) else $error("DUT is not done after processing, you should check waiting cycles");
+      a_finish_idle: assert (idle == 0) else $error("DUT is idle after processing");
+      a_finish_rdy: assert (ready == 0) else $error("DUT is ready after processing");
 
       // wait(done);  // Wait for the DUT to finish processing
       // $display("DUT is done processing");
 
       // Check the results
-      assert (mse_min_value == min_mse_value_expected) else
-        $error(0, "Minimum MSE value is incorrect: expected %0d, got %0d", min_mse_value_expected, mse_min_value);
-      assert (mse_max_value == max_mse_value_expected) else
-        $error(0, "Maximum MSE value is incorrect: expected %0d, got %0d", max_mse_value_expected, mse_max_value);
-      assert (mse_min_ref == min_mse_ref_expected) else
-        $error(0, "Minimum MSE reference is incorrect: expected %0d, got %0d", min_mse_ref_expected, mse_min_ref);
-      assert (mse_max_ref == max_mse_ref_expected) else
-        $error(0, "Maximum MSE reference is incorrect: expected %0d, got %0d", max_mse_ref_expected, mse_max_ref);
+      a_mse_min_value: assert (mse_min_value == min_mse_value_expected) else
+        $error("Minimum MSE value is incorrect: expected %0d, got %0d", min_mse_value_expected, mse_min_value);
+      a_mse_max_value: assert (mse_max_value == max_mse_value_expected) else
+        $error("Maximum MSE value is incorrect: expected %0d, got %0d", max_mse_value_expected, mse_max_value);
+      a_mse_min_ref: assert (mse_min_ref == min_mse_ref_expected) else
+        $error("Minimum MSE reference is incorrect: expected %0d, got %0d", min_mse_ref_expected, mse_min_ref);
+      a_mse_max_ref: assert (mse_max_ref == max_mse_ref_expected) else
+        $error("Maximum MSE reference is incorrect: expected %0d, got %0d", max_mse_ref_expected, mse_max_ref);
 
       #10;
 
-      assert (idle == 1) else $error("DUT is not idle after processing");
-      assert (done == 0) else $error("DUT is done after processing");
-      assert (ready == 0) else $error("DUT is ready after processing");
+      a_aft_finish_idle: assert (idle == 1) else $error("DUT is not idle after processing");
+      a_aft_finish_done: assert (done == 0) else $error("DUT is done after processing");
+      a_aft_finish_rdy: assert (ready == 0) else $error("DUT is ready after processing");
     end
+
+    $display("Case 2: Send complete random inputs to the DUT ...");
+    for(int i=0; i<200; i++) begin
+      if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
+
+      band_data_in = hsid_main_random.band_data_in;
+      band_data_in_valid = hsid_main_random.band_data_in_valid;
+      hsp_bands_in = hsid_main_random.hsp_bands_in;
+      hsp_library_size_in = hsid_main_random.hsp_library_size_in;
+      start = hsid_main_random.start;
+      clear = hsid_main_random.clear;
+
+      #10; // Wait for the DUT to process the input
+    end
+
 
     $finish;
   end

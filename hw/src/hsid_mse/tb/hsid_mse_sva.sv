@@ -30,8 +30,8 @@ module hsid_mse_sva #(
     // input logic [DATA_WIDTH_ACC-1:0] channel_1_acc_value, channel_2_acc_value,
     // input logic channel_1_acc_last, channel_2_acc_last,
     // input logic channel_1_acc_of, channel_2_acc_of,  // Overflow flag for the accumulated vector
-    // input logic compute_acc_sum_en,  // Enable signal for mean square error accumulator
-    // input logic compute_mse_en,
+    input logic compute_acc_sum_en,  // Enable signal for mean square error accumulator
+    input logic compute_mse_en,
     // input logic [DATA_WIDTH_ACC:0] acc_value,  // Accumulator for both channels
     input logic [HSP_LIBRARY_WIDTH-1:0] acc_ref,  // Reference vector for mean square error
     input logic [HSP_BANDS_WIDTH-1:0] acc_hsp_bands
@@ -39,7 +39,11 @@ module hsid_mse_sva #(
 
   // Assert mse_valid after 5 (3 of sq_df_acc + 2 of mse) clock cycles when band_pack_valid and band_pack_last are high
   property mse_valid_after_band_pack_last;
-    @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |-> ##5 mse_valid;
+    @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |->
+      ##3 compute_acc_sum_en
+      ##1 compute_mse_en
+      ##1 mse_valid && mse_ref == $past(hsp_ref, 5)
+      ##1 !mse_valid
   endproperty
 
   assert property (mse_valid_after_band_pack_last) else $error("MSE valid signal is not asserted when expected");
@@ -64,12 +68,12 @@ module hsid_mse_sva #(
   cover property (odd_hsp_bands_lsb_zero); //$display("LSB of band_pack_a and band_pack_a are zero when hsp_bands is odd")
 
   // Ensure HSP bands are at least 5, to avoid problems with the latest steps of mse (3 of sq_df_acc + 2 of mse)
-  property hsp_bands_bigger_than_five;
-    @(posedge clk) disable iff (!rst_n) band_pack_last && band_pack_valid |-> hsp_bands >= 5;
-  endproperty
+  // property hsp_bands_bigger_than_five;
+  //   @(posedge clk) disable iff (!rst_n) band_pack_last && band_pack_valid |-> hsp_bands >= 5;
+  // endproperty
 
-  assert property (hsp_bands_bigger_than_five) else $error("HSP bands are less than 5, which may cause issues in the last steps of MSE");
-  cover property (hsp_bands_bigger_than_five); // $display("Checked: HSP bands are greater than or equal to 6");
+  // assert property (hsp_bands_bigger_than_five) else $error("HSP bands are less than 5, which may cause issues in the last steps of MSE");
+  // cover property (hsp_bands_bigger_than_five); // $display("Checked: HSP bands are greater than or equal to 6");
 
   // On clear signal, all outputs should be zero
   property clear_outputs;

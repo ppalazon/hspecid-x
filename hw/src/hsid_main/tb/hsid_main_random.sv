@@ -59,3 +59,42 @@ class HsidHSPReferenceGen#(
   }
 
 endclass
+
+class HsidMainRandom #(
+    parameter int WORD_WIDTH = HSID_WORD_WIDTH, // Width of the word in bits
+    parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Address width for HSP bands
+    parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH // Address width for HSI library
+  );
+
+  rand logic clear;
+  rand logic band_data_in_valid;
+  rand logic [WORD_WIDTH-1:0] band_data_in;
+  rand logic [HSP_LIBRARY_WIDTH-1:0] hsp_library_size_in;
+  rand logic [HSP_BANDS_WIDTH-1:0] hsp_bands_in;
+  rand logic start;
+
+  constraint c_clear {
+    clear dist {0:=80, 1:=20}; // 80% chance to not clear, 20% chance to clear
+  }
+
+  constraint c_band_data_in_valid {
+    band_data_in_valid dist {0:=30, 1:=70}; // 70% chance to have valid band data input, 30% chance to not have valid input
+  }
+
+  constraint c_band_data_in {
+    band_data_in dist {0:=15, {WORD_WIDTH{1'b1}}:=15, [1:{WORD_WIDTH{1'b1}}-1]:/70}; // Distribute band data values
+  }
+
+  constraint c_hsp_library_size_in {
+    hsp_library_size_in dist {0:=15, {HSP_LIBRARY_WIDTH{1'b1}}:=15, [1:{HSP_LIBRARY_WIDTH{1'b1}}-1]:/70}; // Distribute HSP library size values
+  }
+
+  constraint c_hsp_bands_in {
+    hsp_bands_in dist {0:=15, {HSP_BANDS_WIDTH{1'b1}}:=15, [1:{HSP_BANDS_WIDTH{1'b1}}-1]:/70}; // Distribute HSP bands values
+  }
+
+  constraint c_start {
+    start dist {1:=80, 0:=20}; // 80% chance to not start, 20% chance to start
+  }
+
+endclass

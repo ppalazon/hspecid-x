@@ -56,17 +56,14 @@ module hsid_main #(
   wire band_pack_start;  // Start vector processing signal
   wire band_pack_last;  // Last vector processing signal
   wire band_pack_valid; // Element valid signal
-  wire hsp_ref_last;  // Last HSP reference signal
-  wire finished_library;  // Flag to indicate if the library processing is finished
-  wire [HSP_BANDS_WIDTH-1:0] band_pack_count;  // Count of HSP bands processed
   wire [HSP_LIBRARY_WIDTH-1:0] hsp_ref;  // Reference vector for MSE
   wire [WORD_WIDTH-1:0] mse_out;  // Mean Squared Error
   wire [HSP_LIBRARY_WIDTH-1:0] mse_ref;  // Reference vector for MSE
   wire initialize;
 
   // Assigns statements
-  wire [HSP_BANDS_WIDTH-1:0] band_pack_threshold; // Threshold for element count to restart the element count and check almost full condition
-  assign band_pack_threshold = (hsp_bands_in + 1) / 2; // Half of the HSP bands to process
+  wire [HSP_BANDS_WIDTH-1:0] cfg_band_pack_threshold;
+  wire [HSP_BANDS_WIDTH-1:0] cfg_hsp_bands;
 
   // Assigns statements
   assign fifo_captured_data_in = (state == READ_HSP_CAPTURED) ? band_data_in : '0; //(state == COMPUTE_MSE ? fifo_measure_data_out : '0);
@@ -74,32 +71,30 @@ module hsid_main #(
   assign fifo_ref_write_en = (state == COMPUTE_MSE && band_data_in_valid);
 
   hsid_main_fsm #(
-    .WORD_WIDTH(WORD_WIDTH),
-    .DATA_WIDTH(DATA_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) fsm (
     .clk(clk),
     .rst_n(rst_n),
     .clear(clear),
+    .hsp_bands(hsp_bands_in),
     .hsp_library_size(hsp_library_size_in),
     .fifo_captured_complete(fifo_captured_complete),
     .fifo_captured_empty(fifo_captured_empty),
     .fifo_ref_empty(fifo_ref_empty),
     .fifo_ref_full(fifo_ref_full),
-    .mse_valid(mse_valid),  // MSE valid signal
-    .mse_comparison_valid(mse_comparison_valid),  // MSE comparison valid signal
+    .mse_valid(mse_valid),
+    .mse_comparison_valid(mse_comparison_valid),
+    .mse_ref(mse_ref),
     .state(state),
     .hsp_ref_count(hsp_ref),
-    .band_pack_threshold(band_pack_threshold),
-    .finished_library(finished_library),
+    .cfg_band_pack_threshold(cfg_band_pack_threshold),
+    .cfg_hsp_bands(cfg_hsp_bands),
     .band_pack_start(band_pack_start),  // Start vector processing signal
     .band_pack_last(band_pack_last),
     .band_pack_valid(band_pack_valid),
-    .hsp_ref_last(hsp_ref_last),
     .fifo_both_read_en(fifo_both_read_en),  // FIFO read enable signal
-    .band_pack_count(band_pack_count),
-    .initialize(initialize),  // Initialize signal
+    .initialize(initialize),  // Initialize signal to clear submodules
     .start(start),
     .done(done),
     .idle(idle),
@@ -116,14 +111,14 @@ module hsid_main #(
   ) hsi_mse (
     .clk(clk),
     .rst_n(rst_n),
-    .clear(clear || initialize),
+    .clear(initialize),
     .band_pack_start(band_pack_start),
     .band_pack_last(band_pack_last),
     .hsp_ref(hsp_ref),
     .band_pack_a(fifo_captured_data_out),
     .band_pack_b(fifo_ref_data_out),
     .band_pack_valid(band_pack_valid),
-    .hsp_bands(hsp_bands_in),
+    .hsp_bands(cfg_hsp_bands),
     .mse_value(mse_out),
     .mse_ref(mse_ref),
     .mse_valid(mse_valid),
@@ -140,7 +135,7 @@ module hsid_main #(
     .mse_in_of(acc_of),
     .mse_in_value(mse_out),
     .mse_in_ref(mse_ref),
-    .clear(clear || initialize),
+    .clear(initialize),
     .mse_min_value(mse_min_value),
     .mse_min_ref(mse_min_ref),
     .mse_min_changed(),
@@ -160,12 +155,12 @@ module hsid_main #(
     .wr_en(fifo_captured_write_en),
     .rd_en(fifo_both_read_en),
     .data_in(fifo_captured_data_in),
-    .almost_full_threshold(band_pack_threshold),  // Threshold for almost full condition
+    .almost_full_threshold(cfg_band_pack_threshold),  // Threshold for almost full condition
     .data_out(fifo_captured_data_out),
     .full(),
     .almost_full(fifo_captured_complete),
     .empty(fifo_captured_empty),
-    .clear(clear || initialize)
+    .clear(initialize)
   );
 
   hsid_fifo #(
@@ -183,7 +178,7 @@ module hsid_main #(
     .full(fifo_ref_full),
     .almost_full(),
     .empty(fifo_ref_empty),
-    .clear(clear || initialize)
+    .clear(initialize)
   );
 
 endmodule
