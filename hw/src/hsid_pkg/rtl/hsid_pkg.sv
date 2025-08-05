@@ -12,7 +12,8 @@ package hsid_pkg;
 
   // HSI MSE library state machine states
   typedef enum logic [3:0] {
-    MAIN_IDLE, MAIN_CLEAR, MAIN_CONFIG, READ_HSP_CAPTURED, COMPUTE_MSE, WAIT_MSE, COMPARE_MSE, DONE
+    HM_IDLE, HM_CLEAR, HM_CONFIG, HM_ERROR, HM_READ_HSP_CAPTURED,
+    HM_COMPUTE_MSE, HM_WAIT_MSE, HM_COMPARE_MSE, HM_DONE
   } hsid_main_state_t;
 
   typedef enum logic [2:0] {

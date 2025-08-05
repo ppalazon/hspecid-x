@@ -13,6 +13,11 @@ set WildcardFilter "Variable Constant Generic Parameter SpecParam Memory Asserti
 
 vsim -assertdebug -coverage -cvgperinstance +nowarnTFMPC $top_opt -msgmode both
 add wave -group "DUT" /$top/dut/*
+add wave -group "FSM" /$top/dut/fsm/*
+add wave -group "MSE" /$top/dut/mse/*
+add wave -group "MSE Comp" /$top/dut/mse_comp/*
+add wave -group "FIFO Cap" /$top/dut/fifo_captured/*
+add wave -group "FIFO Ref" /$top/dut/fifo_ref/*
 
 view cover
 view assertion

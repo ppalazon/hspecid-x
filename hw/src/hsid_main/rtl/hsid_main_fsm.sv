@@ -3,6 +3,7 @@
 import hsid_pkg::*;  // Import the package for HSI MSE
 
 module hsid_main_fsm #(
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Number of bits to represent vector length
   ) (
@@ -10,6 +11,10 @@ module hsid_main_fsm #(
     input logic rst_n,
 
     input logic clear,
+
+    // Input vector data
+    input logic band_data_in_valid,  // Enable input sample data
+    input logic [WORD_WIDTH-1:0] band_data_in, // Input sample word data
 
     // Library size input
     input logic [HSP_BANDS_WIDTH-1:0] hsp_bands,  // HSP bands to process
@@ -25,13 +30,18 @@ module hsid_main_fsm #(
     input logic fifo_ref_empty,  // Empty signal for output data FIFO
     input logic fifo_ref_full,  // Full signal for output data FIFO
 
+    // FIFO Control signals
+    output logic [WORD_WIDTH-1:0] fifo_captured_data_in,
+    output logic fifo_captured_write_en,
+    output logic fifo_ref_write_en,
+
     // MSE signals
     input logic mse_valid,
     input logic [HSP_LIBRARY_WIDTH-1:0] mse_ref,
     input logic mse_comparison_valid,
 
     // Current state
-    output hsid_main_state_t state,
+    // output hsid_main_state_t state,
     output logic [HSP_LIBRARY_WIDTH-1:0] hsp_ref_count,
     output logic band_pack_start,  // Start vector processing signal
     output logic band_pack_last,  // Last vector processing signal
@@ -43,49 +53,61 @@ module hsid_main_fsm #(
     input logic start,
     output logic done,
     output logic idle,
-    output logic ready
+    output logic ready,
+    output logic error
   );
 
   // Internal state machine states
-  hsid_main_state_t current_state = MAIN_IDLE, next_state = MAIN_IDLE;
+  hsid_main_state_t current_state = HM_IDLE, next_state = HM_IDLE;
   logic [HSP_LIBRARY_WIDTH-1:0] cfg_hsp_library_size;
-  logic [HSP_BANDS_WIDTH-1:0] band_pack_count;
-  // logic finished_library;
+  logic cfg_fail;  // Configuration failure flag
+  logic [HSP_BANDS_WIDTH-1:0] ref_band_pack_count;
+  // logic [HSP_BANDS_WIDTH-1:0] cap_band_pack_count;
+  // logic cap_read_finished;
   logic hsp_ref_last;
 
   // Combinational assignments
-  assign fifo_both_read_en = (state == COMPUTE_MSE && !fifo_ref_empty && !fifo_captured_empty);
-  assign hsp_ref_last = (hsp_ref_count == cfg_hsp_library_size - 1);
-  assign band_pack_start = (band_pack_valid && band_pack_count == 0);
-  assign band_pack_last = (band_pack_valid && band_pack_count == cfg_band_pack_threshold - 1);
-  assign state = current_state;
+  assign fifo_both_read_en = (current_state == HM_COMPUTE_MSE && next_state == HM_COMPUTE_MSE && !fifo_ref_empty && !fifo_captured_empty);
+  assign hsp_ref_last = (current_state == HM_COMPUTE_MSE && hsp_ref_count == cfg_hsp_library_size - 1);
+  assign band_pack_start = (current_state == HM_COMPUTE_MSE && band_pack_valid && ref_band_pack_count == 0);
+  assign band_pack_last = (current_state == HM_COMPUTE_MSE && band_pack_valid && ref_band_pack_count == cfg_band_pack_threshold - 1);
+  // assign state = current_state;
+  assign cfg_fail = (current_state == HM_CONFIG && hsp_bands < 7 || hsp_library_size == 0);
+  // Assigns statements
+  // assign cap_read_finished = (current_state == HM_READ_HSP_CAPTURED && cap_band_pack_count == cfg_band_pack_threshold);
+  assign fifo_captured_write_en = (current_state == HM_READ_HSP_CAPTURED && next_state == HM_READ_HSP_CAPTURED && band_data_in_valid); //&& cap_band_pack_count < cfg_band_pack_threshold);
+  assign fifo_captured_data_in = current_state == HM_READ_HSP_CAPTURED ? band_data_in : '0; //(state == COMPUTE_MSE ? fifo_measure_data_out : '0);
+  assign fifo_ref_write_en = (current_state == HM_COMPUTE_MSE && next_state == HM_COMPUTE_MSE && band_data_in_valid);
+  assign initialize = (current_state == HM_CLEAR || current_state == HM_DONE || current_state == HM_ERROR);
 
   // Check measure vector FIFO status
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-      current_state <= MAIN_IDLE;  // Reset to IDLE state
+      current_state <= HM_IDLE;  // Reset to IDLE state
       reset_values();
-      initialize <= 0;
+      // initialize <= 0;
     end else begin
       current_state <= next_state;  // Transition to next state
-      if (current_state == MAIN_CLEAR) begin
+      if (current_state == HM_CLEAR || current_state == HM_DONE || current_state == HM_ERROR) begin
         reset_values();
-      end else if (current_state == DONE) begin
-        reset_values();
-      end else if (current_state == MAIN_CONFIG) begin
+      end else if (current_state == HM_CONFIG) begin
         cfg_hsp_bands <= hsp_bands;  // Set HSP bands to process
         cfg_hsp_library_size <= hsp_library_size;  // Set HSP library size
         cfg_band_pack_threshold <= (hsp_bands + 1) / 2;
+        // end else if (current_state == HM_READ_HSP_CAPTURED) begin
+        //   if (band_data_in_valid) begin
+        //     cap_band_pack_count <= cap_band_pack_count + 1;
+        //   end
       end else begin
-        initialize <= 0;
+        // initialize <= 0;
         band_pack_valid <= fifo_both_read_en; // After read from both FIFOs, set band_pack_valid
         // finished_library <= hsp_ref_last & band_pack_last;
         if (band_pack_valid) begin
-          if (band_pack_count == cfg_band_pack_threshold - 1) begin
-            band_pack_count <= 0;  // Reset element count when threshold is reached
+          if (ref_band_pack_count == cfg_band_pack_threshold - 1) begin
+            ref_band_pack_count <= 0;  // Reset element count when threshold is reached
           end else begin
-            band_pack_count <= band_pack_count + 1;
+            ref_band_pack_count <= ref_band_pack_count + 1;
           end
           if (band_pack_last) begin
             hsp_ref_count <= hsp_ref_count + 1;
@@ -97,55 +119,60 @@ module hsid_main_fsm #(
 
   always_comb begin
     case (current_state)
-      MAIN_IDLE: begin
-        idle = 1; ready = 0; done = 0;
-        next_state = start ? MAIN_CONFIG : MAIN_IDLE;
+      HM_IDLE: begin
+        idle = 1; ready = 0; done = 0; error = 0;
+        next_state = start ? HM_CONFIG : HM_IDLE;
       end
-      MAIN_CLEAR: begin
-        idle = 0; ready = 0; done = 0;
-        next_state = MAIN_IDLE;  // Transition to IDLE after clearing
+      HM_CLEAR: begin
+        idle = 0; ready = 0; done = 0; error = 0;
+        next_state = HM_IDLE;  // Transition to IDLE after clearing
       end
-      MAIN_CONFIG: begin
-        idle = 0; ready = 0; done = 0;
-        next_state = clear ? MAIN_CLEAR : READ_HSP_CAPTURED;
+      HM_CONFIG: begin
+        idle = 0; ready = 0; done = 0; error = 0;
+        next_state = clear ? HM_CLEAR : (cfg_fail ? HM_ERROR : HM_READ_HSP_CAPTURED);
       end
-      READ_HSP_CAPTURED: begin
-        idle = 0; ready = 1; done = 0;
-        next_state = clear ? MAIN_CLEAR : (fifo_captured_complete ? COMPUTE_MSE : READ_HSP_CAPTURED);
+      HM_ERROR: begin
+        idle = 0; ready = 0; done = 0; error = 1;  // Error state, no further processing
+        next_state = HM_IDLE;  // Stay in error state until cleared
       end
-      COMPUTE_MSE: begin
-        idle = 0; ready = !fifo_ref_full; done = 0;
-        next_state = clear ? MAIN_CLEAR : (hsp_ref_last & band_pack_last ? WAIT_MSE : COMPUTE_MSE);
+      HM_READ_HSP_CAPTURED: begin
+        idle = 0; ready = 1; done = 0; error = 0;
+        next_state = clear ? HM_CLEAR : (fifo_captured_complete ? HM_COMPUTE_MSE : HM_READ_HSP_CAPTURED);
       end
-      WAIT_MSE: begin
-        idle = 0; ready = 0; done = 0;
-        next_state = clear ? MAIN_CLEAR : (mse_valid && mse_ref == cfg_hsp_library_size - 1 ? COMPARE_MSE : WAIT_MSE);
+      HM_COMPUTE_MSE: begin
+        idle = 0; ready = !fifo_ref_full; done = 0; error = 0;
+        next_state = clear ? HM_CLEAR : (hsp_ref_last & band_pack_last ? HM_WAIT_MSE : HM_COMPUTE_MSE);
       end
-      COMPARE_MSE: begin
-        idle = 0; ready = 0; done = 0;
-        next_state = clear ? MAIN_CLEAR : (mse_comparison_valid ? DONE : COMPARE_MSE);
+      HM_WAIT_MSE: begin
+        idle = 0; ready = 0; done = 0; error = 0;
+        next_state = clear ? HM_CLEAR : (mse_valid && mse_ref == cfg_hsp_library_size - 1 ? HM_COMPARE_MSE : HM_WAIT_MSE);
       end
-      DONE: begin
-        idle = 0; ready = 0; done = 1;
-        next_state = MAIN_IDLE;
+      HM_COMPARE_MSE: begin
+        idle = 0; ready = 0; done = 0; error = 0;
+        next_state = clear ? HM_CLEAR : (mse_comparison_valid ? HM_DONE : HM_COMPARE_MSE);
+      end
+      HM_DONE: begin
+        idle = 0; ready = 0; done = 1; error = 0;
+        next_state = HM_IDLE;
       end
       default: begin
-        idle = 1; ready = 0; done = 0;
-        next_state = MAIN_IDLE;
+        idle = 1; ready = 0; done = 0; error = 0;
+        next_state = HM_IDLE;
       end
     endcase
   end
 
   task reset_values();
     begin
-      band_pack_count <= 0;
+      // cap_band_pack_count <= 0;
+      ref_band_pack_count <= 0;
       hsp_ref_count <= 0;
       band_pack_valid <= 0;
       // finished_library <= 0;
       cfg_band_pack_threshold <= {{HSP_BANDS_WIDTH{1'b1}}};  // Max value for threshold to avoid false captured FIFO complete
       cfg_hsp_library_size <= {{HSP_LIBRARY_WIDTH{1'b1}}}; // Max value for library size to avoid false last hsp
       cfg_hsp_bands <= {{HSP_BANDS_WIDTH{1'b1}}}; // Max value for HSP bands to avoid false last hsp bands
-      initialize <= 1;
+      // initialize <= 1;
     end
   endtask
 

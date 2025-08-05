@@ -11,6 +11,7 @@ class HsidMainGen #(
     parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH // Address width for HSI library
   ) extends HsidHSPixelMseGen #(WORD_WIDTH, DATA_WIDTH, DATA_WIDTH_MUL, DATA_WIDTH_ACC, HSP_BANDS_WIDTH, HSP_LIBRARY_WIDTH);
 
+  rand logic test_rnd_insert; // Enable random insertion of test vectors
   rand logic [HSP_LIBRARY_WIDTH-1:0] library_size;
 
   constraint c_library_size {
@@ -66,6 +67,7 @@ class HsidMainRandom #(
     parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH // Address width for HSI library
   );
 
+  rand logic rst_n;
   rand logic clear;
   rand logic band_data_in_valid;
   rand logic [WORD_WIDTH-1:0] band_data_in;
@@ -74,11 +76,15 @@ class HsidMainRandom #(
   rand logic start;
 
   constraint c_clear {
-    clear dist {0:=80, 1:=20}; // 80% chance to not clear, 20% chance to clear
+    clear dist {0:=90, 1:=10}; // 80% chance to not clear, 20% chance to clear
+  }
+
+  constraint c_rst_n {
+    rst_n dist {0:=10, 1:=90}; // 10% chance to reset, 90% chance to not reset
   }
 
   constraint c_band_data_in_valid {
-    band_data_in_valid dist {0:=30, 1:=70}; // 70% chance to have valid band data input, 30% chance to not have valid input
+    band_data_in_valid dist {0:=10, 1:=90}; // 70% chance to have valid band data input, 30% chance to not have valid input
   }
 
   constraint c_band_data_in {

@@ -35,12 +35,13 @@ module hsid_main #(
     input logic start,
     output logic done,
     output logic idle,
-    output logic ready
+    output logic ready,
+    output logic error
   );
 
   localparam BUFFER_SIZE = 2 ** BUFFER_WIDTH;  // Size of the FIFO buffer
 
-  wire hsid_main_state_t state;
+  // wire hsid_main_state_t state;
   wire fifo_captured_complete, fifo_captured_empty;
   wire fifo_ref_full, fifo_ref_empty;
 
@@ -65,11 +66,6 @@ module hsid_main #(
   wire [HSP_BANDS_WIDTH-1:0] cfg_band_pack_threshold;
   wire [HSP_BANDS_WIDTH-1:0] cfg_hsp_bands;
 
-  // Assigns statements
-  assign fifo_captured_data_in = (state == READ_HSP_CAPTURED) ? band_data_in : '0; //(state == COMPUTE_MSE ? fifo_measure_data_out : '0);
-  assign fifo_captured_write_en = (state == READ_HSP_CAPTURED && band_data_in_valid); // || (state == COMPUTE_MSE && fifo_measure_loop);
-  assign fifo_ref_write_en = (state == COMPUTE_MSE && band_data_in_valid);
-
   hsid_main_fsm #(
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
@@ -77,19 +73,23 @@ module hsid_main #(
     .clk(clk),
     .rst_n(rst_n),
     .clear(clear),
+    .band_data_in_valid(band_data_in_valid),
+    .band_data_in(band_data_in),
     .hsp_bands(hsp_bands_in),
     .hsp_library_size(hsp_library_size_in),
     .fifo_captured_complete(fifo_captured_complete),
     .fifo_captured_empty(fifo_captured_empty),
     .fifo_ref_empty(fifo_ref_empty),
     .fifo_ref_full(fifo_ref_full),
+    .fifo_captured_data_in(fifo_captured_data_in),
+    .fifo_captured_write_en(fifo_captured_write_en),
+    .fifo_ref_write_en(fifo_ref_write_en),
     .mse_valid(mse_valid),
     .mse_comparison_valid(mse_comparison_valid),
     .mse_ref(mse_ref),
-    .state(state),
-    .hsp_ref_count(hsp_ref),
     .cfg_band_pack_threshold(cfg_band_pack_threshold),
     .cfg_hsp_bands(cfg_hsp_bands),
+    .hsp_ref_count(hsp_ref),
     .band_pack_start(band_pack_start),  // Start vector processing signal
     .band_pack_last(band_pack_last),
     .band_pack_valid(band_pack_valid),
@@ -98,7 +98,8 @@ module hsid_main #(
     .start(start),
     .done(done),
     .idle(idle),
-    .ready(ready)
+    .ready(ready),
+    .error(error)
   );
 
   hsid_mse #(
@@ -108,7 +109,7 @@ module hsid_main #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL)
-  ) hsi_mse (
+  ) mse (
     .clk(clk),
     .rst_n(rst_n),
     .clear(initialize),
@@ -128,7 +129,7 @@ module hsid_main #(
   hsid_mse_comp #(
     .WORD_WIDTH(WORD_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
-  ) hsi_mse_comp (
+  ) mse_comp (
     .clk(clk),
     .rst_n(rst_n),
     .mse_in_valid(mse_valid),  // Valid MSE output and no overflow

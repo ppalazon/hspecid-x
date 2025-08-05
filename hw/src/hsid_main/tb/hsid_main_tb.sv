@@ -9,8 +9,7 @@ module hsid_main_tb #(
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,  // Number of bits for Hyperspectral Pixels Library (11 bits - 4096 pixels)
-    parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
-    parameter TEST_RND_INSERT = 0 // Enable random insertion of test vectors
+    parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH  // Length of the buffer
   ) ();
 
   localparam MAX_WORD = {WORD_WIDTH{1'b1}};
@@ -34,6 +33,7 @@ module hsid_main_tb #(
   wire done;
   wire idle;
   wire ready;
+  wire error;
 
   // DUT instantiation
   hsid_main #(
@@ -57,7 +57,8 @@ module hsid_main_tb #(
     .start(start),
     .done(done),
     .idle(idle),
-    .ready(ready)
+    .ready(ready),
+    .error(error)
   );
 
   // Constraint randomization for the HSI vector
@@ -106,6 +107,7 @@ module hsid_main_tb #(
 
   // Binding SVA assertions to the DUT
   bind hsid_main_fsm hsid_main_fsm_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsid_main_fsm_sva_inst (.*);
@@ -154,6 +156,7 @@ module hsid_main_tb #(
 
   int hsp_band_packs = 0;
   logic [WORD_WIDTH-1:0] hsp_packed [];
+  logic will_raised_error;
 
 // Count for the number of inserted band packs
   int count_insert;
@@ -180,11 +183,11 @@ module hsid_main_tb #(
     #5 rst_n = 1;  // Release reset
 
     $display("Case 1: Test normal operation with random vectors ...");
-    for (int t = 0; t < 10; t++) begin
+    for (int t = 0; t < 20; t++) begin
       // Generate a random vector as a measure
       if (!hsid_main_gen.randomize()) $fatal(0, "Failed to randomize measure vector");
 
-      $display("Test %0d: Library size: %0d, HSP Bands: %0d", t, hsid_main_gen.library_size, hsid_main_gen.hsp_bands);
+      $display("Test %0d: Library size: %0d, HSP Bands: %0d, Random Insert: %0d", t, hsid_main_gen.library_size, hsid_main_gen.hsp_bands, hsid_main_gen.test_rnd_insert);
       captured = hsid_main_gen.vctr1;  // Get the measure vector
       lib = new [hsid_main_gen.library_size];
       acc_int = new [hsid_main_gen.library_size];
@@ -244,7 +247,7 @@ module hsid_main_tb #(
       hsid_main_gen.band_packer(captured, hsp_packed);
       count_insert = 0;
       while (count_insert < hsp_band_packs) begin
-        insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
+        insert_en = hsid_main_gen.test_rnd_insert ? $urandom % 2 : 1; // Randomly enable or disable element processing
         band_data_in = hsp_packed[count_insert];
         band_data_in_valid = insert_en;
         #10;
@@ -254,8 +257,8 @@ module hsid_main_tb #(
 
       band_data_in_valid = 0;  // Disable input vector valid signal
       band_data_in = 0;  // Reset input vector
-
       #10;
+
       a_read_lib_idle: assert (idle == 0) else $error("DUT is idle on reading library");
       a_read_lib_done: assert (done == 0) else $error("DUT is done on reading library");
       a_read_lib_rdy: assert (ready == 1) else $error("DUT is not ready on reading library");
@@ -267,7 +270,7 @@ module hsid_main_tb #(
         count_insert = 0;
         // $display("  - Sending library vector: %p", hsp_packed);
         while (count_insert < hsp_band_packs) begin
-          insert_en = TEST_RND_INSERT ? $urandom % 2 : 1; // Randomly enable or disable element processing
+          insert_en = hsid_main_gen.test_rnd_insert ? $urandom % 2 : 1; // Randomly enable or disable element processing
           band_data_in = hsp_packed[count_insert];
           band_data_in_valid = insert_en;
           // $display("     - Sending band pack %0d of %0d hsp: %h", count_insert, i, band_data_in);
@@ -309,8 +312,8 @@ module hsid_main_tb #(
       a_aft_finish_rdy: assert (ready == 0) else $error("DUT is ready after processing");
     end
 
-    $display("Case 2: Send complete random inputs to the DUT ...");
-    for(int i=0; i<200; i++) begin
+    $display("Case 2: Send complete random inputs to the DUT, without clear ...");
+    for(int i=0; i<300; i++) begin
       if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
 
       band_data_in = hsid_main_random.band_data_in;
@@ -318,12 +321,50 @@ module hsid_main_tb #(
       hsp_bands_in = hsid_main_random.hsp_bands_in;
       hsp_library_size_in = hsid_main_random.hsp_library_size_in;
       start = hsid_main_random.start;
-      clear = hsid_main_random.clear;
+      clear = '0;
 
       #10; // Wait for the DUT to process the input
     end
 
+    $display("Case 3: Clear and reset the DUT on different states ...");
+    for (int i=0; i<300; i++) begin
+      if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
 
+      start = hsid_main_random.start;
+      clear = hsid_main_random.clear;
+      rst_n = hsid_main_random.rst_n;
+      band_data_in = hsid_main_random.band_data_in;
+      band_data_in_valid = '1;
+      hsp_bands_in = 7; // Minimum HSP bands to avoid errors
+      hsp_library_size_in = 1; // Minimal library size to avoid errors
+
+      #10; // Wait for the DUT to process the input
+    end
+
+    $display("Case 4: Test error on configuration ...");
+    for (int i=0; i<50; i++) begin
+      if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
+
+      // Clear
+      clear = 1;
+      #10;
+      clear = 0;
+      #10;
+      // Start
+      start = 1;
+      #10;
+      start = 0;
+      // Configure
+      hsp_bands_in = i % 3 == 0 ? '0 : hsid_main_random.hsp_bands_in; // Invalid HSP bands
+      hsp_library_size_in = i % 2 ==0 ? '0: hsid_main_random.hsp_library_size_in; // Invalid HSP bands
+      will_raised_error = hsp_bands_in == 0 || hsp_library_size_in == 0;
+      #10;
+      if (will_raised_error)
+        a_error: assert (error == 1) else $error("DUT did not raise error on invalid configuration");
+      else
+        a_non_error: assert (error == 0) else $error("DUT did raise error on valid configuration");
+      #30;
+    end
     $finish;
   end
 
