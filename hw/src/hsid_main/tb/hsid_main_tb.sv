@@ -163,12 +163,12 @@ module hsid_main_tb #(
   logic insert_en;
 
 // Waveform generation for debugging
-  initial begin
+  initial begin : tb_waveform
     $dumpfile("wave.vcd");
     $dumpvars(0, hsid_main_tb);
   end
 
-  initial begin
+  initial begin : tb_hsid_main
     clk = 1;
     rst_n = 1;
     band_data_in_valid = 0;
@@ -183,7 +183,7 @@ module hsid_main_tb #(
     #5 rst_n = 1;  // Release reset
 
     $display("Case 1: Test normal operation with random vectors ...");
-    for (int t = 0; t < 20; t++) begin
+    for (int t = 0; t < 20; t++) begin : case_1
       // Generate a random vector as a measure
       if (!hsid_main_gen.randomize()) $fatal(0, "Failed to randomize measure vector");
 
@@ -313,7 +313,7 @@ module hsid_main_tb #(
     end
 
     $display("Case 2: Send complete random inputs to the DUT, without clear ...");
-    for(int i=0; i<300; i++) begin
+    for(int i=0; i<300; i++) begin : case_2
       if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
 
       band_data_in = hsid_main_random.band_data_in;
@@ -327,7 +327,7 @@ module hsid_main_tb #(
     end
 
     $display("Case 3: Clear and reset the DUT on different states ...");
-    for (int i=0; i<300; i++) begin
+    for (int i=0; i<300; i++) begin : case_3
       if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
 
       start = hsid_main_random.start;
@@ -342,7 +342,7 @@ module hsid_main_tb #(
     end
 
     $display("Case 4: Test error on configuration ...");
-    for (int i=0; i<50; i++) begin
+    for (int i=0; i<50; i++) begin : case_4
       if (!hsid_main_random.randomize()) $fatal(0, "Failed to randomize HSI vector");
 
       // Clear
