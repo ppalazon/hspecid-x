@@ -143,8 +143,8 @@ module hsid_main_tb #(
   // ) hsid_fifo_sva_inst (.*);
 
   // Test vectors
-  logic [DATA_WIDTH-1:0] captured [];
-  logic [DATA_WIDTH-1:0] lib [][];
+  logic [DATA_WIDTH-1:0] captured_hsp [];
+  logic [DATA_WIDTH-1:0] library_hsp [][];
   logic [DATA_WIDTH_ACC:0] acc_int [][];
   logic [WORD_WIDTH-1:0] expected_mse [];
   logic expected_mse_of [];
@@ -188,8 +188,8 @@ module hsid_main_tb #(
       if (!hsid_main_gen.randomize()) $fatal(0, "Failed to randomize measure vector");
 
       $display("Test %0d: Library size: %0d, HSP Bands: %0d, Random Insert: %0d", t, hsid_main_gen.library_size, hsid_main_gen.hsp_bands, hsid_main_gen.test_rnd_insert);
-      captured = hsid_main_gen.vctr1;  // Get the measure vector
-      lib = new [hsid_main_gen.library_size];
+      captured_hsp = hsid_main_gen.vctr1;  // Get the measure vector
+      library_hsp = new [hsid_main_gen.library_size];
       acc_int = new [hsid_main_gen.library_size];
       expected_mse = new [hsid_main_gen.library_size];
       expected_mse_of = new [hsid_main_gen.library_size];
@@ -197,12 +197,12 @@ module hsid_main_tb #(
       // $display("Captured vector: %p", captured);
 
       // Generate random library vectors
-      lib = new[hsid_main_gen.library_size];
+      library_hsp = new[hsid_main_gen.library_size];
       hsid_hsp_ref_gen.hsp_bands = hsid_main_gen.hsp_bands;
       for (int i = 0; i < hsid_main_gen.library_size; i++) begin : generate_library
         if (!hsid_hsp_ref_gen.randomize()) $fatal(0, "Failed to randomize library vector %0d", i);
-        lib[i] = hsid_hsp_ref_gen.reference_hsp;
-        hsid_main_gen.sq_df_acc_vctr(captured, lib[i], acc_int[i]); // Get intermediate accumulator values
+        library_hsp[i] = hsid_hsp_ref_gen.reference_hsp;
+        hsid_main_gen.sq_df_acc_vctr(captured_hsp, library_hsp[i], acc_int[i]); // Get intermediate accumulator values
         hsid_main_gen.mse(acc_int[i], expected_mse[i], expected_mse_of[i]);
         $display("  - Id: %0d, Accumulated value: %p, MSE: %d, Overflow: %0d", i, acc_int[i][hsid_main_gen.hsp_bands-1], expected_mse[i], expected_mse_of[i]);
         // $display("  - Library vector %0d: %p, MSE: %d", i, lib[i], expected_mse[i]);
@@ -244,7 +244,7 @@ module hsid_main_tb #(
 
       // Send the captured vector (packed)
       $display(" - Sending captured vector...");
-      hsid_main_gen.band_packer(captured, hsp_packed);
+      hsid_main_gen.band_packer(captured_hsp, hsp_packed);
       count_insert = 0;
       while (count_insert < hsp_band_packs) begin
         insert_en = hsid_main_gen.test_rnd_insert ? $urandom % 2 : 1; // Randomly enable or disable element processing
@@ -266,7 +266,7 @@ module hsid_main_tb #(
       $display(" - Sending library vectors...");
       // Send the library vectors
       for (int i = 0; i < hsid_main_gen.library_size; i++) begin
-        hsid_main_gen.band_packer(lib[i], hsp_packed);
+        hsid_main_gen.band_packer(library_hsp[i], hsp_packed);
         count_insert = 0;
         // $display("  - Sending library vector: %p", hsp_packed);
         while (count_insert < hsp_band_packs) begin

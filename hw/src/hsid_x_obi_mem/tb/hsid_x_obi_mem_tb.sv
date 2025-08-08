@@ -6,10 +6,9 @@
 module hsid_x_obi_mem_tb #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for the pixel memory
-    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH, // Address width for HSI library size
+    parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH, // Address width for HSI library size
     parameter VALUE_MASK = 32'h0000FFFF, // Mask to return least significant 16 bits of the address
-    parameter TESTS = 30, // Number of tests to run
-    parameter RANDOM_GNT = 1 // If set to 1, pixel_obi_mem will return random grant signals
+    parameter TESTS = 30 // Number of tests to run
   ) ();
 
   reg clk;
@@ -19,7 +18,8 @@ module hsid_x_obi_mem_tb #(
   reg [WORD_WIDTH-1:0] initial_addr;
   wire data_out_valid;
   wire [WORD_WIDTH-1:0] data_out;
-  reg [HSP_LIBRARY_WIDTH-1:0] limit; // Limit for the number of requests
+  reg [MEM_ACCESS_WIDTH-1:0] limit; // Limit for the number of requests
+  reg random_gnt; // Random grant signal
   reg start;
   wire idle;
   wire ready;
@@ -27,7 +27,7 @@ module hsid_x_obi_mem_tb #(
 
   hsid_x_obi_mem #(
     .WORD_WIDTH(WORD_WIDTH),
-    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
   ) dut (
     .clk(clk),
     .rst_n(rst_n),
@@ -46,16 +46,17 @@ module hsid_x_obi_mem_tb #(
   // Instantiate a memory OBI subordinate for testing
   pixel_obi_mem #(
     .DATA_WIDTH(DATA_WIDTH), // Data width for the pixel memory
-    .RANDOM_GNT(RANDOM_GNT),  // Set to 0 for deterministic behavior
-    .RANDOM_VALUE(0), // Set to 0 for deterministic behavior
     .VALUE_MASK(VALUE_MASK) // Mask to return least significant 14 bits of the address
   ) pixel_obi_mem (
     .clk(clk),
     .rst_n(rst_n),
     .obi_req(obi_req),
-    .obi_rsp(obi_rsp)
+    .obi_rsp(obi_rsp),
+    .random_gnt(random_gnt)
   );
 
+
+  // Module to debug the OBI bus
   obi_bus_debug obi_bus_debug (
     .clk(clk),
     .rst_n(rst_n),
@@ -63,6 +64,13 @@ module hsid_x_obi_mem_tb #(
     .obi_rsp(obi_rsp)
   );
 
+  // Generate a random number of requests
+  HsidXObiMemRandom #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
+  ) hsid_x_obi_mem_random = new();
+
+  logic[MEM_ACCESS_WIDTH-1:0] requests;
   int read_addr;
   int reads;
 
@@ -80,25 +88,35 @@ module hsid_x_obi_mem_tb #(
     reads = 0;
     start = 0;
     limit = 0;
+    random_gnt = 0;
 
     #3 rst_n = 0; // Set reset
     #5 rst_n = 1; // Release reset
 
     $display("Case 1: Read %0d addresses", TESTS);
-    initial_addr = $urandom();
-    limit = TESTS;
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
+    initial_addr = hsid_x_obi_mem_random.initial_addr;
+    limit = hsid_x_obi_mem_random.requests;
     perform_reads();
 
     #10; // Wait for a clock cycle
 
     $display("Case 2 Address Overflow: Read %0d addresses", TESTS);
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
     initial_addr = 32'hFFFFFFFF - (2 * (WORD_WIDTH / 8)); // Let 2 addresses before the maximum address
-    limit = TESTS;
+    limit = hsid_x_obi_mem_random.requests;
     perform_reads();
 
     #10; // Wait for a clock cycle
 
-    // Test
+    $display("Case 3: Read %0d addresses with random grant", TESTS);
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
+    initial_addr = hsid_x_obi_mem_random.initial_addr;
+    limit = hsid_x_obi_mem_random.requests;
+    random_gnt = 1; // Enable random grant signal
+    perform_reads();
+
+    #10;
 
     $finish;
   end
@@ -106,9 +124,9 @@ module hsid_x_obi_mem_tb #(
   always
     #5 clk = ! clk;
 
-  // initial begin
-  //   #2000; $finish; // End simulation after a long time to avoid hanging;
-  // end
+  initial begin
+    #2000000; $finish; // End simulation after a long time to avoid hanging;
+  end
 
   task assert_dut_state(
       input logic expected_idle,
@@ -121,12 +139,13 @@ module hsid_x_obi_mem_tb #(
   endtask
 
   task perform_reads();
+    requests = limit;
     reads = 0;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
     start = 1;
     #10; // Wait for a clock cycle
     start = 0;
-    while (reads < TESTS) begin
+    while (reads < requests) begin
       assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
       if (data_out_valid) begin
         read_addr = initial_addr + (reads * (WORD_WIDTH / 8));
@@ -140,15 +159,17 @@ module hsid_x_obi_mem_tb #(
       #10;
     end
     assert_dut_state(0, 0, 1); // Assert DUT is not idle, not ready, and done
-    assert(reads == TESTS) else $error("ERROR: Not all reads were successful");
+    assert(reads == requests) else $error("ERROR: Not all reads were successful");
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
   endtask
 
   function logic [31:0] addr_value(logic [WORD_WIDTH-1:0] addr);
-    logic [DATA_WIDTH-1:0] masked_addr;
-    masked_addr = addr[DATA_WIDTH-1:0] & VALUE_MASK; // Mask to return least significant 14 bits of the address
-    return {masked_addr, masked_addr}; // Return least significant 14 bits of the address
+    logic [DATA_WIDTH-1:0] msb_masked_addr;
+    logic [DATA_WIDTH-1:0] lsb_masked_addr;
+    lsb_masked_addr = addr[DATA_WIDTH-1:0] & VALUE_MASK; // Mask to return least significant 14 bits of the address
+    msb_masked_addr = addr[WORD_WIDTH-1:DATA_WIDTH] & VALUE_MASK; // Mask to return least significant 14 bits of the address
+    return {lsb_masked_addr, msb_masked_addr}; // Return least significant 14 bits of the address
   endfunction
 
 endmodule

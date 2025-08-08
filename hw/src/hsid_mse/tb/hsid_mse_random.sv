@@ -11,13 +11,19 @@ class HsidHSPixelMseGen#(
     parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH // Address width for HSI library
   ) extends HsidHSPixelGen #(DATA_WIDTH, DATA_WIDTH_MUL, DATA_WIDTH_ACC, HSP_BANDS_WIDTH, HSP_LIBRARY_WIDTH);
 
+  logic [HSP_BANDS_WIDTH-1:0] hsp_bands_packs;
   rand logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref; // Reference vector
 
   function void pre_randomize();
     super.pre_randomize();
     initial_acc.rand_mode(0);
     initial_acc = 0; // Set initial accumulator value to zero
-  endfunction : pre_randomize
+  endfunction
+
+  function void post_randomize();
+    super.post_randomize();
+    hsp_bands_packs = (hsp_bands + 1) / 2;
+  endfunction
 
   constraint c_vctr_ref {
     vctr_ref dist {0:=15, MAX_HSP_LIBRARY:=15,  [1:MAX_HSP_LIBRARY-1]:/70};
@@ -62,6 +68,21 @@ class HsidHSPixelMseGen#(
     // mse_of = last_acc_sum > (hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of the divisor
     mse = last_acc_sum / hsp_bands; // Compute mean square error
   endfunction
+
+  task display_hsp_packed(input string description, input logic [WORD_WIDTH-1:0] hsp []);
+    int size = hsp.size();
+    int limit = (size > 10) ? 10 : size;
+    $write("%s: {", description);
+    for (int i = 0; i < limit; i++) begin
+      $write("0x%0h, ", hsp[i]);
+    end
+    if (size > limit) begin
+      $write(" ... } (%0d more elements)", size - limit);
+    end else begin
+      $write("}");
+    end
+    $display("");
+  endtask
 
 endclass
 

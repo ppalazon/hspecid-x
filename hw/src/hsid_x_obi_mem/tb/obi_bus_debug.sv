@@ -3,8 +3,8 @@
 module obi_bus_debug(
     input logic clk,
     input logic rst_n,
-    input hsid_x_obi_inf_pkg::obi_req_t obi_req,
-    input hsid_x_obi_inf_pkg::obi_resp_t obi_rsp
+    input wire hsid_x_obi_inf_pkg::obi_req_t obi_req,
+    input wire hsid_x_obi_inf_pkg::obi_resp_t obi_rsp
   );
 
   logic        req;

@@ -35,11 +35,11 @@ package hsid_x_ctrl_reg_pkg;
   } hsid_x_ctrl_reg2hw_status_reg_t;
 
   typedef struct packed {
-    logic [11:0] q;
+    logic [5:0]  q;
   } hsid_x_ctrl_reg2hw_library_size_reg_t;
 
   typedef struct packed {
-    logic [7:0]  q;
+    logic [6:0]  q;
   } hsid_x_ctrl_reg2hw_pixel_bands_reg_t;
 
   typedef struct packed {
@@ -115,9 +115,9 @@ package hsid_x_ctrl_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    hsid_x_ctrl_reg2hw_status_reg_t status; // [217:212]
-    hsid_x_ctrl_reg2hw_library_size_reg_t library_size; // [211:200]
-    hsid_x_ctrl_reg2hw_pixel_bands_reg_t pixel_bands; // [199:192]
+    hsid_x_ctrl_reg2hw_status_reg_t status; // [210:205]
+    hsid_x_ctrl_reg2hw_library_size_reg_t library_size; // [204:199]
+    hsid_x_ctrl_reg2hw_pixel_bands_reg_t pixel_bands; // [198:192]
     hsid_x_ctrl_reg2hw_captured_pixel_addr_reg_t captured_pixel_addr; // [191:160]
     hsid_x_ctrl_reg2hw_library_pixel_addr_reg_t library_pixel_addr; // [159:128]
     hsid_x_ctrl_reg2hw_mse_min_ref_reg_t mse_min_ref; // [127:96]
@@ -162,7 +162,7 @@ package hsid_x_ctrl_reg_pkg;
   // Register width information to check illegal writes
   parameter logic [3:0] HSID_X_CTRL_PERMIT [9] = '{
     4'b 0001, // index[0] HSID_X_CTRL_STATUS
-    4'b 0011, // index[1] HSID_X_CTRL_LIBRARY_SIZE
+    4'b 0001, // index[1] HSID_X_CTRL_LIBRARY_SIZE
     4'b 0001, // index[2] HSID_X_CTRL_PIXEL_BANDS
     4'b 1111, // index[3] HSID_X_CTRL_CAPTURED_PIXEL_ADDR
     4'b 1111, // index[4] HSID_X_CTRL_LIBRARY_PIXEL_ADDR

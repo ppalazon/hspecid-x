@@ -12,8 +12,8 @@ module hsid_x_ctrl_reg #(
 
     // Register interface
     // REG_BUS.in  regbus_slave,
-    input hsid_x_reg_pkg::reg_req_t reg_req,  // Register interface request
-    output hsid_x_reg_pkg::reg_rsp_t reg_rsp,  // Register interface response
+    input wire hsid_x_reg_pkg::reg_req_t reg_req,  // Register interface request
+    output var hsid_x_reg_pkg::reg_rsp_t reg_rsp,  // Register interface response
 
     // HSpecID-X register for block interface for handshake
     output logic start,
@@ -22,6 +22,7 @@ module hsid_x_ctrl_reg #(
     input logic ready,
     input logic done,
     input logic error,
+    input logic interrupt,
 
     output logic [HSP_LIBRARY_WIDTH-1:0] library_size,  // Size of the Hyperspectral pixel library
     output logic [HSP_BANDS_WIDTH-1:0] pixel_bands,  // Number of bands per hyperspectral pixel
@@ -91,26 +92,26 @@ module hsid_x_ctrl_reg #(
   assign pixel_bands = reg2hw.pixel_bands.q[HSP_BANDS_WIDTH-1:0];  // Number of bands
 
   // HW to Register interface (Input)
+  assign hw2reg.status.ready.d = ready;
+  assign hw2reg.status.ready.de = 1'b1;
   assign hw2reg.status.idle.d = idle;
   assign hw2reg.status.idle.de = 1'b1;
   assign hw2reg.status.done.d = done;
   assign hw2reg.status.done.de = 1'b1;
   assign hw2reg.status.error.d = error;
   assign hw2reg.status.error.de = 1'b1;
-  assign hw2reg.status.ready.d = ready;
-  assign hw2reg.status.ready.de = 1'b1;
 
   assign hw2reg.mse_min_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_min_ref}; // Zero-extend to match width
-  assign hw2reg.mse_min_ref.de = 1'b1;
+  assign hw2reg.mse_min_ref.de = interrupt;
 
   assign hw2reg.mse_min_value.d = mse_min_value;
-  assign hw2reg.mse_min_value.de = 1'b1;
+  assign hw2reg.mse_min_value.de = interrupt;
 
   assign hw2reg.mse_max_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_max_ref}; // Zero-extend to match width
-  assign hw2reg.mse_max_ref.de = 1'b1;
+  assign hw2reg.mse_max_ref.de = interrupt;
 
   assign hw2reg.mse_max_value.d = mse_max_value;
-  assign hw2reg.mse_max_value.de = 1'b1;
+  assign hw2reg.mse_max_value.de = interrupt;
 
   // Software set start bit, and this bit is always cleared by hardware. It's only high for one clock cycle
   assign hw2reg.status.start.d  = 1'b0;

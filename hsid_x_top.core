@@ -9,20 +9,27 @@ filesets:
       - hw/src/hsid_x_top/rtl/hsid_x_top.sv
     file_type: systemVerilogSource
     depend:
-      - "uclm:hspecidx:hsid_pkg"
       - "uclm:hspecidx:hsid_main"
       - "uclm:hspecidx:hsid_x_ctrl_reg"
       - "uclm:hspecidx:hsid_x_obi_mem"
 
   tb:
     files:
-      - hw/src/hsid_main/tb/hsid_main_tb_random.sv
+      # - hw/src/hsid_main/tb/hsid_main_tb_random.sv
       - hw/src/hsid_x_ctrl_reg/tb/ctrl_reg_tb_tasks.sv
       - hw/src/hsid_x_ctrl_reg/tb/reg_inf_debug.sv
       - hw/src/hsid_x_obi_mem/tb/pixel_obi_mem.sv
       - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
+      - hw/src/hsid_x_top/tb/hsid_x_top_random.sv
       - hw/src/hsid_x_top/tb/hsid_x_top_tb.sv
     file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_test"
+
+  tcl_modelsim:
+    files:
+      - hw/tcl/modelsim-do/hsid_x_top_debug.do
+    file_type: tclSource
 
   nexys_a7_100t:
     files:
@@ -40,9 +47,12 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
+      - tool_modelsim? (tcl_modelsim)
     toplevel: hsid_x_top_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+      modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
         #xelab_options:
         #xsim_options:

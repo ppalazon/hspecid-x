@@ -128,6 +128,7 @@ module hsid_mse_comp_tb #(
     #3 rst_n = 0;  // Reset the DUT
     #15 rst_n = 1;  // Release reset
 
+    $display("Case 1: Randomized MSE Comparison Test");
     for (int i=0; i<1000; i++) begin
       if (!mse_comp_random.randomize()) $fatal(0, "Randomization failed");
       mse_in_valid = mse_comp_random.mse_in_valid;

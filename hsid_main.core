@@ -16,17 +16,8 @@ filesets:
       - "uclm:hspecidx:hsid_mse_comp" # mse_comp.core
 
   tb:
-    files:
-      - hw/src/hsid_fifo/tb/hsid_fifo_sva.sv
-      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_sva.sv
-      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_random.sv
-      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_sva.sv
-      - hw/src/hsid_mse/tb/hsid_mse_sva.sv
-      - hw/src/hsid_mse/tb/hsid_mse_random.sv
-      - hw/src/hsid_main/tb/hsid_main_random.sv
-      - hw/src/hsid_main/tb/hsid_main_fsm_sva.sv
-      - hw/src/hsid_main/tb/hsid_main_tb.sv
-    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_test"
 
   tcl_modelsim:
     files:

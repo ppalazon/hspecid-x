@@ -78,11 +78,11 @@ module hsid_x_ctrl_reg_top #(
   logic status_clear_wd;
   logic status_clear_we;
   logic status_error_qs;
-  logic [11:0] library_size_qs;
-  logic [11:0] library_size_wd;
+  logic [5:0] library_size_qs;
+  logic [5:0] library_size_wd;
   logic library_size_we;
-  logic [7:0] pixel_bands_qs;
-  logic [7:0] pixel_bands_wd;
+  logic [6:0] pixel_bands_qs;
+  logic [6:0] pixel_bands_wd;
   logic pixel_bands_we;
   logic [31:0] captured_pixel_addr_qs;
   logic [31:0] captured_pixel_addr_wd;
@@ -253,9 +253,9 @@ module hsid_x_ctrl_reg_top #(
   // R[library_size]: V(False)
 
   prim_subreg #(
-    .DW      (12),
+    .DW      (6),
     .SWACCESS("RW"),
-    .RESVAL  (12'h0)
+    .RESVAL  (6'h0)
   ) u_library_size (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -280,9 +280,9 @@ module hsid_x_ctrl_reg_top #(
   // R[pixel_bands]: V(False)
 
   prim_subreg #(
-    .DW      (8),
+    .DW      (7),
     .SWACCESS("RW"),
-    .RESVAL  (8'h0)
+    .RESVAL  (7'h0)
   ) u_pixel_bands (
     .clk_i   (clk_i    ),
     .rst_ni  (rst_ni  ),
@@ -501,10 +501,10 @@ module hsid_x_ctrl_reg_top #(
   assign status_clear_wd = reg_wdata[4];
 
   assign library_size_we = addr_hit[1] & reg_we & !reg_error;
-  assign library_size_wd = reg_wdata[11:0];
+  assign library_size_wd = reg_wdata[5:0];
 
   assign pixel_bands_we = addr_hit[2] & reg_we & !reg_error;
-  assign pixel_bands_wd = reg_wdata[7:0];
+  assign pixel_bands_wd = reg_wdata[6:0];
 
   assign captured_pixel_addr_we = addr_hit[3] & reg_we & !reg_error;
   assign captured_pixel_addr_wd = reg_wdata[31:0];
@@ -526,11 +526,11 @@ module hsid_x_ctrl_reg_top #(
       end
 
       addr_hit[1]: begin
-        reg_rdata_next[11:0] = library_size_qs;
+        reg_rdata_next[5:0] = library_size_qs;
       end
 
       addr_hit[2]: begin
-        reg_rdata_next[7:0] = pixel_bands_qs;
+        reg_rdata_next[6:0] = pixel_bands_qs;
       end
 
       addr_hit[3]: begin

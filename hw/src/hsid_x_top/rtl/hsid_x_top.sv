@@ -9,18 +9,19 @@ module hsid_x_top #(
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC,  // Data width for accumulator
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Number of entries in the FIFO buffer
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
-    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
+    parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH
   ) (
     input logic clk,
     input logic rst_n,
 
     // Register interface
-    input hsid_x_reg_pkg::reg_req_t reg_req_i,
-    output hsid_x_reg_pkg::reg_rsp_t reg_rsp_o,
+    input wire hsid_x_reg_pkg::reg_req_t reg_req_i,
+    output var hsid_x_reg_pkg::reg_rsp_t reg_rsp_o,
 
     // OBI interface (Master)
-    input hsid_x_obi_inf_pkg::obi_resp_t obi_rsp_i,
-    output hsid_x_obi_inf_pkg::obi_req_t obi_req_o,
+    input wire hsid_x_obi_inf_pkg::obi_resp_t obi_rsp_i,
+    output var hsid_x_obi_inf_pkg::obi_req_t obi_req_o,
 
     // Interrupt interface
     output logic hsid_x_int_o
@@ -46,11 +47,9 @@ module hsid_x_top #(
   wire obi_data_out_valid;
   wire [WORD_WIDTH-1:0] obi_data_out;
   wire [WORD_WIDTH-1:0] obi_initial_addr;
-  wire [HSP_LIBRARY_WIDTH-1:0] obi_limit_in;
+  wire [MEM_ACCESS_WIDTH-1:0] obi_limit_in;
   wire obi_start;
   wire obi_done;
-
-  assign hsid_x_int_o = done;
 
   hsid_x_top_fsm #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -60,8 +59,8 @@ module hsid_x_top #(
   ) fsm (
     .clk(clk),
     .rst_n(rst_n),
-    .pixel_bands(pixel_bands),
-    .library_size(library_size),
+    .hsp_bands(pixel_bands),
+    .hsp_library_size(library_size),
     .captured_pixel_addr(captured_pixel_addr),
     .library_pixel_addr(library_pixel_addr),
     .start(start),
@@ -70,16 +69,17 @@ module hsid_x_top #(
     .obi_limit_in(obi_limit_in),
     .obi_start(obi_start),
     .obi_done(obi_done),
-    .error(error)
+    .error(error),
+    .done(done),
+    .interrupt(hsid_x_int_o)
   );
-
 
   // Register interface to hardware interface
   hsid_x_ctrl_reg #(
+    .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
-    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
-    .WORD_WIDTH(WORD_WIDTH)
-  ) hsid_x_ctrl_reg (
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) ctrl_reg (
     .clk(clk),
     .rst_n(rst_n),
     .reg_req(reg_req_i),
@@ -90,6 +90,7 @@ module hsid_x_top #(
     .ready(ready),
     .done(done),
     .error(error),
+    .interrupt(hsid_x_int_o),
     .library_size(library_size),
     .pixel_bands(pixel_bands),
     .captured_pixel_addr(captured_pixel_addr),
@@ -102,22 +103,21 @@ module hsid_x_top #(
 
   // OBI interface to memory interface
   hsid_x_obi_mem #(
-    .WORD_WIDTH      (WORD_WIDTH),
-    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
-  )
-  u_hsid_x_obi_mem (
-    .clk           (clk),
-    .data_out      (obi_data_out),
+    .WORD_WIDTH (WORD_WIDTH),
+    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
+  ) obi_mem (
+    .clk(clk),
+    .data_out(obi_data_out),
     .data_out_valid(obi_data_out_valid),
-    .done          (obi_done),
-    .idle          (),
-    .initial_addr  (obi_initial_addr),
-    .limit         (obi_limit_in),
-    .obi_req       (obi_req_o),
-    .obi_rsp       (obi_rsp_i),
-    .ready         (),
-    .rst_n         (rst_n),
-    .start         (obi_start)
+    .done(obi_done),
+    .idle(),
+    .initial_addr(obi_initial_addr),
+    .limit(obi_limit_in),
+    .obi_req(obi_req_o),
+    .obi_rsp(obi_rsp_i),
+    .ready(),
+    .rst_n(rst_n),
+    .start(obi_start)
   );
 
   // HSID Main module instantiation
@@ -126,29 +126,26 @@ module hsid_x_top #(
     .DATA_WIDTH (DATA_WIDTH),
     .DATA_WIDTH_MUL (DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC (DATA_WIDTH_ACC),
-    .HSP_BANDS_WIDTH (HSP_BANDS_WIDTH),
     .BUFFER_WIDTH (BUFFER_WIDTH),
+    .HSP_BANDS_WIDTH (HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
-  )
-  u_hsid_main (
-    // Clear signal to reset MSE values
-    .clear            (clear),
-    .clk              (clk),
-    .done             (done),
-    .hsp_bands_in     (pixel_bands),
-    .band_data_in      (obi_data_out),
+  ) main (
+    .clk(clk),
+    .rst_n(rst_n),
+    .clear(clear),
+    .band_data_in(obi_data_out),
     .band_data_in_valid(obi_data_out_valid),
-    .idle             (idle),
-    .hsp_library_size_in  (library_size),
-    .mse_max_ref      (mse_max_ref),
-    .mse_max_value    (mse_max_value),
-    .mse_min_ref      (mse_min_ref),
-    .mse_min_value    (mse_min_value),
-    .ready            (ready),
-    .rst_n            (rst_n),
-    .start            (start)
+    .hsp_bands_in(pixel_bands),
+    .hsp_library_size_in(library_size),
+    .mse_max_ref(mse_max_ref),
+    .mse_max_value(mse_max_value),
+    .mse_min_ref(mse_min_ref),
+    .mse_min_value(mse_min_value),
+    .idle(idle),
+    .start(start),
+    .ready(ready),
+    .done(done),
+    .error(error)
   );
-
-
 
 endmodule

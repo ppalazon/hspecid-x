@@ -11,11 +11,8 @@ filesets:
       - "uclm:hspecidx:hsid_pkg"
 
   tb:
-    files:
-      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_random.sv
-      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_sva.sv
-      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_tb.sv
-    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_test"
 
   tcl_modelsim:
     files:

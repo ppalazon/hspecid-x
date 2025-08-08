@@ -39,8 +39,6 @@ module hsid_main #(
     output logic error
   );
 
-  localparam BUFFER_SIZE = 2 ** BUFFER_WIDTH;  // Size of the FIFO buffer
-
   // wire hsid_main_state_t state;
   wire fifo_captured_complete, fifo_captured_empty;
   wire fifo_ref_full, fifo_ref_empty;
@@ -174,7 +172,7 @@ module hsid_main #(
     .wr_en(fifo_ref_write_en),
     .rd_en(fifo_both_read_en),
     .data_in(band_data_in),
-    .almost_full_threshold(BUFFER_SIZE - 1),  // Threshold for almost full condition
+    .almost_full_threshold({BUFFER_WIDTH,{1'b1}}),  // Threshold for almost full condition
     .data_out(fifo_ref_data_out),
     .full(fifo_ref_full),
     .almost_full(),

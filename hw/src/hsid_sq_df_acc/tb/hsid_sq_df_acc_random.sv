@@ -10,10 +10,10 @@ class HsidHSPixelGen #(
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   );
 
-  localparam int                       MAX_DATA = (1 << DATA_WIDTH) - 1; // Maximum value for data vectors
-  localparam logic[DATA_WIDTH_ACC-1:0] MAX_DATA_ACC = (1 << DATA_WIDTH_ACC) - 1; // Maximum value for accumulator, it's wider than 32 bits
-  localparam int                       MAX_HSP_BANDS = (1 << HSP_BANDS_WIDTH) - 1; // Maximum value for HSP bands
-  localparam int                       MAX_HSP_LIBRARY = (1 << HSP_LIBRARY_WIDTH) - 1; // Maximum value for HSI library
+  localparam int                       MAX_DATA = {DATA_WIDTH{1'b1}}; // Maximum value for data vectors
+  localparam logic[DATA_WIDTH_ACC-1:0] MAX_DATA_ACC = {DATA_WIDTH_ACC{1'b1}}; // Maximum value for accumulator, it's wider than 32 bits
+  localparam int                       MAX_HSP_BANDS = {HSP_BANDS_WIDTH{1'b1}}; // Maximum value for HSP bands
+  localparam int                       MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}}; // Maximum value for HSI library
 
   rand logic [HSP_BANDS_WIDTH-1:0] hsp_bands; // Number of HSP bands
   rand logic [DATA_WIDTH-1:0] vctr1 [];
@@ -67,6 +67,27 @@ class HsidHSPixelGen #(
     foreach (vctr1[i]) vctr1[i] = MAX_DATA; // Set all elements to maximum value
     foreach (vctr2[i]) vctr2[i] = 0;
   endfunction
+
+  task display_hsp(input string description, input logic [DATA_WIDTH-1:0] hsp []);
+    int size = hsp.size();
+    $write("%s: {", description);
+    if (size > 10) begin
+      int limit = 5;
+      for (int i = 0; i < limit; i++) begin
+        $write("0x%0h, ", hsp[i]);
+      end
+      $write(" ... ");
+      for (int i = size - limit; i < size; i++) begin
+        $write("0x%0h, ", hsp[i]);
+      end
+    end else begin
+      for (int i = 0; i < size; i++) begin
+        $write("0x%0h, ", hsp[i]);
+      end
+    end
+    $write("}");
+    $display("");
+  endtask
 
 endclass
 

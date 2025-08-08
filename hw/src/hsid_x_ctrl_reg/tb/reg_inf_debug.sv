@@ -1,13 +1,11 @@
 `timescale 1ns/1ps
 
-import hsid_x_reg_pkg::*;
-
 module reg_inf_debug(
     input logic clk,
     input logic rst_n,
 
-    input reg_req_t reg_req,
-    input reg_rsp_t reg_rsp
+    input wire hsid_x_reg_pkg::reg_req_t reg_req,
+    input wire hsid_x_reg_pkg::reg_rsp_t reg_rsp
   );
 
   logic        valid;

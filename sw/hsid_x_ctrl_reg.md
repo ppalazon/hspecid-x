@@ -38,35 +38,35 @@ HSpecID-X main control and status register
 Amount of reference pixels in memory to compare with captured pixel
 - Offset: `0x4`
 - Reset default: `0x0`
-- Reset mask: `0xfff`
+- Reset mask: `0x3f`
 
 ### Fields
 
 ```wavejson
-{"reg": [{"name": "LIBRARY_SIZE", "bits": 12, "attr": ["rw"], "rotate": 0}, {"bits": 20}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
+{"reg": [{"name": "LIBRARY_SIZE", "bits": 6, "attr": ["rw"], "rotate": -90}, {"bits": 26}], "config": {"lanes": 1, "fontsize": 10, "vspace": 140}}
 ```
 
 |  Bits  |  Type  |  Reset  | Name         | Description                                                          |
 |:------:|:------:|:-------:|:-------------|:---------------------------------------------------------------------|
-| 31:12  |        |         |              | Reserved                                                             |
-|  11:0  |   rw   |   0x0   | LIBRARY_SIZE | Amount of reference pixels in memory to compare with captured pixel. |
+|  31:6  |        |         |              | Reserved                                                             |
+|  5:0   |   rw   |   0x0   | LIBRARY_SIZE | Amount of reference pixels in memory to compare with captured pixel. |
 
 ## PIXEL_BANDS
 Number of bands in each pixel
 - Offset: `0x8`
 - Reset default: `0x0`
-- Reset mask: `0xff`
+- Reset mask: `0x7f`
 
 ### Fields
 
 ```wavejson
-{"reg": [{"name": "PIXEL_BANDS", "bits": 8, "attr": ["rw"], "rotate": 0}, {"bits": 24}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
+{"reg": [{"name": "PIXEL_BANDS", "bits": 7, "attr": ["rw"], "rotate": 0}, {"bits": 25}], "config": {"lanes": 1, "fontsize": 10, "vspace": 80}}
 ```
 
 |  Bits  |  Type  |  Reset  | Name        | Description                    |
 |:------:|:------:|:-------:|:------------|:-------------------------------|
-|  31:8  |        |         |             | Reserved                       |
-|  7:0   |   rw   |   0x0   | PIXEL_BANDS | Number of bands in each pixel. |
+|  31:7  |        |         |             | Reserved                       |
+|  6:0   |   rw   |   0x0   | PIXEL_BANDS | Number of bands in each pixel. |
 
 ## CAPTURED_PIXEL_ADDR
 Address of the captured pixel in main memory
