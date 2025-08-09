@@ -5,45 +5,15 @@ description: Control register module for HSpecID-x accelerator
 filesets:
   rtl:
     files:
-      - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_reg_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_pkg.sv
       - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg_top.sv
-      - hw/src/hsid_x_ctrl_reg/rtl/hsid_x_ctrl_reg.sv
     file_type: systemVerilogSource
     depend:
-      - "uclm:hspecidx:hsid_pkg"
       - "pulp-platform.org::common_cells" # common_cells.core from deps
       - "uclm:hspecidx:register_interface" # register_interface.core in root
-
-  tb:
-    files:
-      - hw/src/hsid_x_ctrl_reg/tb/hsid_x_ctrl_reg_random.sv
-      - hw/src/hsid_x_ctrl_reg/tb/reg_inf_debug.sv
-      - hw/src/hsid_x_ctrl_reg/tb/ctrl_reg_tb_tasks.sv
-      - hw/src/hsid_x_ctrl_reg/tb/hsid_x_ctrl_reg_tb.sv
-    file_type: systemVerilogSource
-
-  tcl_modelsim:
-    files:
-      - hw/tcl/modelsim-do/hsid_x_ctrl_reg_debug.do
-    file_type: tclSource
 
 targets:
   default: &default
     filesets:
       - rtl
     toplevel: hsid_x_ctrl_reg
-
-  sim:
-    <<: *default
-    description: Simulate hsid with some random data
-    default_tool: xsim
-    filesets_append:
-      - tb
-      - tool_modelsim? (tcl_modelsim)
-    toplevel: hsid_x_ctrl_reg_tb
-    tools:
-      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
-        compilation_mode: common
-      modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
-        compilation_mode: common

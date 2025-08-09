@@ -2,7 +2,7 @@
 
 import hsid_pkg::*;
 
-module hsid_x_ctrl_reg #(
+module hsid_x_registers #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
@@ -22,7 +22,9 @@ module hsid_x_ctrl_reg #(
     input logic ready,
     input logic done,
     input logic error,
-    input logic interrupt,
+    input logic cancelled,
+
+    input logic interruption,
 
     output logic [HSP_LIBRARY_WIDTH-1:0] library_size,  // Size of the Hyperspectral pixel library
     output logic [HSP_BANDS_WIDTH-1:0] pixel_bands,  // Number of bands per hyperspectral pixel
@@ -43,45 +45,18 @@ module hsid_x_ctrl_reg #(
   // Block writing when HSpecID-X is activate
   // assign regbus_slave.write = regbus_slave.write && idle;
 
-  //
-
   hsid_x_ctrl_reg_top #(
     .reg_req_t(hsid_x_reg_pkg::reg_req_t),
     .reg_rsp_t(hsid_x_reg_pkg::reg_rsp_t)
   ) hsid_x_ctrl_reg_top (
     .clk_i(clk),
     .rst_ni(rst_n),
-
-    // Register interface (Request and response)
-    .reg_req_i(reg_req),
-    .reg_rsp_o(reg_rsp),
-
-    // Register to HW interface
-    .reg2hw(reg2hw),
-
-    // HW to register interface
-    .hw2reg(hw2reg),
-
+    .reg_req_i(reg_req), // Register interface (Request)
+    .reg_rsp_o(reg_rsp), // Register interface (Response)
+    .reg2hw(reg2hw), // Register to HW interface
+    .hw2reg(hw2reg), // HW to register interface
     .devmode_i(1'b0)  // Device mode, not used in this module
   );
-
-
-  // Using interface
-  // hsid_x_ctrl_reg_top_intf hsid_x_ctrl_reg_top_inst (
-  //   .clk_i(clk),
-  //   .rst_ni(rst_n),
-
-  //   // Register interface (Request and response)
-  //   .regbus_slave(regbus_slave),
-
-  //   // Register to HW interface
-  //   .reg2hw(reg2hw),
-
-  //   // HW to register interface
-  //   .hw2reg(hw2reg),
-
-  //   .devmode_i(1'b0)  // Device mode, not used in this module
-  // );
 
   // Register to HW interface (Output)
   assign start = reg2hw.status.start.q;
@@ -100,18 +75,20 @@ module hsid_x_ctrl_reg #(
   assign hw2reg.status.done.de = 1'b1;
   assign hw2reg.status.error.d = error;
   assign hw2reg.status.error.de = 1'b1;
+  assign hw2reg.status.cancelled.d = cancelled;
+  assign hw2reg.status.cancelled.de = 1'b1;
 
   assign hw2reg.mse_min_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_min_ref}; // Zero-extend to match width
-  assign hw2reg.mse_min_ref.de = interrupt;
+  assign hw2reg.mse_min_ref.de = interruption;
 
   assign hw2reg.mse_min_value.d = mse_min_value;
-  assign hw2reg.mse_min_value.de = interrupt;
+  assign hw2reg.mse_min_value.de = interruption;
 
   assign hw2reg.mse_max_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_max_ref}; // Zero-extend to match width
-  assign hw2reg.mse_max_ref.de = interrupt;
+  assign hw2reg.mse_max_ref.de = interruption;
 
   assign hw2reg.mse_max_value.d = mse_max_value;
-  assign hw2reg.mse_max_value.de = interrupt;
+  assign hw2reg.mse_max_value.de = interruption;
 
   // Software set start bit, and this bit is always cleared by hardware. It's only high for one clock cycle
   assign hw2reg.status.start.d  = 1'b0;

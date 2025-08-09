@@ -21,6 +21,7 @@ module hsid_x_top_fsm #(
     input logic clear,  // Clear signal to reset MSE values
     input logic error,  // Error flag
     input logic done,  // Idle signal indicating FSM is not processing
+    input logic cancelled,  // Cancel signal to stop reading from OBI
     output logic interrupt,  // Idle signal indicating FSM is not processing
 
     // OBI interface signals
@@ -30,8 +31,9 @@ module hsid_x_top_fsm #(
     input wire obi_done
   );
 
-  // Elements bands
-  logic [HSP_BANDS_WIDTH-1:0] cfg_hsp_bands;  // Number of pixel band packs
+  // Config registers
+  logic [WORD_WIDTH-1:0] cfg_captured_pixel_addr;  // Number of pixel band packs
+  logic [WORD_WIDTH-1:0] cfg_library_pixel_addr;  // Number of pixel band packs
   logic [HSP_LIBRARY_WIDTH-1:0] cfg_hsp_library_size;  // Size of the HSI library
   logic [HSP_BANDS_WIDTH-1:0] cfg_band_pack_threshold;
 
@@ -39,20 +41,15 @@ module hsid_x_top_fsm #(
   logic cancel_read;
 
   // Assignations
-  assign cancel_read = clear || error || done;
-  assign interrupt = done || error;  // Interrupt signal is high when done or error
+  assign cancel_read = clear || error;
+  assign interrupt = done || error || cancelled;  // Interrupt signal is high when done or error
 
   hsid_x_top_t current_state = HXT_IDLE, next_state = HXT_START_READ_CAPTURED;
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= HXT_IDLE;
-      cfg_hsp_bands <= '0;
-      cfg_hsp_library_size <= '0;
-      cfg_band_pack_threshold <= '0;
-      obi_initial_addr <= 0;
-      obi_limit_in <= 1;
-      obi_start <= 1'b0;
+      reset_values();
     end else begin
       current_state <= next_state;  // Update current state
       if (current_state == HXT_IDLE) begin
@@ -60,21 +57,24 @@ module hsid_x_top_fsm #(
         obi_limit_in <= 1;
         obi_start <= 1'b0;
       end else if (current_state == HXT_CONFIG) begin
-        cfg_hsp_bands <= hsp_bands;  // Set HSP bands to process
+        cfg_captured_pixel_addr <= captured_pixel_addr;
+        cfg_library_pixel_addr <= library_pixel_addr;
         cfg_hsp_library_size <= hsp_library_size;  // Set HSP library size
         cfg_band_pack_threshold <= (hsp_bands + 1) / 2;
       end else if (current_state == HXT_START_READ_CAPTURED) begin
-        obi_initial_addr <= captured_pixel_addr;
+        obi_initial_addr <= cfg_captured_pixel_addr;
         obi_limit_in <= { {(MEM_ACCESS_WIDTH-HSP_BANDS_WIDTH){1'b0}}, cfg_band_pack_threshold };
         obi_start <= 1'b1;
       end else if (current_state == HXT_READ_CAPTURED) begin
         obi_start <= 1'b0;
       end else if (current_state == HXT_START_READ_LIBRARY) begin
-        obi_initial_addr <= library_pixel_addr;
-        obi_limit_in <= cfg_band_pack_threshold * hsp_library_size;
+        obi_initial_addr <= cfg_library_pixel_addr;
+        obi_limit_in <= cfg_band_pack_threshold * cfg_hsp_library_size;
         obi_start <= 1'b1;
       end else if (current_state == HXT_READ_LIBRARY) begin
-        obi_start <= 1'b1;
+        obi_start <= 1'b0;
+      end else if (current_state == HXT_CLEAR) begin
+        reset_values();
       end
     end
   end
@@ -85,24 +85,38 @@ module hsid_x_top_fsm #(
         next_state = start ? HXT_CONFIG : HXT_IDLE;
       end
       HXT_CONFIG: begin
-        next_state = cancel_read ? HXT_IDLE : HXT_START_READ_CAPTURED;
+        next_state = cancel_read ? HXT_CLEAR : HXT_START_READ_CAPTURED;
       end
       HXT_START_READ_CAPTURED: begin
-        next_state = cancel_read ? HXT_IDLE : HXT_READ_CAPTURED;
+        next_state = cancel_read ? HXT_CLEAR : HXT_READ_CAPTURED;
       end
       HXT_READ_CAPTURED: begin
-        next_state = cancel_read ? HXT_IDLE : (obi_done ? HXT_START_READ_LIBRARY : HXT_READ_CAPTURED);
+        next_state = cancel_read ? HXT_CLEAR : (obi_done ? HXT_START_READ_LIBRARY : HXT_READ_CAPTURED);
       end
       HXT_START_READ_LIBRARY: begin
-        next_state = cancel_read ? HXT_IDLE : HXT_READ_LIBRARY;
+        next_state = cancel_read ? HXT_CLEAR : HXT_READ_LIBRARY;
       end
       HXT_READ_LIBRARY: begin
-        next_state = cancel_read ? HXT_IDLE : (obi_done ? HXT_IDLE : HXT_READ_LIBRARY);
+        next_state = cancel_read ? HXT_CLEAR : (obi_done ? HXT_IDLE : HXT_READ_LIBRARY);
+      end
+      HXT_CLEAR: begin
+        next_state = HXT_IDLE;
       end
       default: begin
         next_state = HXT_IDLE;
       end
     endcase
   end
+
+  task reset_values();
+    // Reset all internal values
+    cfg_captured_pixel_addr <= '0;
+    cfg_library_pixel_addr <= '0;
+    cfg_hsp_library_size <= '0;
+    cfg_band_pack_threshold <= '0;
+    obi_initial_addr <= 0;
+    obi_limit_in <= 1;
+    obi_start <= 1'b0;
+  endtask
 
 endmodule

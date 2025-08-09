@@ -1,10 +1,18 @@
-package ctrl_reg_tb_tasks;
+package registers_tb_tasks;
 
   import hsid_pkg::*;
   import hsid_x_ctrl_reg_pkg::*;
   import hsid_x_reg_pkg::*;
 
   localparam WORD_WIDTH = HSID_WORD_WIDTH;
+
+  const int STATUS_START     = 32'b0000001;
+  const int STATUS_IDLE      = 32'b0000010;
+  const int STATUS_READY     = 32'b0000100;
+  const int STATUS_DONE      = 32'b0001000;
+  const int STATUS_CLEAR     = 32'b0010000;
+  const int STATUS_ERROR     = 32'b0100000;
+  const int STATUS_CANCELLED = 32'b1000000;
 
   function [WORD_WIDTH-1:0] addr_reg(input hsid_x_ctrl_id_e ctrl_id);
     logic [BlockAw-1:0] addr;
@@ -38,10 +46,10 @@ package ctrl_reg_tb_tasks;
   endtask
 
   task assert_value(input logic [31:0] actual, input logic [31:0] expected, string message);
-    if (expected !== actual) begin
-      $error("ERROR: %s: expected 0x%0h, got 0x%0h", message, expected, actual);
-    end else begin
+    a_exp_var: assert (expected == actual) begin
       $display("PASS: %s passed: got %0d (0x%h)", message, actual, actual);
+    end else begin
+      $error("ERROR: %s: expected 0x%0h, got 0x%0h", message, expected, actual);
     end
   endtask
 

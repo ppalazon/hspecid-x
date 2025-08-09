@@ -9,22 +9,14 @@ filesets:
       - hw/src/hsid_x_top/rtl/hsid_x_top.sv
     file_type: systemVerilogSource
     depend:
-      - "uclm:hspecidx:hsid_main"
       - "uclm:hspecidx:hsid_x_ctrl_reg"
       - "uclm:hspecidx:hsid_x_obi_mem"
+      - "uclm:hspecidx:hsid_x_registers"
+      - "uclm:hspecidx:hsid_main"
 
   tb:
-    files:
-      # - hw/src/hsid_main/tb/hsid_main_tb_random.sv
-      - hw/src/hsid_x_ctrl_reg/tb/ctrl_reg_tb_tasks.sv
-      - hw/src/hsid_x_ctrl_reg/tb/reg_inf_debug.sv
-      - hw/src/hsid_x_obi_mem/tb/pixel_obi_mem.sv
-      - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
-      - hw/src/hsid_x_top/tb/hsid_x_top_random.sv
-      - hw/src/hsid_x_top/tb/hsid_x_top_tb.sv
-    file_type: systemVerilogSource
     depend:
-      - "uclm:hspecidx:hsid_test"
+      - "uclm:hspecidx:hsid_x_test"
 
   tcl_modelsim:
     files:

@@ -1,0 +1,31 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_x_test
+description: Testbench files for HSpecID-x accelerator
+
+filesets:
+  tb:
+    files:
+      - hw/src/hsid_x_registers/tb/reg_inf_debug.sv
+      - hw/src/hsid_x_registers/tb/registers_tb_tasks.sv
+      - hw/src/hsid_x_registers/tb/hsid_x_registers_random.sv
+      - hw/src/hsid_x_registers/tb/hsid_x_registers_tb.sv
+
+      - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
+      - hw/src/hsid_x_obi_mem/tb/pixel_obi_mem.sv
+      - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_random.sv
+      - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_tb.sv
+
+      - hw/src/hsid_x_top/tb/hsid_x_top_random.sv
+      - hw/src/hsid_x_top/tb/hsid_x_top_tb.sv
+    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_pkg"
+      - "uclm:hspecidx:hsid_x_ctrl_reg"
+      - "uclm:hspecidx:hsid_test"
+      - "pulp-platform.org::common_cells" # common_cells.core from deps
+      - "uclm:hspecidx:register_interface" # register_interface.core in root
+
+targets:
+  default: &default
+    filesets:
+      - tb

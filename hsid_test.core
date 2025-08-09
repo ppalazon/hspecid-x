@@ -1,6 +1,6 @@
 CAPI=2:
 name: uclm:hspecidx:hsid_test
-description: Testbench files for HSpecID-x accelerator
+description: Testbench files for HSpecID accelerator
 
 filesets:
   tb:

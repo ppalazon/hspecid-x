@@ -57,6 +57,13 @@
           "desc": "When this bit is set to one, HSpecID-X has detected an error during its operations. It will be set to 0 after software reads the register. Default: 0.",
           "swaccess": "ro",
           "hwaccess": "hrw"
+        },
+        {
+          "bits": "6",
+          "name": "CANCELLED",
+          "desc": "When this bit is set to one, user has clear HSpecID-X during its operations. It will be set to 0 after software reads the register. Default: 0.",
+          "swaccess": "ro",
+          "hwaccess": "hrw"
         }
       ],
       "swaccess": "ro",

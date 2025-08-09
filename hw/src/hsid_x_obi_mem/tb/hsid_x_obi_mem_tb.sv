@@ -20,6 +20,7 @@ module hsid_x_obi_mem_tb #(
   wire [WORD_WIDTH-1:0] data_out;
   reg [MEM_ACCESS_WIDTH-1:0] limit; // Limit for the number of requests
   reg random_gnt; // Random grant signal
+  reg clear;
   reg start;
   wire idle;
   wire ready;
@@ -38,6 +39,7 @@ module hsid_x_obi_mem_tb #(
     .data_out_valid(data_out_valid),
     .data_out(data_out),
     .start(start),
+    .clear(clear),
     .idle(idle),
     .ready(ready),
     .done(done)
@@ -88,35 +90,71 @@ module hsid_x_obi_mem_tb #(
     reads = 0;
     start = 0;
     limit = 0;
+    clear = 0;
     random_gnt = 0;
 
     #3 rst_n = 0; // Set reset
     #5 rst_n = 1; // Release reset
 
-    $display("Case 1: Read %0d addresses", TESTS);
+
     if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
     initial_addr = hsid_x_obi_mem_random.initial_addr;
     limit = hsid_x_obi_mem_random.requests;
+    $display("Case 1: Read %0d addresses from 0x%0h", limit, initial_addr);
     perform_reads();
 
     #10; // Wait for a clock cycle
 
-    $display("Case 2 Address Overflow: Read %0d addresses", TESTS);
     if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
     initial_addr = 32'hFFFFFFFF - (2 * (WORD_WIDTH / 8)); // Let 2 addresses before the maximum address
     limit = hsid_x_obi_mem_random.requests;
+    $display("Case 2: Address will overflow: Read %0d addresses from 0x%0h", limit, initial_addr);
     perform_reads();
 
     #10; // Wait for a clock cycle
 
-    $display("Case 3: Read %0d addresses with random grant", TESTS);
+
     if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
     initial_addr = hsid_x_obi_mem_random.initial_addr;
     limit = hsid_x_obi_mem_random.requests;
     random_gnt = 1; // Enable random grant signal
+    $display("Case 3: Read %0d addresses with random grant from 0x%0h", limit, initial_addr);
     perform_reads();
 
     #10;
+
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
+    initial_addr = hsid_x_obi_mem_random.initial_addr;
+    limit = hsid_x_obi_mem_random.requests;
+    random_gnt = 1; // Enable random grant signal
+    $display("Case 4: Read %0d addresses with clear just after start from 0x%0h", limit, initial_addr);
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+    start = 1; clear = 0;
+    #10;
+    assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
+    start = 0; clear = 1;
+    #10;
+    assert_dut_state(0, 0, 0); // Assert DUT is not idle, ready, and not done
+    start = 0; clear = 0;
+    #10;
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+
+
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
+    initial_addr = hsid_x_obi_mem_random.initial_addr;
+    limit = hsid_x_obi_mem_random.requests;
+    random_gnt = 1; // Enable random grant signal
+    $display("Case 5: Read %0d addresses with clear in the middle of reading", limit);
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+    start = 1; clear = 0;
+    #((limit/2) * 10); // Wait for half of the requests
+    assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
+    start = 0; clear = 1;
+    #10;
+    assert_dut_state(0, 0, 0); // Assert DUT is not idle, ready, and not done
+    start = 0; clear = 0;
+    #10;
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
 
     $finish;
   end
@@ -124,18 +162,18 @@ module hsid_x_obi_mem_tb #(
   always
     #5 clk = ! clk;
 
-  initial begin
-    #2000000; $finish; // End simulation after a long time to avoid hanging;
-  end
+  // initial begin
+  //   #2000000; $finish; // End simulation after a long time to avoid hanging;
+  // end
 
   task assert_dut_state(
       input logic expected_idle,
       input logic expected_ready,
       input logic expected_done
     );
-    assert(idle == expected_idle) else $error("ERROR: DUT idle state mismatch. Expected: %0d, Got: %0d", expected_idle, idle);
-    assert(ready == expected_ready) else $error("ERROR: DUT ready state mismatch. Expected: %0d, Got: %0d", expected_ready, ready);
-    assert(done == expected_done) else $error("ERROR: DUT done state mismatch. Expected: %0d, Got: %0d", expected_done, done);
+    a_idle_exp: assert(idle == expected_idle) else $error("ERROR: DUT idle state mismatch. Expected: %0d, Got: %0d", expected_idle, idle);
+    a_ready_exp: assert(ready == expected_ready) else $error("ERROR: DUT ready state mismatch. Expected: %0d, Got: %0d", expected_ready, ready);
+    a_done_exp: assert(done == expected_done) else $error("ERROR: DUT done state mismatch. Expected: %0d, Got: %0d", expected_done, done);
   endtask
 
   task perform_reads();
@@ -149,9 +187,7 @@ module hsid_x_obi_mem_tb #(
       assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
       if (data_out_valid) begin
         read_addr = initial_addr + (reads * (WORD_WIDTH / 8));
-        if (data_out == addr_value(read_addr)) begin
-          $display("PASS: %d Data received: 0x%h at address 0x%h", reads, data_out, read_addr);
-        end else begin
+        a_addr_data: assert (data_out == addr_value(read_addr)) else begin
           $error("ERROR: %d Incorrect data 0x%h at address 0x%h", reads, data_out, read_addr);
         end
         reads++;
@@ -159,7 +195,7 @@ module hsid_x_obi_mem_tb #(
       #10;
     end
     assert_dut_state(0, 0, 1); // Assert DUT is not idle, not ready, and done
-    assert(reads == requests) else $error("ERROR: Not all reads were successful");
+    a_finish_reads: assert(reads == requests) else $error("ERROR: Not all reads were successful");
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
   endtask

@@ -78,6 +78,7 @@ module hsid_x_ctrl_reg_top #(
   logic status_clear_wd;
   logic status_clear_we;
   logic status_error_qs;
+  logic status_cancelled_qs;
   logic [5:0] library_size_qs;
   logic [5:0] library_size_wd;
   logic library_size_we;
@@ -247,6 +248,31 @@ module hsid_x_ctrl_reg_top #(
 
     // to register interface (read)
     .qs     (status_error_qs)
+  );
+
+
+  //   F[cancelled]: 6:6
+  prim_subreg #(
+    .DW      (1),
+    .SWACCESS("RO"),
+    .RESVAL  (1'h0)
+  ) u_status_cancelled (
+    .clk_i   (clk_i    ),
+    .rst_ni  (rst_ni  ),
+
+    .we     (1'b0),
+    .wd     ('0  ),
+
+    // from internal hardware
+    .de     (hw2reg.status.cancelled.de),
+    .d      (hw2reg.status.cancelled.d ),
+
+    // to internal hardware
+    .qe     (),
+    .q      (reg2hw.status.cancelled.q ),
+
+    // to register interface (read)
+    .qs     (status_cancelled_qs)
   );
 
 
@@ -523,6 +549,7 @@ module hsid_x_ctrl_reg_top #(
         reg_rdata_next[3] = status_done_qs;
         reg_rdata_next[4] = status_clear_qs;
         reg_rdata_next[5] = status_error_qs;
+        reg_rdata_next[6] = status_cancelled_qs;
       end
 
       addr_hit[1]: begin

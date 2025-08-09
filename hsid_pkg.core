@@ -6,21 +6,11 @@ filesets:
   rtl:
     files:
       - hw/src/hsid_pkg/rtl/hsid_pkg.sv
-    file_type: systemVerilogSource
-
-  tb:
-    files:
-      - hw/src/hsid_pkg/tb/hsid_pkg_tb.sv
+      - hw/src/hsid_pkg/rtl/hsid_x_reg_pkg.sv
+      - hw/src/hsid_pkg/rtl/hsid_x_obi_inf_pkg.sv
     file_type: systemVerilogSource
 
 targets:
   default: &default
     filesets:
       - rtl
-
-  sim:
-    <<: *default
-    description: Simulate hsid with some random data
-    default_tool: xsim
-    filesets_append:
-      - tb

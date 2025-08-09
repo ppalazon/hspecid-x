@@ -54,7 +54,8 @@ module hsid_main_fsm #(
     output logic done,
     output logic idle,
     output logic ready,
-    output logic error
+    output logic error,
+    output logic cancelled
   );
 
   // Internal state machine states
@@ -78,7 +79,7 @@ module hsid_main_fsm #(
   assign fifo_captured_write_en = (current_state == HM_READ_HSP_CAPTURED && next_state == HM_READ_HSP_CAPTURED && band_data_in_valid); //&& cap_band_pack_count < cfg_band_pack_threshold);
   assign fifo_captured_data_in = current_state == HM_READ_HSP_CAPTURED ? band_data_in : '0; //(state == COMPUTE_MSE ? fifo_measure_data_out : '0);
   assign fifo_ref_write_en = (current_state == HM_COMPUTE_MSE && next_state == HM_COMPUTE_MSE && band_data_in_valid);
-  assign initialize = (current_state == HM_CLEAR || current_state == HM_DONE || current_state == HM_ERROR);
+  assign initialize = (current_state == HM_DONE || current_state == HM_ERROR);
 
   // Check measure vector FIFO status
 
@@ -86,7 +87,6 @@ module hsid_main_fsm #(
     if (!rst_n) begin
       current_state <= HM_IDLE;  // Reset to IDLE state
       reset_values();
-      // initialize <= 0;
     end else begin
       current_state <= next_state;  // Transition to next state
       if (current_state == HM_CLEAR || current_state == HM_DONE || current_state == HM_ERROR) begin
@@ -100,7 +100,6 @@ module hsid_main_fsm #(
         //     cap_band_pack_count <= cap_band_pack_count + 1;
         //   end
       end else begin
-        // initialize <= 0;
         band_pack_valid <= fifo_both_read_en; // After read from both FIFOs, set band_pack_valid
         // finished_library <= hsp_ref_last & band_pack_last;
         if (band_pack_valid) begin
@@ -120,43 +119,43 @@ module hsid_main_fsm #(
   always_comb begin
     case (current_state)
       HM_IDLE: begin
-        idle = 1; ready = 0; done = 0; error = 0;
-        next_state = start ? HM_CONFIG : HM_IDLE;
+        idle = 1; ready = 0; done = 0; error = 0; cancelled = 0;
+        next_state = !clear && start ? HM_CONFIG : HM_IDLE; // Give priority to clear signal
       end
       HM_CLEAR: begin
-        idle = 0; ready = 0; done = 0; error = 0;
+        idle = 0; ready = 0; done = 0; error = 0; cancelled = 1;
         next_state = HM_IDLE;  // Transition to IDLE after clearing
       end
       HM_CONFIG: begin
-        idle = 0; ready = 0; done = 0; error = 0;
+        idle = 0; ready = 0; done = 0; error = 0; cancelled = 0;
         next_state = clear ? HM_CLEAR : (cfg_fail ? HM_ERROR : HM_READ_HSP_CAPTURED);
       end
       HM_ERROR: begin
-        idle = 0; ready = 0; done = 0; error = 1;  // Error state, no further processing
+        idle = 0; ready = 0; done = 0; error = 1; cancelled = 0;  // Error state, no further processing
         next_state = HM_IDLE;  // Stay in error state until cleared
       end
       HM_READ_HSP_CAPTURED: begin
-        idle = 0; ready = 1; done = 0; error = 0;
+        idle = 0; ready = 1; done = 0; error = 0; cancelled = 0;
         next_state = clear ? HM_CLEAR : (fifo_captured_complete ? HM_COMPUTE_MSE : HM_READ_HSP_CAPTURED);
       end
       HM_COMPUTE_MSE: begin
-        idle = 0; ready = !fifo_ref_full; done = 0; error = 0;
+        idle = 0; ready = !fifo_ref_full; done = 0; error = 0; cancelled = 0;
         next_state = clear ? HM_CLEAR : (hsp_ref_last & band_pack_last ? HM_WAIT_MSE : HM_COMPUTE_MSE);
       end
       HM_WAIT_MSE: begin
-        idle = 0; ready = 0; done = 0; error = 0;
+        idle = 0; ready = 0; done = 0; error = 0; cancelled = 0;
         next_state = clear ? HM_CLEAR : (mse_valid && mse_ref == cfg_hsp_library_size - 1 ? HM_COMPARE_MSE : HM_WAIT_MSE);
       end
       HM_COMPARE_MSE: begin
-        idle = 0; ready = 0; done = 0; error = 0;
+        idle = 0; ready = 0; done = 0; error = 0; cancelled = 0;
         next_state = clear ? HM_CLEAR : (mse_comparison_valid ? HM_DONE : HM_COMPARE_MSE);
       end
       HM_DONE: begin
-        idle = 0; ready = 0; done = 1; error = 0;
+        idle = 0; ready = 0; done = 1; error = 0; cancelled = 0;
         next_state = HM_IDLE;
       end
       default: begin
-        idle = 1; ready = 0; done = 0; error = 0;
+        idle = 1; ready = 0; done = 0; error = 0; cancelled = 0;
         next_state = HM_IDLE;
       end
     endcase
@@ -172,7 +171,6 @@ module hsid_main_fsm #(
       cfg_band_pack_threshold <= {{HSP_BANDS_WIDTH{1'b1}}};  // Max value for threshold to avoid false captured FIFO complete
       cfg_hsp_library_size <= {{HSP_LIBRARY_WIDTH{1'b1}}}; // Max value for library size to avoid false last hsp
       cfg_hsp_bands <= {{HSP_BANDS_WIDTH{1'b1}}}; // Max value for HSP bands to avoid false last hsp bands
-      // initialize <= 1;
     end
   endtask
 

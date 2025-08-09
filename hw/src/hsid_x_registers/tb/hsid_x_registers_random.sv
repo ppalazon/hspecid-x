@@ -2,7 +2,7 @@
 
 import hsid_pkg::*;
 
-class HsidXCtrlRegRandom #(
+class HsidXRegistersRandom #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
@@ -22,6 +22,7 @@ class HsidXCtrlRegRandom #(
   rand logic idle;
   rand logic done;
   rand logic error;
+  rand logic cancelled;
   rand logic interrupt;
 
   rand logic [HSP_LIBRARY_WIDTH-1:0] mse_min_ref;

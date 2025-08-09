@@ -1,14 +1,15 @@
 CAPI=2:
-name: uclm:hspecidx:hsid_x_obi_mem
-description: OBI Manager to request pixels from memory for HSpecID-x accelerator
+name: uclm:hspecidx:hsid_x_registers
+description: Registers module to bridge with Control Register interface for HSpecID-x accelerator
 
 filesets:
   rtl:
     files:
-      - hw/src/hsid_x_obi_mem/rtl/hsid_x_obi_mem.sv
+      - hw/src/hsid_x_registers/rtl/hsid_x_registers.sv
     file_type: systemVerilogSource
     depend:
       - "uclm:hspecidx:hsid_pkg"
+      - "uclm:hspecidx:hsid_x_ctrl_reg"
 
   tb:
     depend:
@@ -16,14 +17,14 @@ filesets:
 
   tcl_modelsim:
     files:
-      - hw/tcl/modelsim-do/hsid_x_obi_mem_debug.do
+      - hw/tcl/modelsim-do/hsid_x_registers_debug.do
     file_type: tclSource
 
 targets:
   default: &default
     filesets:
       - rtl
-    toplevel: hsid_x_obi_mem
+    toplevel: hsid_x_registers
 
   sim:
     <<: *default
@@ -32,7 +33,7 @@ targets:
     filesets_append:
       - tb
       - tool_modelsim? (tcl_modelsim)
-    toplevel: hsid_x_obi_mem_tb
+    toplevel: hsid_x_registers_tb
     tools:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common

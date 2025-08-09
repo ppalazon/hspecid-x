@@ -2,11 +2,11 @@
 
 import hsid_pkg::*;
 import hsid_x_ctrl_reg_pkg::*;
-import ctrl_reg_tb_tasks::*;
+import registers_tb_tasks::*;
 
 `include "register_interface/typedef.svh"
 
-module hsid_x_ctrl_reg_tb #(
+module hsid_x_registers_tb #(
     parameter int WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Address width for HSI library size
@@ -24,7 +24,8 @@ module hsid_x_ctrl_reg_tb #(
   reg done;
   reg error;
   reg ready;
-  reg interrupt;
+  reg cancelled;
+  reg interruption;
   wire [HSP_LIBRARY_WIDTH-1:0] library_size;
   wire [HSP_BANDS_WIDTH-1:0] pixel_bands;
   wire [WORD_WIDTH-1:0] captured_pixel_addr;
@@ -57,7 +58,7 @@ module hsid_x_ctrl_reg_tb #(
   hsid_x_reg_pkg::reg_req_t reg_req;
   hsid_x_reg_pkg::reg_rsp_t reg_rsp;
 
-  hsid_x_ctrl_reg #(
+  hsid_x_registers #(
     .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
@@ -73,7 +74,8 @@ module hsid_x_ctrl_reg_tb #(
     .ready(ready),
     .done(done),
     .error(error),
-    .interrupt(interrupt),
+    .cancelled(cancelled),
+    .interruption(interruption),
     .library_size(library_size),
     .pixel_bands(pixel_bands),
     .captured_pixel_addr(captured_pixel_addr),
@@ -93,7 +95,7 @@ module hsid_x_ctrl_reg_tb #(
   );
 
   // Constrainted random values for the test
-  HsidXCtrlRegRandom #(
+  HsidXRegistersRandom #(
     .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
@@ -106,7 +108,7 @@ module hsid_x_ctrl_reg_tb #(
     coverpoint done iff (reg_req.addr == HSID_X_CTRL_STATUS_OFFSET && reg_req.write == 0);
     coverpoint error iff (reg_req.addr == HSID_X_CTRL_STATUS_OFFSET && reg_req.write == 0);
 
-    coverpoint interrupt;
+    coverpoint interruption;
 
     coverpoint start iff (reg_req.addr == HSID_X_CTRL_STATUS_OFFSET && reg_req.write == 1);
     coverpoint clear iff (reg_req.addr == HSID_X_CTRL_STATUS_OFFSET && reg_req.write == 1);
@@ -160,7 +162,7 @@ module hsid_x_ctrl_reg_tb #(
   // Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
-    $dumpvars(0, hsid_x_ctrl_reg_tb);
+    $dumpvars(0, hsid_x_registers_tb);
   end
 
   initial begin
@@ -170,11 +172,12 @@ module hsid_x_ctrl_reg_tb #(
     ready = 0;
     done = 0;
     error = 0;
+    cancelled = 0;
     mse_min_ref = 0;
     mse_min_value = 0;
     mse_max_ref = 0;
     mse_max_value = 0;
-    interrupt = 0;
+    interruption = 0;
 
     // Initialize the register interface request
     // regbus_slave.valid = 0;
@@ -195,7 +198,7 @@ module hsid_x_ctrl_reg_tb #(
 
     data_in = 32'hFFFFFFFF;
     write_reg(reg_req, HSID_X_CTRL_LIBRARY_SIZE, data_in);
-    assert_value(library_size_w, 2 ** HSP_LIBRARY_WIDTH - 1, "Library size limited to 13 bits");
+    assert_value(library_size_w, MAX_HSP_LIBRARY, "Library size limited to 13 bits");
 
     // Writing pixel bands
     data_in = 5;
@@ -204,7 +207,7 @@ module hsid_x_ctrl_reg_tb #(
 
     data_in = 32'hFFFFFFFF;
     write_reg(reg_req, HSID_X_CTRL_PIXEL_BANDS, data_in);
-    assert_value(pixel_bands_w, 2 ** HSP_BANDS_WIDTH - 1, "Pixel bands limited to 9 bits");
+    assert_value(pixel_bands_w, MAX_HSP_BANDS, "Pixel bands limited to 9 bits");
 
     // Writing captured pixel addr
     data_in = 32'h12345678;
@@ -223,7 +226,7 @@ module hsid_x_ctrl_reg_tb #(
     assert_read_reg(HSID_X_CTRL_LIBRARY_PIXEL_ADDR, library_pixel_addr);
 
     $display("Case 3: Status register - start and clear");
-    data_in = 32'b000001; // Start (bit 0)
+    data_in = STATUS_START; // Start (bit 0)
     write_reg(reg_req, HSID_X_CTRL_STATUS, data_in);
     assert_value(start_w, 1, "Start signal");
     assert_value(clear_w, 0, "Clear signal");
@@ -232,7 +235,7 @@ module hsid_x_ctrl_reg_tb #(
     assert_value(start_w, 0, "Start signal after one clock cycle");
     assert_value(clear_w, 0, "Clear signal after one clock cycle");
 
-    data_in = 32'b010000; // Clear (bit 4)
+    data_in = STATUS_CLEAR; // Clear (bit 4)
     write_reg(reg_req, HSID_X_CTRL_STATUS, data_in);
     assert_value(start_w, 0, "Start signal");
     assert_value(clear_w, 1, "Clear signal");
@@ -241,7 +244,7 @@ module hsid_x_ctrl_reg_tb #(
     assert_value(start_w, 0, "Start signal after one clock cycle");
     assert_value(clear_w, 0, "Clear signal after one clock cycle");
 
-    data_in = 32'b010001; // Start & Clear (bit 0 y 4)
+    data_in = STATUS_CLEAR | STATUS_START; // Start & Clear (bit 0 y 4)
     write_reg(reg_req, HSID_X_CTRL_STATUS, data_in);
     assert_value(start_w, 1, "Start signal");
     assert_value(clear_w, 1, "Clear signal");
@@ -258,15 +261,15 @@ module hsid_x_ctrl_reg_tb #(
     #10;
 
     $display("Case 4: Hardware wire status and reading bus");
-    interrupt = 1; // Simulate an interrupt
+    interruption = 1; // Simulate an interrupt
     idle = 1; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b000010);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
     ready = 1; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b000110);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE | STATUS_READY);
     done = 1; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b001110);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE | STATUS_READY | STATUS_DONE);
     error = 1; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b101110);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE | STATUS_READY | STATUS_DONE | STATUS_ERROR);
 
     // Set start again
     data_in = 32'b000001; // Start (bit 0)
@@ -275,19 +278,20 @@ module hsid_x_ctrl_reg_tb #(
     assert_value(clear_w, 0, "Clear signal");
 
     idle = 0; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b101100);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_READY | STATUS_DONE | STATUS_ERROR);
     ready = 0; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b101000);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE | STATUS_ERROR);
     done = 0; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b100000);
+    assert_read_reg(HSID_X_CTRL_STATUS, STATUS_ERROR);
     error = 0; #10;
-    assert_read_reg(HSID_X_CTRL_STATUS, 32'b000000);
+    assert_read_reg(HSID_X_CTRL_STATUS, '0);
 
     $display("Case 5: Reading outputs");
-    mse_max_ref = $urandom() % (2**HSP_LIBRARY_WIDTH);
-    mse_max_value = $urandom();
-    mse_min_ref = $urandom() % (2**HSP_LIBRARY_WIDTH);
-    mse_min_value = $urandom();
+    if(!hsid_x_ctrl_reg_random.randomize()) $fatal(0, "Randomization failed");
+    mse_max_ref = hsid_x_ctrl_reg_random.mse_max_ref;
+    mse_max_value = hsid_x_ctrl_reg_random.mse_max_value;
+    mse_min_ref = hsid_x_ctrl_reg_random.mse_min_ref;
+    mse_min_value = hsid_x_ctrl_reg_random.mse_min_value;
     #10;
 
     assert_read_reg(HSID_X_CTRL_MSE_MAX_REF, mse_max_ref_w);
@@ -303,23 +307,24 @@ module hsid_x_ctrl_reg_tb #(
       ready = hsid_x_ctrl_reg_random.ready;
       done = hsid_x_ctrl_reg_random.done;
       error = hsid_x_ctrl_reg_random.error;
-      interrupt = hsid_x_ctrl_reg_random.interrupt;
+      cancelled = hsid_x_ctrl_reg_random.cancelled;
+      interruption = hsid_x_ctrl_reg_random.interrupt;
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, {{26'b0},{error,1'b0,done,ready,idle, 1'b0}});
+      assert_read_reg(HSID_X_CTRL_STATUS, {{25'b0},{cancelled,error,1'b0,done,ready,idle, 1'b0}});
 
       // Set start and clear again
-      data_in = {{26'b0},{1'b0,hsid_x_ctrl_reg_random.clear,1'b0, 1'b0, 1'b0, hsid_x_ctrl_reg_random.start}};
+      data_in = {{25'b0},{1'b0,1'b0,hsid_x_ctrl_reg_random.clear,1'b0, 1'b0, 1'b0, hsid_x_ctrl_reg_random.start}};
       write_reg(reg_req, HSID_X_CTRL_STATUS, data_in);
-      assert_value(start_w, hsid_x_ctrl_reg_random.start, "Start signal");
-      assert_value(clear_w, hsid_x_ctrl_reg_random.clear, "Clear signal");
+      assert_value(start_w, {{31{1'b0}}, hsid_x_ctrl_reg_random.start}, "Start signal");
+      assert_value(clear_w, {{31{1'b0}}, hsid_x_ctrl_reg_random.clear}, "Clear signal");
 
       data_in = {{(WORD_WIDTH-HSP_BANDS_WIDTH){1'b0}}, hsid_x_ctrl_reg_random.hsp_bands};
       write_reg(reg_req, HSID_X_CTRL_PIXEL_BANDS, data_in);
-      assert_value(pixel_bands_w, hsid_x_ctrl_reg_random.hsp_bands, "Pixel bands after random write");
+      assert_value(pixel_bands_w, {{(WORD_WIDTH-HSP_BANDS_WIDTH){1'b0}}, hsid_x_ctrl_reg_random.hsp_bands}, "Pixel bands after random write");
 
       data_in = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, hsid_x_ctrl_reg_random.hsp_library_size};
       write_reg(reg_req, HSID_X_CTRL_LIBRARY_SIZE, data_in);
-      assert_value(library_size_w, hsid_x_ctrl_reg_random.hsp_library_size, "Library size after random write");
+      assert_value(library_size_w, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, hsid_x_ctrl_reg_random.hsp_library_size}, "Library size after random write");
 
       data_in = hsid_x_ctrl_reg_random.captured_pixel_addr;
       write_reg(reg_req, HSID_X_CTRL_CAPTURED_PIXEL_ADDR, data_in);
@@ -335,7 +340,7 @@ module hsid_x_ctrl_reg_tb #(
       mse_max_ref = hsid_x_ctrl_reg_random.mse_max_ref;
       mse_max_value = hsid_x_ctrl_reg_random.mse_max_value;
       #10;
-      if (interrupt) begin
+      if (interruption) begin
         assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_min_ref});
         assert_read_reg(HSID_X_CTRL_MSE_MIN_VALUE, mse_min_value);
         assert_read_reg(HSID_X_CTRL_MSE_MAX_REF, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_max_ref});

@@ -44,6 +44,7 @@ module hsid_main_fsm_sva #(
     input logic idle,
     input logic ready,
     input logic error,
+    input logic cancelled,
 
     // Internal signals for verification
     input hsid_main_state_t current_state, next_state,
@@ -72,7 +73,7 @@ module hsid_main_fsm_sva #(
 
   // Initilize is only high for one clock cycle after start
   property initialize_high_on_done;
-    @(posedge clk) disable iff (!rst_n) current_state == HM_DONE || current_state == HM_CLEAR || current_state == HM_ERROR |-> initialize ##1 !initialize;
+    @(posedge clk) disable iff (!rst_n) current_state == HM_DONE || current_state == HM_ERROR |-> initialize ##1 !initialize;
   endproperty
   assert property (initialize_high_on_done) else $error("Initialize signal is not high for one clock cycle after start");
   cover property (initialize_high_on_done); // $display("Checked: Initialize signal is high for one clock cycle after start");
@@ -250,5 +251,13 @@ module hsid_main_fsm_sva #(
   endproperty
   assert property (clear_on_wait_mse) else $error("State is not MAIN_CLEAR after clear on wait MSE");
   cover property (clear_on_wait_mse); // $display("Checked: State is MAIN_CLEAR after clear on wait MSE");
+
+  // Cancelled signal should be high when clear is high
+  property cancelled_signal_on_clear;
+    @(posedge clk) disable iff (!rst_n) current_state == HM_CLEAR |-> cancelled ##1 !cancelled;
+  endproperty
+
+  assert property (cancelled_signal_on_clear) else $error("Cancelled signal is not high when it's on clear status and only for one clock cycle");
+  cover property (cancelled_signal_on_clear); // $display("Checked: Cancelled signal is not high when it's on clear status and only for one clock cycle");
 
 endmodule

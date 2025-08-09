@@ -36,7 +36,8 @@ module hsid_main #(
     output logic done,
     output logic idle,
     output logic ready,
-    output logic error
+    output logic error,
+    output logic cancelled
   );
 
   // wire hsid_main_state_t state;
@@ -97,7 +98,8 @@ module hsid_main #(
     .done(done),
     .idle(idle),
     .ready(ready),
-    .error(error)
+    .error(error),
+    .cancelled(cancelled)
   );
 
   hsid_mse #(
@@ -110,7 +112,7 @@ module hsid_main #(
   ) mse (
     .clk(clk),
     .rst_n(rst_n),
-    .clear(initialize),
+    .clear(clear || initialize),
     .band_pack_start(band_pack_start),
     .band_pack_last(band_pack_last),
     .hsp_ref(hsp_ref),
@@ -134,7 +136,7 @@ module hsid_main #(
     .mse_in_of(acc_of),
     .mse_in_value(mse_out),
     .mse_in_ref(mse_ref),
-    .clear(initialize),
+    .clear(clear || initialize),
     .mse_min_value(mse_min_value),
     .mse_min_ref(mse_min_ref),
     .mse_min_changed(),
@@ -159,7 +161,7 @@ module hsid_main #(
     .full(),
     .almost_full(fifo_captured_complete),
     .empty(fifo_captured_empty),
-    .clear(initialize)
+    .clear(clear || initialize)
   );
 
   hsid_fifo #(
@@ -177,7 +179,7 @@ module hsid_main #(
     .full(fifo_ref_full),
     .almost_full(),
     .empty(fifo_ref_empty),
-    .clear(initialize)
+    .clear(clear || initialize)
   );
 
 endmodule

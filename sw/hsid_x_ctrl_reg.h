@@ -17,6 +17,7 @@ extern "C" {
 #define HSID_X_CTRL_STATUS_DONE_BIT 3
 #define HSID_X_CTRL_STATUS_CLEAR_BIT 4
 #define HSID_X_CTRL_STATUS_ERROR_BIT 5
+#define HSID_X_CTRL_STATUS_CANCELLED_BIT 6
 
 // Amount of reference pixels in memory to compare with captured pixel
 #define HSID_X_CTRL_LIBRARY_SIZE_REG_OFFSET 0x4

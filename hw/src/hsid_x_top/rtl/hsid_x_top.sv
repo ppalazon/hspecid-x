@@ -33,6 +33,7 @@ module hsid_x_top #(
   wire ready;
   wire done;
   wire error;
+  wire cancelled;
 
   wire [HSP_LIBRARY_WIDTH-1:0] library_size;
   wire [HSP_BANDS_WIDTH-1:0] pixel_bands;
@@ -70,12 +71,13 @@ module hsid_x_top #(
     .obi_start(obi_start),
     .obi_done(obi_done),
     .error(error),
+    .cancelled(cancelled),
     .done(done),
     .interrupt(hsid_x_int_o)
   );
 
   // Register interface to hardware interface
-  hsid_x_ctrl_reg #(
+  hsid_x_registers #(
     .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
@@ -90,7 +92,8 @@ module hsid_x_top #(
     .ready(ready),
     .done(done),
     .error(error),
-    .interrupt(hsid_x_int_o),
+    .cancelled(cancelled),
+    .interruption(hsid_x_int_o),
     .library_size(library_size),
     .pixel_bands(pixel_bands),
     .captured_pixel_addr(captured_pixel_addr),
@@ -117,7 +120,8 @@ module hsid_x_top #(
     .obi_rsp(obi_rsp_i),
     .ready(),
     .rst_n(rst_n),
-    .start(obi_start)
+    .start(obi_start),
+    .clear(clear)
   );
 
   // HSID Main module instantiation
@@ -145,7 +149,8 @@ module hsid_x_top #(
     .start(start),
     .ready(ready),
     .done(done),
-    .error(error)
+    .error(error),
+    .cancelled(cancelled)
   );
 
 endmodule

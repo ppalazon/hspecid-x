@@ -32,6 +32,9 @@ package hsid_x_ctrl_reg_pkg;
     struct packed {
       logic        q;
     } error;
+    struct packed {
+      logic        q;
+    } cancelled;
   } hsid_x_ctrl_reg2hw_status_reg_t;
 
   typedef struct packed {
@@ -91,6 +94,10 @@ package hsid_x_ctrl_reg_pkg;
       logic        d;
       logic        de;
     } error;
+    struct packed {
+      logic        d;
+      logic        de;
+    } cancelled;
   } hsid_x_ctrl_hw2reg_status_reg_t;
 
   typedef struct packed {
@@ -115,7 +122,7 @@ package hsid_x_ctrl_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    hsid_x_ctrl_reg2hw_status_reg_t status; // [210:205]
+    hsid_x_ctrl_reg2hw_status_reg_t status; // [211:205]
     hsid_x_ctrl_reg2hw_library_size_reg_t library_size; // [204:199]
     hsid_x_ctrl_reg2hw_pixel_bands_reg_t pixel_bands; // [198:192]
     hsid_x_ctrl_reg2hw_captured_pixel_addr_reg_t captured_pixel_addr; // [191:160]
@@ -128,7 +135,7 @@ package hsid_x_ctrl_reg_pkg;
 
   // HW -> register type
   typedef struct packed {
-    hsid_x_ctrl_hw2reg_status_reg_t status; // [143:132]
+    hsid_x_ctrl_hw2reg_status_reg_t status; // [145:132]
     hsid_x_ctrl_hw2reg_mse_min_ref_reg_t mse_min_ref; // [131:99]
     hsid_x_ctrl_hw2reg_mse_max_ref_reg_t mse_max_ref; // [98:66]
     hsid_x_ctrl_hw2reg_mse_min_value_reg_t mse_min_value; // [65:33]

@@ -34,6 +34,7 @@ module hsid_main_tb #(
   wire idle;
   wire ready;
   wire error;
+  wire cancelled;
 
   // DUT instantiation
   hsid_main #(
@@ -58,7 +59,8 @@ module hsid_main_tb #(
     .done(done),
     .idle(idle),
     .ready(ready),
-    .error(error)
+    .error(error),
+    .cancelled(cancelled)
   );
 
   // Constraint randomization for the HSI vector
