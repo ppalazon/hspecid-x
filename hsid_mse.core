@@ -12,12 +12,8 @@ filesets:
       - "uclm:hspecidx:hsid_sq_df_acc" # sq_df_acc.core
 
   tb:
-    files:
-      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_random.sv
-      - hw/src/hsid_mse/tb/hsid_mse_sva.sv
-      - hw/src/hsid_mse/tb/hsid_mse_random.sv
-      - hw/src/hsid_mse/tb/hsid_mse_tb.sv
-    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_test"
 
   tcl_modelsim:
     files:

@@ -136,6 +136,12 @@ module hsid_mse_tb #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut_sva (.*);
 
+  bind hsid_sq_df_acc hsid_sq_df_acc_sva #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
+  ) hsid_sq_df_acc_sva_inst (.*);
+
   // Test vectors
   int mse_order = 0;
   int hsp_band_packs = 0;
