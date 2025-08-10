@@ -74,10 +74,10 @@ module hsid_x_top_tb #(
   );
 
   // Connect test memory on the OBI bus
-  pixel_obi_mem #(
+  hsp_obi_mem #(
     .DATA_WIDTH(DATA_WIDTH),
     .VALUE_MASK(TEST_MEM_MASK)
-  ) u_pixel_obi_mem (
+  ) hsp_obi_mem_inst (
     .clk(clk),
     .rst_n(rst_n),
     .obi_req(obi_req),
@@ -303,8 +303,6 @@ module hsid_x_top_tb #(
       write_reg(reg_req, HSID_X_CTRL_STATUS, STATUS_START);
 
       #10; // Wait a cycle to allow the FSMs getting configured values
-
-      // While the processing is ongoing, modify the registers except clear, all of them
 
       wait_and_reg: fork
 

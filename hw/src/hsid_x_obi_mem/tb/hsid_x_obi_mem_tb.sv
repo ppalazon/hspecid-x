@@ -46,10 +46,10 @@ module hsid_x_obi_mem_tb #(
   );
 
   // Instantiate a memory OBI subordinate for testing
-  pixel_obi_mem #(
+  hsp_obi_mem #(
     .DATA_WIDTH(DATA_WIDTH), // Data width for the pixel memory
     .VALUE_MASK(VALUE_MASK) // Mask to return least significant 14 bits of the address
-  ) pixel_obi_mem (
+  ) hsp_obi_mem_inst (
     .clk(clk),
     .rst_n(rst_n),
     .obi_req(obi_req),

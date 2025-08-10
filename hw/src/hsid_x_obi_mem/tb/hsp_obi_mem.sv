@@ -2,7 +2,7 @@
 
 import hsid_pkg::*;
 
-module pixel_obi_mem #(
+module hsp_obi_mem #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Pixel data width
     parameter VALUE_MASK = 32'h00003FFF // Mask to return least significant 14 bits of the address

@@ -14,7 +14,7 @@ set WildcardFilter "Variable Constant Generic Parameter SpecParam Memory Asserti
 vsim -assertdebug -coverage -cvgperinstance +nowarnTFMPC $top_opt -msgmode both
 add wave -group "DUT" /$top/dut/*
 add wave -group "OBI Bus" /$top/obi_bus_debug/*
-add wave -group "Pixel Memory" /$top/pixel_obi_mem/*
+add wave -group "HSP Memory" /$top/hsp_obi_mem_inst/*
 
 view cover
 view assertion
