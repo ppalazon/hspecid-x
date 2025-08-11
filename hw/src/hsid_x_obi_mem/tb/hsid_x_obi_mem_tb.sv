@@ -7,8 +7,10 @@ module hsid_x_obi_mem_tb #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for the pixel memory
     parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH, // Address width for HSI library size
-    parameter VALUE_MASK = 32'h0000FFFF // Mask to return least significant 16 bits of the address
+    parameter VALUE_MASK = 32'h00003FFF // Mask to return least significant 16 bits of the address
   ) ();
+
+  localparam MAX_MEM_ACCESS = {MEM_ACCESS_WIDTH{1'b1}};
 
   reg clk;
   reg rst_n;
@@ -56,7 +58,7 @@ module hsid_x_obi_mem_tb #(
     .obi_req(obi_req),
     .obi_rsp(obi_rsp),
     .random_gnt(random_gnt),
-    .def_gnt(def_gnt) // Default grant signal, can be set to 1'b1 for fixed grant
+    .def_gnt(def_gnt)
   );
 
   // Module to debug the OBI bus
@@ -72,6 +74,30 @@ module hsid_x_obi_mem_tb #(
     .WORD_WIDTH(WORD_WIDTH),
     .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
   ) hsid_x_obi_mem_random = new();
+
+  // Coverage group for OBI memory
+  covergroup hsid_x_obi_mem_cg @(posedge clk);
+    coverpoint idle;
+    coverpoint ready;
+    coverpoint done;
+    coverpoint start iff (idle);
+    coverpoint clear iff (idle);
+    coverpoint initial_addr iff (!idle && !ready && !done) { // On init state
+      bins addr_low  = { [32'h0000_0000 : 32'h5555_5554] }; // 0 .. 0x5555_5554
+      bins addr_mid  = { [32'h5555_5555 : 32'hAAAA_AAA9] }; // 0x5555_5555 .. 0xAAAA_AAA9
+      bins addr_high = { [32'hAAAA_AAAA : 32'hFFFF_FFFF] }; // 0xAAAA_AAAA .. 0xFFFF_FFFF
+    }
+    coverpoint limit iff (!idle && !ready && !done) { // On init state
+      bins zero = {0};
+      bins max = {MAX_MEM_ACCESS};
+      bins mid = {[1:MAX_MEM_ACCESS-1]};
+    }
+    coverpoint data_out_valid;
+
+    start_clear: cross start, clear iff (idle);
+  endgroup
+
+  hsid_x_obi_mem_cg hsid_x_obi_mem_cov = new;
 
   `ifdef MODEL_TECH
   // Binding SVA modules
@@ -123,12 +149,18 @@ module hsid_x_obi_mem_tb #(
 
     #10; // Wait for a clock cycle
 
-
     if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
     initial_addr = hsid_x_obi_mem_random.initial_addr;
     limit = hsid_x_obi_mem_random.requests;
     random_gnt = 1; // Enable random grant signal
     $display("Case 3: Read %0d addresses with random grant from 0x%0h", limit, initial_addr);
+    perform_reads();
+
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
+    initial_addr = hsid_x_obi_mem_random.initial_addr;
+    limit = MAX_MEM_ACCESS;
+    random_gnt = 1; // Enable random grant signal
+    $display("Case 4: Read %0d (Maximum) addresses with random grant from 0x%0h", limit, initial_addr);
     perform_reads();
 
     #10;
@@ -137,14 +169,14 @@ module hsid_x_obi_mem_tb #(
     initial_addr = hsid_x_obi_mem_random.initial_addr;
     limit = hsid_x_obi_mem_random.requests;
     random_gnt = 1; // Enable random grant signal
-    $display("Case 4: Read %0d addresses with clear just after start from 0x%0h", limit, initial_addr);
+    $display("Case 5: Read %0d addresses with clear just after start from 0x%0h", limit, initial_addr);
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
     start = 1; clear = 0;
     #10;
-    assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
+    assert_dut_state(0, 0, 0); // Assert DUT is not idle, ready, and not done (INIT State)
     start = 0; clear = 1;
     #10;
-    assert_dut_state(0, 0, 0); // Assert DUT is not idle, ready, and not done
+    assert_dut_state(0, 0, 0); // Assert DUT is not idle, ready, and not done (CLEAR State)
     start = 0; clear = 0;
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
@@ -154,7 +186,7 @@ module hsid_x_obi_mem_tb #(
     initial_addr = hsid_x_obi_mem_random.initial_addr;
     limit = hsid_x_obi_mem_random.requests;
     random_gnt = 1; // Enable random grant signal
-    $display("Case 5: Read %0d addresses with clear in the middle of reading", limit);
+    $display("Case 6: Read %0d addresses with clear in the middle of reading", limit);
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
     start = 1; clear = 0;
     #((limit/2) * 10); // Wait for half of the requests
@@ -166,14 +198,21 @@ module hsid_x_obi_mem_tb #(
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
 
-    $display("Case 6: Set start and clear at the same time in IDLE state");
+    $display("Case 7: Set start and clear at the same time in IDLE state");
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
     start = 1; clear = 1;
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is still idle, not ready, and not done
     start = 0; clear = 0;
 
-    $display("Case 7: Set limit to 0 and start reading, and then clear");
+    $display("Case 8: Test clear on IDLE state");
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+    clear = 1;
+    #10;
+    assert_dut_state(1, 0, 0); // Assert DUT is still idle, not ready, and not done
+    clear = 0;
+
+    $display("Case 9: Set limit to 0 and start reading, and then clear");
     if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
     initial_addr = hsid_x_obi_mem_random.initial_addr;
     limit = 0; // Set limit to 0
@@ -218,6 +257,7 @@ module hsid_x_obi_mem_tb #(
     start = 1;
     #10; // Wait for a clock cycle
     start = 0;
+    #10; // Wait for a clock cycle for INIT state
     while (reads < requests) begin
       assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
       if (data_out_valid) begin

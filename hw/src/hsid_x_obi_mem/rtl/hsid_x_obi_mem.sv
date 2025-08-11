@@ -86,7 +86,7 @@ module hsid_x_obi_mem #(
         next_state = !clear && start ? HXOM_INIT : HXOM_IDLE;
       end
       HXOM_INIT: begin
-        idle = 0; ready = 1; done = 0;
+        idle = 0; ready = 0; done = 0;
         next_state = clear ? HXOM_CLEAR : HXOM_READING;
       end
       HXOM_READING: begin

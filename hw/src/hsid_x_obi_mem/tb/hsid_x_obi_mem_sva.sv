@@ -100,4 +100,39 @@ module hsid_x_obi_mem_sva #(
   assert property (p_data_out_valid) else $error("After rvalid OBI response, relay the data out immediately");
   cover property (p_data_out_valid); //$display("Coverage: Data out valid");
 
+  // Disable all handshake signals when on INIT state
+  property p_init_no_handshake;
+    @(posedge clk) disable iff (!rst_n || clear) current_state == HXOM_INIT |-> !idle && !ready && !done;
+  endproperty
+  assert property (p_init_no_handshake) else $error("Disable all handshake signals when on INIT state");
+  cover property (p_init_no_handshake); //$display("Coverage: INIT state no handshake");
+
+  // Disable all handshake signals when on CLEAR state
+  property p_clear_no_handshake;
+    @(posedge clk) disable iff (!rst_n || clear) current_state == HXOM_CLEAR |-> !idle && !ready && !done;
+  endproperty
+  assert property (p_clear_no_handshake) else $error("Disable all handshake signals when on CLEAR state");
+  cover property (p_clear_no_handshake); //$display("Coverage: CLEAR state no handshake");
+
+  // Enable ready signal when in READING state
+  property p_reading_ready;
+    @(posedge clk) disable iff (!rst_n || clear) current_state == HXOM_READING |-> !idle && ready && !done;
+  endproperty
+  assert property (p_reading_ready) else $error("Enable ready signal when in READING state");
+  cover property (p_reading_ready); //$display("Coverage: READING state ready signal");
+
+  // Enable done signal when in DONE state
+  property p_done_signal;
+    @(posedge clk) disable iff (!rst_n || clear) current_state == HXOM_DONE |-> !idle && !ready && done;
+  endproperty
+  assert property (p_done_signal) else $error("Enable done signal when in DONE state");
+  cover property (p_done_signal); //$display("Coverage: DONE state signal");
+
+  // Enable idle signal when in IDLE state
+  property p_idle_signal;
+    @(posedge clk) disable iff (!rst_n || clear) current_state == HXOM_IDLE |-> idle && !ready && !done;
+  endproperty
+  assert property (p_idle_signal) else $error("Enable idle signal when in IDLE state");
+  cover property (p_idle_signal); //$display("Coverage: IDLE state signal");
+
 endmodule
