@@ -1,0 +1,71 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:27:19 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_x_registers_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:26:14 2025"
+[dumpfile_size] 1012802
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_x_registers.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-19.879648 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_x_registers_tb.
+[sst_width] 317
+[signals_width] 389
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsid_x_registers_tb.dut.clk
+hsid_x_registers_tb.dut.rst_n
+hsid_x_registers_tb.dut.cancelled
+@22
+hsid_x_registers_tb.dut.captured_pixel_addr[31:0]
+@28
+hsid_x_registers_tb.dut.clear
+hsid_x_registers_tb.dut.done
+hsid_x_registers_tb.dut.error
+@22
+hsid_x_registers_tb.dut.hw2reg[145:0]
+@28
+hsid_x_registers_tb.dut.idle
+hsid_x_registers_tb.dut.interruption
+@22
+hsid_x_registers_tb.dut.library_pixel_addr[31:0]
+hsid_x_registers_tb.dut.library_size[5:0]
+hsid_x_registers_tb.dut.mse_max_ref[5:0]
+hsid_x_registers_tb.dut.mse_max_value[31:0]
+hsid_x_registers_tb.dut.mse_min_ref[5:0]
+hsid_x_registers_tb.dut.mse_min_value[31:0]
+hsid_x_registers_tb.dut.pixel_bands[6:0]
+@28
+hsid_x_registers_tb.dut.ready
+@22
+hsid_x_registers_tb.dut.reg2hw[211:0]
+hsid_x_registers_tb.dut.reg_req[69:0]
+hsid_x_registers_tb.dut.reg_rsp[33:0]
+@28
+hsid_x_registers_tb.dut.start
+@201
+-Register Interface
+@22
+hsid_x_registers_tb.reg_inf_debug_inst.addr[31:0]
+@28
+hsid_x_registers_tb.reg_inf_debug_inst.error
+@22
+hsid_x_registers_tb.reg_inf_debug_inst.rdata[31:0]
+@28
+hsid_x_registers_tb.reg_inf_debug_inst.ready
+@22
+hsid_x_registers_tb.reg_inf_debug_inst.reg_req[69:0]
+hsid_x_registers_tb.reg_inf_debug_inst.reg_rsp[33:0]
+@28
+hsid_x_registers_tb.reg_inf_debug_inst.valid
+@22
+hsid_x_registers_tb.reg_inf_debug_inst.wdata[31:0]
+@28
+hsid_x_registers_tb.reg_inf_debug_inst.write
+@22
+hsid_x_registers_tb.reg_inf_debug_inst.wstrb[3:0]
+[pattern_trace] 1
+[pattern_trace] 0

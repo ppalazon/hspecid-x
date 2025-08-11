@@ -1,52 +1,41 @@
 [*]
-[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Wed Jul  9 20:04:32 2025
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:17:59 2025
 [*]
-[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_fifo_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Wed Jul  9 20:04:02 2025"
-[dumpfile_size] 7261
-[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_fifo.gtkw"
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_fifo_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:17:30 2025"
+[dumpfile_size] 21861
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_fifo.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-16.670849 31700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.550158 31700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_fifo_tb.
-[treeopen] hsid_fifo_tb.uut.
+[treeopen] hsid_fifo_tb.dut.
 [sst_width] 354
 [signals_width] 342
 [sst_expanded] 1
 [sst_vpaned_height] 464
 @28
-hsid_fifo_tb.clk
-hsid_fifo_tb.rst_n
-hsid_fifo_tb.rd_en
-hsid_fifo_tb.wr_en
-hsid_fifo_tb.clear
-@200
--DUT
+hsid_fifo_tb.dut.clk
+hsid_fifo_tb.dut.rst_n
+hsid_fifo_tb.dut.almost_full
+hsid_fifo_tb.dut.almost_full_threshold[1:0]
+hsid_fifo_tb.dut.clear
+hsid_fifo_tb.dut.clk
 @22
-hsid_fifo_tb.uut.data_in[31:0]
-@23
-hsid_fifo_tb.uut.data_out[31:0]
+hsid_fifo_tb.dut.data_in[31:0]
+hsid_fifo_tb.dut.data_out[31:0]
 @28
-hsid_fifo_tb.uut.almost_full
-@22
-hsid_fifo_tb.uut.almost_full_threshold[3:0]
-@28
-hsid_fifo_tb.uut.clear
-hsid_fifo_tb.uut.empty
-@22
-hsid_fifo_tb.uut.fifo_count[4:0]
-@28
-hsid_fifo_tb.uut.fifo_request[2:0]
-hsid_fifo_tb.uut.full
-hsid_fifo_tb.uut.loop_en
-hsid_fifo_tb.uut.rd_en
-@22
-hsid_fifo_tb.uut.rd_ptr[3:0]
-@28
-hsid_fifo_tb.uut.wr_en
-@22
-hsid_fifo_tb.uut.wr_ptr[3:0]
+hsid_fifo_tb.dut.empty
+hsid_fifo_tb.dut.fifo_count[2:0]
+hsid_fifo_tb.dut.fifo_request[1:0]
+hsid_fifo_tb.dut.full
+hsid_fifo_tb.dut.loop_en
+hsid_fifo_tb.dut.rd_en
+hsid_fifo_tb.dut.rd_ptr[1:0]
+hsid_fifo_tb.dut.rst_n
+hsid_fifo_tb.dut.wr_en
+hsid_fifo_tb.dut.wr_ptr[1:0]
 [pattern_trace] 1
 [pattern_trace] 0

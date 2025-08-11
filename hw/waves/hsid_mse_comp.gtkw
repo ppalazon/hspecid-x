@@ -1,57 +1,42 @@
 [*]
-[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul  4 17:25:07 2025
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:21:33 2025
 [*]
-[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_mse_comp_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul  4 17:24:30 2025"
-[dumpfile_size] 10042
-[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_mse_comp.gtkw"
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_mse_comp_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:20:52 2025"
+[dumpfile_size] 217627
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_mse_comp.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-15.890248 92300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-20.026743 92300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_mse_comp_tb.
 [sst_width] 317
 [signals_width] 334
 [sst_expanded] 1
 [sst_vpaned_height] 464
 @28
-hsid_mse_comp_tb.clk
-hsid_mse_comp_tb.rst_n
-hsid_mse_comp_tb.clear
-@24
-hsid_mse_comp_tb.mse_in[31:0]
-hsid_mse_comp_tb.mse_in_ref[7:0]
-@28
-hsid_mse_comp_tb.mse_in_valid
-hsid_mse_comp_tb.mse_out_valid
-@200
--Max
-@28
-hsid_mse_comp_tb.mse_max_changed
+hsid_mse_comp_tb.dut.clk
+hsid_mse_comp_tb.dut.rst_n
+hsid_mse_comp_tb.dut.clear
+hsid_mse_comp_tb.dut.mse_in_of
 @22
-hsid_mse_comp_tb.mse_max_ref[7:0]
-@24
-hsid_mse_comp_tb.mse_max_value[31:0]
-@200
--Min
+hsid_mse_comp_tb.dut.mse_in_ref[5:0]
 @28
-hsid_mse_comp_tb.mse_min_changed
-@24
-hsid_mse_comp_tb.mse_min_ref[7:0]
-hsid_mse_comp_tb.mse_min_value[31:0]
-@200
--Aux
-@28
-hsid_mse_comp_tb.aux_max_changed
+hsid_mse_comp_tb.dut.mse_in_valid
 @22
-hsid_mse_comp_tb.aux_max_ref[7:0]
-hsid_mse_comp_tb.aux_max_value[31:0]
+hsid_mse_comp_tb.dut.mse_in_value[31:0]
 @28
-hsid_mse_comp_tb.aux_min_changed
-@24
-hsid_mse_comp_tb.aux_min_ref[7:0]
-@25
-hsid_mse_comp_tb.aux_min_value[31:0]
+hsid_mse_comp_tb.dut.mse_max_changed
+@22
+hsid_mse_comp_tb.dut.mse_max_ref[5:0]
+hsid_mse_comp_tb.dut.mse_max_value[31:0]
+@28
+hsid_mse_comp_tb.dut.mse_min_changed
+@22
+hsid_mse_comp_tb.dut.mse_min_ref[5:0]
+hsid_mse_comp_tb.dut.mse_min_value[31:0]
+@28
+hsid_mse_comp_tb.dut.mse_out_valid
 [pattern_trace] 1
 [pattern_trace] 0

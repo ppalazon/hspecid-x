@@ -1,44 +1,57 @@
 [*]
-[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul 11 17:49:02 2025
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:18:57 2025
 [*]
-[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_sq_df_acc_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul 11 17:48:15 2025"
-[dumpfile_size] 12361
-[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_sq_df_acc.gtkw"
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_sq_df_acc_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:18:31 2025"
+[dumpfile_size] 790384
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_sq_df_acc.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-16.767824 342540 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-22.186314 342540 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_sq_df_acc_tb.
 [sst_width] 370
 [signals_width] 347
 [sst_expanded] 1
-[sst_vpaned_height] 899
+[sst_vpaned_height] 683
+@29
+hsid_sq_df_acc_tb.dut.clk
+hsid_sq_df_acc_tb.dut.rst_n
+@22
+hsid_sq_df_acc_tb.dut.acc_1[39:0]
 @28
-hsid_sq_df_acc_tb.clk
-hsid_sq_df_acc_tb.rst_n
-@420
-hsid_sq_df_acc_tb.cycle_count
+hsid_sq_df_acc_tb.dut.acc_1_en
+@22
+hsid_sq_df_acc_tb.dut.acc_2[39:0]
 @28
-hsid_sq_df_acc_tb.data_in_valid
-@24
-hsid_sq_df_acc_tb.data_in_a[15:0]
-hsid_sq_df_acc_tb.data_in_b[15:0]
-@420
+hsid_sq_df_acc_tb.dut.acc_2_en
+hsid_sq_df_acc_tb.dut.acc_last
+hsid_sq_df_acc_tb.dut.acc_of
+hsid_sq_df_acc_tb.dut.acc_reg_of
+hsid_sq_df_acc_tb.dut.acc_valid
+@22
+hsid_sq_df_acc_tb.dut.acc_value[39:0]
+hsid_sq_df_acc_tb.dut.acc_w_of[40:0]
+@28
+hsid_sq_df_acc_tb.dut.clear
+@22
+hsid_sq_df_acc_tb.dut.data_in_a[15:0]
+hsid_sq_df_acc_tb.dut.data_in_b[15:0]
+@28
+hsid_sq_df_acc_tb.dut.data_in_last
+hsid_sq_df_acc_tb.dut.data_in_valid
+@22
 hsid_sq_df_acc_tb.dut.diff[16:0]
-@24
+hsid_sq_df_acc_tb.dut.initial_acc[39:0]
+@28
+hsid_sq_df_acc_tb.dut.initial_acc_en
+hsid_sq_df_acc_tb.dut.last_1
+hsid_sq_df_acc_tb.dut.last_2
+@22
 hsid_sq_df_acc_tb.dut.mult[31:0]
-hsid_sq_df_acc_tb.acc_value[47:0]
 @28
-hsid_sq_df_acc_tb.data_in_last
-@24
-hsid_sq_df_acc_tb.initial_acc[47:0]
-@28
-hsid_sq_df_acc_tb.initial_acc_en
-hsid_sq_df_acc_tb.acc_valid
-hsid_sq_df_acc_tb.acc_last
-@23
-hsid_sq_df_acc_tb.dut.acc_ref[11:0]
+hsid_sq_df_acc_tb.dut.stage_1_en
+hsid_sq_df_acc_tb.dut.stage_2_en
 [pattern_trace] 1
 [pattern_trace] 0

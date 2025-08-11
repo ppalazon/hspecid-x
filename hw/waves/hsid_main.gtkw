@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Mon Aug 11 10:12:36 2025
+[*] Mon Aug 11 18:23:22 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_main_0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Mon Aug 11 10:11:45 2025"
-[dumpfile_size] 10395790
+[dumpfile_mtime] "Mon Aug 11 18:21:49 2025"
+[dumpfile_size] 10395787
 [savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_main.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-24.673098 423200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-24.673098 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_main_tb.
 [treeopen] hsid_main_tb.dut.
 [sst_width] 384
@@ -17,59 +17,62 @@
 [sst_expanded] 1
 [sst_vpaned_height] 667
 @28
-hsid_main_tb.clk
-hsid_main_tb.rst_n
-@200
--DUT
-@28
-hsid_main_tb.dut.acc_of
+hsid_main_tb.dut.clk
+hsid_main_tb.dut.rst_n
+@201
+-FSM
 @22
-hsid_main_tb.dut.band_data_in[31:0]
+hsid_main_tb.dut.fsm.band_data_in[31:0]
 @28
-hsid_main_tb.dut.band_data_in_valid
-hsid_main_tb.dut.band_pack_last
-hsid_main_tb.dut.band_pack_start
-hsid_main_tb.dut.band_pack_valid
-hsid_main_tb.dut.cancelled
+hsid_main_tb.dut.fsm.band_data_in_valid
+hsid_main_tb.dut.fsm.band_pack_last
+hsid_main_tb.dut.fsm.band_pack_start
+hsid_main_tb.dut.fsm.band_pack_valid
+hsid_main_tb.dut.fsm.cancelled
 @22
-hsid_main_tb.dut.cfg_band_pack_threshold[6:0]
-hsid_main_tb.dut.cfg_hsp_bands[6:0]
+hsid_main_tb.dut.fsm.cfg_band_pack_threshold[6:0]
 @28
-hsid_main_tb.dut.clear
-hsid_main_tb.dut.done
-hsid_main_tb.dut.error
-hsid_main_tb.dut.fifo_both_read_en
-hsid_main_tb.dut.fifo_captured_complete
+hsid_main_tb.dut.fsm.cfg_fail
 @22
-hsid_main_tb.dut.fifo_captured_data_in[31:0]
-hsid_main_tb.dut.fifo_captured_data_out[31:0]
+hsid_main_tb.dut.fsm.cfg_hsp_bands[6:0]
+hsid_main_tb.dut.fsm.cfg_hsp_library_size[5:0]
 @28
-hsid_main_tb.dut.fifo_captured_empty
-hsid_main_tb.dut.fifo_captured_write_en
+hsid_main_tb.dut.fsm.clear
 @22
-hsid_main_tb.dut.fifo_ref_data_out[31:0]
+hsid_main_tb.dut.fsm.current_state[3:0]
 @28
-hsid_main_tb.dut.fifo_ref_empty
-hsid_main_tb.dut.fifo_ref_full
-hsid_main_tb.dut.fifo_ref_write_en
+hsid_main_tb.dut.fsm.done
+hsid_main_tb.dut.fsm.error
+hsid_main_tb.dut.fsm.fifo_both_read_en
+hsid_main_tb.dut.fsm.fifo_captured_complete
 @22
-hsid_main_tb.dut.hsp_bands_in[6:0]
-hsid_main_tb.dut.hsp_library_size_in[5:0]
-hsid_main_tb.dut.hsp_ref[5:0]
+hsid_main_tb.dut.fsm.fifo_captured_data_in[31:0]
 @28
-hsid_main_tb.dut.idle
-hsid_main_tb.dut.initialize
-hsid_main_tb.dut.mse_comparison_valid
+hsid_main_tb.dut.fsm.fifo_captured_empty
+hsid_main_tb.dut.fsm.fifo_captured_write_en
+hsid_main_tb.dut.fsm.fifo_ref_empty
+hsid_main_tb.dut.fsm.fifo_ref_full
+hsid_main_tb.dut.fsm.fifo_ref_write_en
 @22
-hsid_main_tb.dut.mse_max_ref[5:0]
-hsid_main_tb.dut.mse_max_value[31:0]
-hsid_main_tb.dut.mse_min_ref[5:0]
-hsid_main_tb.dut.mse_min_value[31:0]
-hsid_main_tb.dut.mse_out[31:0]
-hsid_main_tb.dut.mse_ref[5:0]
+hsid_main_tb.dut.fsm.hsp_bands[6:0]
+hsid_main_tb.dut.fsm.hsp_library_size[5:0]
+hsid_main_tb.dut.fsm.hsp_ref_count[5:0]
 @28
-hsid_main_tb.dut.mse_valid
-hsid_main_tb.dut.ready
-hsid_main_tb.dut.start
+hsid_main_tb.dut.fsm.hsp_ref_last
+hsid_main_tb.dut.fsm.idle
+hsid_main_tb.dut.fsm.initialize
+hsid_main_tb.dut.fsm.mse_comparison_valid
+@22
+hsid_main_tb.dut.fsm.mse_ref[5:0]
+@28
+hsid_main_tb.dut.fsm.mse_valid
+@22
+hsid_main_tb.dut.fsm.next_state[3:0]
+@28
+hsid_main_tb.dut.fsm.ready
+@22
+hsid_main_tb.dut.fsm.ref_band_pack_count[6:0]
+@28
+hsid_main_tb.dut.fsm.start
 [pattern_trace] 1
 [pattern_trace] 0

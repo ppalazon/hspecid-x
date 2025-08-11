@@ -1,68 +1,143 @@
 [*]
-[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul 11 18:17:04 2025
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:20:39 2025
 [*]
-[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_mse_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul 11 18:16:31 2025"
-[dumpfile_size] 28312
-[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_mse.gtkw"
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_mse_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:19:08 2025"
+[dumpfile_size] 251020
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_mse.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-17.456858 43800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-19.733009 43800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_mse_tb.
 [treeopen] hsid_mse_tb.dut.
-[sst_width] 317
+[sst_width] 409
 [signals_width] 360
 [sst_expanded] 1
 [sst_vpaned_height] 464
 @28
-hsid_mse_tb.clk
-@24
-hsid_mse_tb.vctr_ref[11:0]
-@22
-hsid_mse_tb.band_pack_a[31:0]
-hsid_mse_tb.band_pack_b[31:0]
+hsid_mse_tb.dut.clk
+hsid_mse_tb.dut.rst_n
+@200
+-DUT
 @28
-hsid_mse_tb.band_pack_last
-hsid_mse_tb.band_pack_start
-hsid_mse_tb.band_pack_valid
-hsid_mse_tb.rst_n
-hsid_mse_tb.mse_valid
-@24
-hsid_mse_tb.mse_value[31:0]
-hsid_mse_tb.mse_ref[11:0]
+hsid_mse_tb.dut.acc_channel_of
+@22
+hsid_mse_tb.dut.acc_hsp_bands[6:0]
+@28
+hsid_mse_tb.dut.acc_of
+@22
+hsid_mse_tb.dut.acc_ref[5:0]
+hsid_mse_tb.dut.acc_value[40:0]
+hsid_mse_tb.dut.band_pack_a[31:0]
+hsid_mse_tb.dut.band_pack_b[31:0]
+@28
+hsid_mse_tb.dut.band_pack_last
+hsid_mse_tb.dut.band_pack_start
+hsid_mse_tb.dut.band_pack_valid
+hsid_mse_tb.dut.channel_1_acc_last
+hsid_mse_tb.dut.channel_1_acc_of
+hsid_mse_tb.dut.channel_1_acc_valid
+@22
+hsid_mse_tb.dut.channel_1_acc_value[39:0]
+@28
+hsid_mse_tb.dut.channel_2_acc_last
+hsid_mse_tb.dut.channel_2_acc_of
+hsid_mse_tb.dut.channel_2_acc_valid
+@22
+hsid_mse_tb.dut.channel_2_acc_value[39:0]
+@28
+hsid_mse_tb.dut.clear
+hsid_mse_tb.dut.compute_acc_sum_en
+hsid_mse_tb.dut.compute_mse_en
+@22
+hsid_mse_tb.dut.hsp_bands[6:0]
+hsid_mse_tb.dut.hsp_ref[5:0]
+hsid_mse_tb.dut.mse_ref[5:0]
+@28
+hsid_mse_tb.dut.mse_valid
+@22
+hsid_mse_tb.dut.mse_value[31:0]
 @200
 -Channel 1
-@24
-hsid_mse_tb.dut.channel_1.initial_acc[47:0]
 @28
-hsid_mse_tb.dut.channel_1.initial_acc_en
-@24
+hsid_mse_tb.dut.channel_1.clk
+hsid_mse_tb.dut.channel_1.rst_n
+@22
+hsid_mse_tb.dut.channel_1.acc_1[39:0]
+@28
+hsid_mse_tb.dut.channel_1.acc_1_en
+@22
+hsid_mse_tb.dut.channel_1.acc_2[39:0]
+@28
+hsid_mse_tb.dut.channel_1.acc_2_en
+hsid_mse_tb.dut.channel_1.acc_last
+hsid_mse_tb.dut.channel_1.acc_of
+hsid_mse_tb.dut.channel_1.acc_reg_of
+hsid_mse_tb.dut.channel_1.acc_valid
+@22
+hsid_mse_tb.dut.channel_1.acc_value[39:0]
+hsid_mse_tb.dut.channel_1.acc_w_of[40:0]
+@28
+hsid_mse_tb.dut.channel_1.clear
+@22
 hsid_mse_tb.dut.channel_1.data_in_a[15:0]
 hsid_mse_tb.dut.channel_1.data_in_b[15:0]
-@420
+@28
+hsid_mse_tb.dut.channel_1.data_in_last
+hsid_mse_tb.dut.channel_1.data_in_valid
+@22
 hsid_mse_tb.dut.channel_1.diff[16:0]
-@24
+hsid_mse_tb.dut.channel_1.initial_acc[39:0]
+@28
+hsid_mse_tb.dut.channel_1.initial_acc_en
+hsid_mse_tb.dut.channel_1.last_1
+hsid_mse_tb.dut.channel_1.last_2
+@22
 hsid_mse_tb.dut.channel_1.mult[31:0]
-hsid_mse_tb.dut.channel_1.acc_value[47:0]
 @28
-hsid_mse_tb.dut.channel_1.acc_valid
-@200
+hsid_mse_tb.dut.channel_1.stage_1_en
+hsid_mse_tb.dut.channel_1.stage_2_en
+@201
 -Channel 2
-@25
-hsid_mse_tb.dut.channel_2.initial_acc[47:0]
 @28
-hsid_mse_tb.dut.channel_2.initial_acc_en
-@24
+hsid_mse_tb.dut.channel_2.clk
+hsid_mse_tb.dut.channel_2.rst_n
+@22
+hsid_mse_tb.dut.channel_2.acc_1[39:0]
+@28
+hsid_mse_tb.dut.channel_2.acc_1_en
+@22
+hsid_mse_tb.dut.channel_2.acc_2[39:0]
+@28
+hsid_mse_tb.dut.channel_2.acc_2_en
+hsid_mse_tb.dut.channel_2.acc_last
+hsid_mse_tb.dut.channel_2.acc_of
+hsid_mse_tb.dut.channel_2.acc_reg_of
+hsid_mse_tb.dut.channel_2.acc_valid
+@22
+hsid_mse_tb.dut.channel_2.acc_value[39:0]
+hsid_mse_tb.dut.channel_2.acc_w_of[40:0]
+@28
+hsid_mse_tb.dut.channel_2.clear
+@22
 hsid_mse_tb.dut.channel_2.data_in_a[31:16]
 hsid_mse_tb.dut.channel_2.data_in_b[31:16]
-@420
-hsid_mse_tb.dut.channel_2.diff[16:0]
-@24
-hsid_mse_tb.dut.channel_2.mult[31:0]
-hsid_mse_tb.dut.channel_2.acc_value[47:0]
 @28
-hsid_mse_tb.dut.channel_2.acc_valid
+hsid_mse_tb.dut.channel_2.data_in_last
+hsid_mse_tb.dut.channel_2.data_in_valid
+@22
+hsid_mse_tb.dut.channel_2.diff[16:0]
+hsid_mse_tb.dut.channel_2.initial_acc[39:0]
+@28
+hsid_mse_tb.dut.channel_2.initial_acc_en
+hsid_mse_tb.dut.channel_2.last_1
+hsid_mse_tb.dut.channel_2.last_2
+@22
+hsid_mse_tb.dut.channel_2.mult[31:0]
+@28
+hsid_mse_tb.dut.channel_2.stage_1_en
+hsid_mse_tb.dut.channel_2.stage_2_en
 [pattern_trace] 1
 [pattern_trace] 0

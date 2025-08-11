@@ -1,85 +1,67 @@
 [*]
-[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul 11 19:26:00 2025
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:28:27 2025
 [*]
-[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_x_obi_mem_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul 11 19:22:28 2025"
-[dumpfile_size] 29022
-[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_x_obi_mem.gtkw"
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_x_obi_mem_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:27:44 2025"
+[dumpfile_size] 18364582
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_x_obi_mem.gtkw"
 [timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-13.643693 51960 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.311312 51960 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_x_obi_mem_tb.
 [sst_width] 317
-[signals_width] 315
+[signals_width] 354
 [sst_expanded] 1
 [sst_vpaned_height] 464
 @28
 hsid_x_obi_mem_tb.clk
 hsid_x_obi_mem_tb.rst_n
+hsid_x_obi_mem_tb.clear
 @22
 hsid_x_obi_mem_tb.data_out[31:0]
 @28
 hsid_x_obi_mem_tb.data_out_valid
+hsid_x_obi_mem_tb.def_gnt
 hsid_x_obi_mem_tb.done
+@22
+hsid_x_obi_mem_tb.hsid_x_obi_mem_random[31:0]
+@28
 hsid_x_obi_mem_tb.idle
 @22
 hsid_x_obi_mem_tb.initial_addr[31:0]
 hsid_x_obi_mem_tb.limit[12:0]
-@24
+hsid_x_obi_mem_tb.obi_req[69:0]
+hsid_x_obi_mem_tb.obi_rsp[33:0]
+@28
+hsid_x_obi_mem_tb.random_gnt
+@22
+hsid_x_obi_mem_tb.read_addr[31:0]
 hsid_x_obi_mem_tb.reads[31:0]
 @28
 hsid_x_obi_mem_tb.ready
+@22
+hsid_x_obi_mem_tb.requests[12:0]
+@28
 hsid_x_obi_mem_tb.start
 @200
--DUT
-@22
-hsid_x_obi_mem_tb.dut.data_out[31:0]
-@28
-hsid_x_obi_mem_tb.dut.data_out_valid
-@22
-hsid_x_obi_mem_tb.dut.initial_addr[31:0]
-@24
-hsid_x_obi_mem_tb.dut.limit[12:0]
-@22
-hsid_x_obi_mem_tb.dut.current_addr[31:0]
-@24
-hsid_x_obi_mem_tb.dut.current_limit[12:0]
-@28
-hsid_x_obi_mem_tb.dut.done
-hsid_x_obi_mem_tb.dut.finish_reading
-hsid_x_obi_mem_tb.dut.idle
-@24
-hsid_x_obi_mem_tb.dut.reads[13:0]
-@28
-hsid_x_obi_mem_tb.dut.ready
-@24
-hsid_x_obi_mem_tb.dut.requests[13:0]
-@28
-hsid_x_obi_mem_tb.dut.start
-@200
 -OBI Bus
-@28
-hsid_x_obi_mem_tb.obi_bus_debug.clk
-hsid_x_obi_mem_tb.obi_bus_debug.rst_n
-hsid_x_obi_mem_tb.obi_bus_debug.req
 @22
 hsid_x_obi_mem_tb.obi_bus_debug.addr[31:0]
 hsid_x_obi_mem_tb.obi_bus_debug.be[3:0]
 @28
 hsid_x_obi_mem_tb.obi_bus_debug.gnt
 @22
+hsid_x_obi_mem_tb.obi_bus_debug.obi_req[69:0]
+hsid_x_obi_mem_tb.obi_bus_debug.obi_rsp[33:0]
 hsid_x_obi_mem_tb.obi_bus_debug.rdata[31:0]
 @28
+hsid_x_obi_mem_tb.obi_bus_debug.req
 hsid_x_obi_mem_tb.obi_bus_debug.rvalid
 @22
 hsid_x_obi_mem_tb.obi_bus_debug.wdata[31:0]
 @28
 hsid_x_obi_mem_tb.obi_bus_debug.we
-@200
--Memory
-@23
-hsid_x_obi_mem_tb.pixel_obi_mem.pixel_value[15:0]
 [pattern_trace] 1
 [pattern_trace] 0

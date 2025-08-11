@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
-[*] Fri Jul 11 19:21:57 2025
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Aug 11 18:31:45 2025
 [*]
-[dumpfile] "/home/ppalazon/workspace/hw/tfm-hsi/build/uclm_hspecidx_hsid_x_top_1.0.0/sim-xsim/cleaned.vcd"
-[dumpfile_mtime] "Fri Jul 11 18:57:55 2025"
-[dumpfile_size] 102577
-[savefile] "/home/ppalazon/workspace/hw/tfm-hsi/hw/waves/hsid_x_top.gtkw"
-[timestart] 98880
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_x_top_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Aug 11 18:28:37 2025"
+[dumpfile_size] 19436829
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_x_top.gtkw"
+[timestart] 0
 [size] 2554 1366
 [pos] -1 -1
-*-13.850673 150980 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-24.490650 150980 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_x_top_tb.
 [treeopen] hsid_x_top_tb.dut.
 [sst_width] 317
@@ -18,91 +18,131 @@
 [sst_vpaned_height] 464
 @28
 hsid_x_top_tb.clk
-hsid_x_top_tb.hsid_x_int_o
 hsid_x_top_tb.rst_n
 @200
--Register Interface
-@22
-hsid_x_top_tb.u_reg_inf_debug.addr[31:0]
+-DUT FSM
 @28
-hsid_x_top_tb.u_reg_inf_debug.error
+hsid_x_top_tb.dut.fsm.cancel_read
+hsid_x_top_tb.dut.fsm.cancelled
 @22
-hsid_x_top_tb.u_reg_inf_debug.rdata[31:0]
+hsid_x_top_tb.dut.fsm.captured_pixel_addr[31:0]
+hsid_x_top_tb.dut.fsm.cfg_band_pack_threshold[6:0]
+hsid_x_top_tb.dut.fsm.cfg_captured_pixel_addr[31:0]
+hsid_x_top_tb.dut.fsm.cfg_hsp_library_size[5:0]
+hsid_x_top_tb.dut.fsm.cfg_library_pixel_addr[31:0]
 @28
-hsid_x_top_tb.u_reg_inf_debug.ready
-hsid_x_top_tb.u_reg_inf_debug.valid
+hsid_x_top_tb.dut.fsm.clear
 @22
-hsid_x_top_tb.u_reg_inf_debug.wdata[31:0]
+hsid_x_top_tb.dut.fsm.current_state[3:0]
 @28
-hsid_x_top_tb.u_reg_inf_debug.write
+hsid_x_top_tb.dut.fsm.done
+hsid_x_top_tb.dut.fsm.error
 @22
-hsid_x_top_tb.u_reg_inf_debug.wstrb[3:0]
+hsid_x_top_tb.dut.fsm.hsp_bands[6:0]
+hsid_x_top_tb.dut.fsm.hsp_library_size[5:0]
 @28
-hsid_x_top_tb.hsid_x_int_o
+hsid_x_top_tb.dut.fsm.interrupt
+@22
+hsid_x_top_tb.dut.fsm.library_pixel_addr[31:0]
+hsid_x_top_tb.dut.fsm.next_state[3:0]
+@28
+hsid_x_top_tb.dut.fsm.obi_done
+@22
+hsid_x_top_tb.dut.fsm.obi_initial_addr[31:0]
+hsid_x_top_tb.dut.fsm.obi_limit_in[12:0]
+@28
+hsid_x_top_tb.dut.fsm.obi_start
+hsid_x_top_tb.dut.fsm.start
+@200
+-Main
+@28
+hsid_x_top_tb.dut.main.clk
+hsid_x_top_tb.dut.main.rst_n
+hsid_x_top_tb.dut.main.acc_of
+@22
+hsid_x_top_tb.dut.main.band_data_in[31:0]
+@28
+hsid_x_top_tb.dut.main.band_data_in_valid
+hsid_x_top_tb.dut.main.band_pack_last
+hsid_x_top_tb.dut.main.band_pack_start
+hsid_x_top_tb.dut.main.band_pack_valid
+hsid_x_top_tb.dut.main.cancelled
+@22
+hsid_x_top_tb.dut.main.cfg_band_pack_threshold[6:0]
+hsid_x_top_tb.dut.main.cfg_hsp_bands[6:0]
+@28
+hsid_x_top_tb.dut.main.clear
+hsid_x_top_tb.dut.main.done
+hsid_x_top_tb.dut.main.error
+hsid_x_top_tb.dut.main.fifo_both_read_en
+hsid_x_top_tb.dut.main.fifo_captured_complete
+@22
+hsid_x_top_tb.dut.main.fifo_captured_data_in[31:0]
+hsid_x_top_tb.dut.main.fifo_captured_data_out[31:0]
+@28
+hsid_x_top_tb.dut.main.fifo_captured_empty
+hsid_x_top_tb.dut.main.fifo_captured_write_en
+@22
+hsid_x_top_tb.dut.main.fifo_ref_data_out[31:0]
+@28
+hsid_x_top_tb.dut.main.fifo_ref_empty
+hsid_x_top_tb.dut.main.fifo_ref_full
+hsid_x_top_tb.dut.main.fifo_ref_write_en
+@22
+hsid_x_top_tb.dut.main.hsp_bands_in[6:0]
+hsid_x_top_tb.dut.main.hsp_library_size_in[5:0]
+hsid_x_top_tb.dut.main.hsp_ref[5:0]
+@28
+hsid_x_top_tb.dut.main.idle
+hsid_x_top_tb.dut.main.initialize
+hsid_x_top_tb.dut.main.mse_comparison_valid
+@22
+hsid_x_top_tb.dut.main.mse_max_ref[5:0]
+hsid_x_top_tb.dut.main.mse_max_value[31:0]
+hsid_x_top_tb.dut.main.mse_min_ref[5:0]
+hsid_x_top_tb.dut.main.mse_min_value[31:0]
+hsid_x_top_tb.dut.main.mse_out[31:0]
+hsid_x_top_tb.dut.main.mse_ref[5:0]
+@28
+hsid_x_top_tb.dut.main.mse_valid
+hsid_x_top_tb.dut.main.ready
+hsid_x_top_tb.dut.main.start
 @200
 -OBI Bus
 @22
-hsid_x_top_tb.u_obi_bus_debug.addr[31:0]
-hsid_x_top_tb.u_obi_bus_debug.be[3:0]
+hsid_x_top_tb.obi_bus_debug_inst.addr[31:0]
+hsid_x_top_tb.obi_bus_debug_inst.be[3:0]
 @28
-hsid_x_top_tb.u_obi_bus_debug.gnt
+hsid_x_top_tb.obi_bus_debug_inst.clk
+hsid_x_top_tb.obi_bus_debug_inst.gnt
 @22
-hsid_x_top_tb.u_obi_bus_debug.rdata[31:0]
+hsid_x_top_tb.obi_bus_debug_inst.rdata[31:0]
 @28
-hsid_x_top_tb.u_obi_bus_debug.req
-hsid_x_top_tb.u_obi_bus_debug.rvalid
+hsid_x_top_tb.obi_bus_debug_inst.req
+hsid_x_top_tb.obi_bus_debug_inst.rst_n
+hsid_x_top_tb.obi_bus_debug_inst.rvalid
 @22
-hsid_x_top_tb.u_obi_bus_debug.wdata[31:0]
+hsid_x_top_tb.obi_bus_debug_inst.wdata[31:0]
 @28
-hsid_x_top_tb.u_obi_bus_debug.we
+hsid_x_top_tb.obi_bus_debug_inst.we
 @200
--DUT
+-Control Register
+@23
+hsid_x_top_tb.reg_inf_debug_inst.addr[31:0]
 @28
-hsid_x_top_tb.dut.start
-hsid_x_top_tb.dut.idle
-hsid_x_top_tb.dut.error
-hsid_x_top_tb.dut.done
-hsid_x_top_tb.dut.clear
-hsid_x_top_tb.dut.current_state[2:0]
-hsid_x_top_tb.dut.obi_start
-hsid_x_top_tb.dut.obi_done
+hsid_x_top_tb.reg_inf_debug_inst.clk
+hsid_x_top_tb.reg_inf_debug_inst.error
 @22
-hsid_x_top_tb.dut.obi_initial_addr[31:0]
-@24
-hsid_x_top_tb.dut.obi_limit_in[11:0]
-@200
--OBI Memory
-@22
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.initial_addr[31:0]
+hsid_x_top_tb.reg_inf_debug_inst.rdata[31:0]
 @28
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.start
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.done
-@24
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.requests[12:0]
+hsid_x_top_tb.reg_inf_debug_inst.ready
+hsid_x_top_tb.reg_inf_debug_inst.rst_n
+hsid_x_top_tb.reg_inf_debug_inst.valid
 @22
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.current_addr[31:0]
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.data_out[31:0]
-@29
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.data_out_valid
-@24
-hsid_x_top_tb.dut.u_hsid_x_obi_mem.current_limit[11:0]
-@200
--HSI Main
+hsid_x_top_tb.reg_inf_debug_inst.wdata[31:0]
 @28
-hsid_x_top_tb.dut.u_hsid_main.clk
+hsid_x_top_tb.reg_inf_debug_inst.write
 @22
-hsid_x_top_tb.dut.u_hsid_main.hsi_vctr_in[31:0]
-@28
-hsid_x_top_tb.dut.u_hsid_main.hsi_vctr_in_valid
-hsid_x_top_tb.dut.u_hsid_main.band_pack_start
-hsid_x_top_tb.dut.u_hsid_main.band_pack_last
-@24
-hsid_x_top_tb.dut.u_hsid_main.band_pack_threshold[6:0]
-hsid_x_top_tb.dut.u_hsid_main.mse_out[31:0]
-@28
-hsid_x_top_tb.dut.u_hsid_main.mse_valid
-@22
-hsid_x_top_tb.dut.u_hsid_main.fifo_measure_data_out[31:0]
-hsid_x_top_tb.dut.u_hsid_main.fifo_ref_data_out[31:0]
+hsid_x_top_tb.reg_inf_debug_inst.wstrb[3:0]
 [pattern_trace] 1
 [pattern_trace] 0
