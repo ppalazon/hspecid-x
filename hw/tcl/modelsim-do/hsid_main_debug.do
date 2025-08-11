@@ -15,6 +15,8 @@ vsim -assertdebug -coverage -cvgperinstance +nowarnTFMPC $top_opt -msgmode both
 add wave -group "DUT" /$top/dut/*
 add wave -group "FSM" /$top/dut/fsm/*
 add wave -group "MSE" /$top/dut/mse/*
+add wave -group "SqDfAcc 1" /$top/dut/mse/channel_1/*
+add wave -group "SqDfAcc 2" /$top/dut/mse/channel_2/*
 add wave -group "MSE Comp" /$top/dut/mse_comp/*
 add wave -group "FIFO Cap" /$top/dut/fifo_captured/*
 add wave -group "FIFO Ref" /$top/dut/fifo_ref/*

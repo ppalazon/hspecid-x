@@ -39,7 +39,7 @@ module hsid_sq_df_acc_sva #(
 
   // Enable stages when data is valid
   property stage_enable;
-    @(posedge clk) disable iff (!rst_n || clear) data_in_valid |-> ##1 stage_1_en ##1 stage_2_en;
+    @(posedge clk) disable iff (!rst_n || clear) !clear && data_in_valid |-> ##1 stage_1_en ##1 stage_2_en;
   endproperty
 
   assert property (stage_enable) else $error("Pipeline stages are enabled in sequence");
@@ -73,7 +73,7 @@ module hsid_sq_df_acc_sva #(
 
   // Compute diff in the same clock cycle as data_in_a and data_in_b
   property compute_diff;
-    @(posedge clk) disable iff (!rst_n || clear) data_in_valid |-> ##1
+    @(posedge clk) disable iff (!rst_n || clear) !clear && data_in_valid |-> ##1
       diff == $past(data_in_a) - $past(data_in_b);
   endproperty
 
@@ -82,7 +82,7 @@ module hsid_sq_df_acc_sva #(
 
   // Assert multiplication result is correct
   property compute_mult;
-    @(posedge clk) disable iff (!rst_n || clear) data_in_valid |-> ##2
+    @(posedge clk) disable iff (!rst_n || clear) !clear && data_in_valid |-> ##2
       mult == (($past(data_in_a, 2) - $past(data_in_b, 2)) * ($past(data_in_a, 2) - $past(data_in_b, 2)));
   endproperty
 
@@ -115,7 +115,6 @@ module hsid_sq_df_acc_sva #(
   assert property (acc_valid_after_last) else $error("Accumulator valid signal is low after 4 cycles since data_in_last is high");
   cover property (acc_valid_after_last); // $display("Checked: Accumulator valid signal is asserted after data_in_last is high");
 
-
   // Assert overflow as soon as its detected
   property acc_of_detected;
     @(posedge clk) disable iff (!rst_n || clear) !acc_2_en && acc_w_of[DATA_WIDTH_ACC] |-> ##1 acc_of;
@@ -123,12 +122,20 @@ module hsid_sq_df_acc_sva #(
   assert property (acc_of_detected) else $error("Overflow is detected as soon as it happens: acc_of = %0b != %0b", acc_of, acc_w_of[DATA_WIDTH_ACC]);
   cover property (acc_of_detected); // $display("Checked: Overflow is detected as soon as it happens");
 
-  // Keep overflow flag even though the overflow bit has been overflown
+  // Keep overflow flag even though the overflow bit has been overflown, it's difficult to test because it requires a large number of iterations
   property keep_overflow_flag;
     @(posedge clk) disable iff (!rst_n || clear) !acc_2_en && acc_of && !acc_w_of[DATA_WIDTH_ACC] |-> ##1 acc_of;
   endproperty
 
   assert property (keep_overflow_flag) else $error("Overflow flag is kept even though the overflow bit has been overflown");
-  cover property (keep_overflow_flag); // $display("Checked: Overflow flag is kept even though the overflow bit has been overflown");
+  // cover property (keep_overflow_flag); // $display("Checked: Overflow flag is kept even though the overflow bit has been overflown");
+
+  // Avoid changing diff, mult and acc_w_of when no data is valid
+  property no_change_when_no_data;
+    @(posedge clk) disable iff (!rst_n || clear) !clear && !data_in_valid |-> ##1
+      $stable(diff) ##1 $stable(mult) ##1 $stable(acc_w_of);
+  endproperty
+  assert property (no_change_when_no_data) else $error("No change in diff, mult and acc_w_of when no data is valid");
+  cover property (no_change_when_no_data); // $display("Checked: No change in diff, mult and acc_w_of when no data is valid");
 
 endmodule

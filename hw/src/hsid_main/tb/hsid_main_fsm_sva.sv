@@ -179,14 +179,14 @@ module hsid_main_fsm_sva #(
 
   // Done signal should be high when state is DONE
   property done_signal_high_in_done_state;
-    @(posedge clk) disable iff (!rst_n || clear) done |-> current_state == HM_DONE;
+    @(posedge clk) disable iff (!rst_n || clear) done |-> current_state == HM_DONE ## 1 !done;
   endproperty
   assert property (done_signal_high_in_done_state) else $error("Done signal is high when it's not expected");
   cover property (done_signal_high_in_done_state); // $display("Checked: Done signal is high when expected");
 
   // Error signal should be high when state is ERROR
   property error_signal_high_in_error_state;
-    @(posedge clk) disable iff (!rst_n || clear) error |-> current_state == HM_ERROR;
+    @(posedge clk) disable iff (!rst_n || clear) error |-> current_state == HM_ERROR ## 1 !error;
   endproperty
   assert property (error_signal_high_in_error_state) else $error("Error signal is high when it's not expected");
   cover property (error_signal_high_in_error_state); // $display("Checked: Error signal is high when expected");

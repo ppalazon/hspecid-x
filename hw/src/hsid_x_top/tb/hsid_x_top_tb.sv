@@ -41,6 +41,7 @@ module hsid_x_top_tb #(
   logic [HSP_LIBRARY_WIDTH-1:0] min_mse_ref_expected;
   logic [HSP_LIBRARY_WIDTH-1:0] max_mse_ref_expected;
 
+  // HSID X Top DUT instantiation
   hsid_x_top #(
     .WORD_WIDTH(WORD_WIDTH),
     .DATA_WIDTH(DATA_WIDTH),
@@ -87,6 +88,57 @@ module hsid_x_top_tb #(
     .random_gnt(random_gnt),
     .def_gnt(def_gnt)
   );
+
+  `ifdef MODEL_TECH
+  bind hsid_x_top_fsm hsid_x_top_fsm_sva #(
+    .HSP_BANDS_WIDTH (HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
+    .WORD_WIDTH(WORD_WIDTH),
+    .MEM_ACCESS_WIDTH(HSID_MEM_ACCESS_WIDTH)
+  ) dut_sva (.*);
+
+  bind hsid_x_obi_mem hsid_x_obi_mem_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
+  ) hsp_obi_mem_sva_inst (.*);
+
+  bind hsid_x_registers hsid_x_registers_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_x_registers_sva_inst (.*);
+
+  bind hsid_main_fsm hsid_main_fsm_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_main_fsm_sva_inst (.*);
+
+  bind hsid_mse hsid_mse_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_mse_sva_inst (.*);
+
+  bind hsid_sq_df_acc hsid_sq_df_acc_sva #(
+    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
+    .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
+  ) hsid_sq_df_acc_sva_inst (.*);
+
+  bind hsid_mse_comp hsid_mse_comp_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_mse_comp_sva_inst (.*);
+
+  bind hsid_fifo hsid_fifo_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
+  ) hsid_fifo_sva_inst (.*);
+  `endif
 
   logic [WORD_WIDTH-1:0] library_size_w;
   logic [WORD_WIDTH-1:0] hsp_bands_w;

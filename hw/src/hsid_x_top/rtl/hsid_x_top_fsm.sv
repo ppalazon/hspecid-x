@@ -4,7 +4,6 @@ import hsid_pkg::*;
 
 module hsid_x_top_fsm #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
-    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH
@@ -82,7 +81,7 @@ module hsid_x_top_fsm #(
   always_comb begin
     case (current_state)
       HXT_IDLE: begin
-        next_state = start ? HXT_CONFIG : HXT_IDLE;
+        next_state = !clear && start ? HXT_CONFIG : HXT_IDLE;
       end
       HXT_CONFIG: begin
         next_state = cancel_read ? HXT_CLEAR : HXT_START_READ_CAPTURED;

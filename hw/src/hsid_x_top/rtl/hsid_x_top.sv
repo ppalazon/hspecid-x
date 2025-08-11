@@ -40,10 +40,10 @@ module hsid_x_top #(
   wire [WORD_WIDTH-1:0] captured_pixel_addr;
   wire [WORD_WIDTH-1:0] library_pixel_addr;
 
-  wire [HSP_LIBRARY_WIDTH-1:0] mse_min_ref; // Pixel reference for minimum MSE value
-  wire [WORD_WIDTH-1:0] mse_min_value;  // Minimum MSE
-  wire [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;  // Pixel reference for maximum MSE value
-  wire [WORD_WIDTH-1:0] mse_max_value;  // Maximum MSE
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_min_ref;
+  wire [WORD_WIDTH-1:0] mse_min_value;
+  wire [HSP_LIBRARY_WIDTH-1:0] mse_max_ref;
+  wire [WORD_WIDTH-1:0] mse_max_value;
 
   wire obi_data_out_valid;
   wire [WORD_WIDTH-1:0] obi_data_out;
@@ -54,9 +54,9 @@ module hsid_x_top #(
 
   hsid_x_top_fsm #(
     .WORD_WIDTH(WORD_WIDTH),
-    .DATA_WIDTH(DATA_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
-    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
+    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
   ) fsm (
     .clk(clk),
     .rst_n(rst_n),

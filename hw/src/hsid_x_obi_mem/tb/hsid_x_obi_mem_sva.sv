@@ -45,7 +45,7 @@ module hsid_x_obi_mem_sva #(
 
   // After starting, the state should change to INIT and then to READING
   property p_start_to_init_to_reading;
-    @(posedge clk) disable iff (!rst_n || clear) start && current_state == HXOM_IDLE |->
+    @(posedge clk) disable iff (!rst_n || clear) start && !clear && current_state == HXOM_IDLE |->
       ##1 (current_state == HXOM_INIT) ##1 (current_state == HXOM_READING);
   endproperty
   assert property (p_start_to_init_to_reading) else $error("After starting, the state should change from IDLE to INIT and then to READING");

@@ -27,7 +27,7 @@ module hsid_mse_comp_sva #(
 
   // Activate output valid signal after input valid signal
   property activate_out_valid;
-    @(posedge clk) disable iff (!rst_n || clear) mse_in_valid |-> ##1 mse_out_valid;
+    @(posedge clk) disable iff (!rst_n || clear) !clear && mse_in_valid |-> ##1 mse_out_valid;
   endproperty
 
   assert property (activate_out_valid) else $error("Output valid signal not activated after input valid signal");
@@ -50,7 +50,7 @@ module hsid_mse_comp_sva #(
 
   // If input is bigger than min, min should not change
   property min_not_changed_on_bigger_input;
-    @(posedge clk) disable iff (!rst_n || clear) mse_in_valid && !mse_in_of && mse_in_value > mse_min_value |-> ##1
+    @(posedge clk) disable iff (!rst_n || clear) !clear && mse_in_valid && !mse_in_of && mse_in_value > mse_min_value |-> ##1
       !mse_min_changed && $stable(mse_min_ref) && $stable(mse_min_value);
   endproperty
 
@@ -77,7 +77,7 @@ module hsid_mse_comp_sva #(
 
   // If input is bigger than max, max should change
   property max_changed_on_bigger_input;
-    @(posedge clk) disable iff (!rst_n || clear) mse_in_valid && !mse_in_of && mse_in_value > mse_max_value |-> ##1
+    @(posedge clk) disable iff (!rst_n || clear) !clear && mse_in_valid && !mse_in_of && mse_in_value > mse_max_value |-> ##1
       mse_max_changed && mse_max_ref == $past(mse_in_ref) && mse_max_value == $past(mse_in_value);
   endproperty
 

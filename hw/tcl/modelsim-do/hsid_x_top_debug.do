@@ -15,11 +15,18 @@ vsim -assertdebug -coverage -cvgperinstance +nowarnTFMPC $top_opt -msgmode both
 # add wave -group "Top" /$top/*
 add wave -group "Top DUT" /$top/dut/*
 add wave -group "Top FSM" /$top/dut/fsm/*
-add wave -group "OBI BUS" /$top/obi_bus_debug_inst/*
-add wave -group "Register Interface" /$top/reg_inf_debug_inst/*
+add wave -group "OBI Memory" /$top/dut/obi_mem/*
+# add wave -group "OBI BUS" /$top/obi_bus_debug_inst/*
+# add wave -group "Register Interface" /$top/reg_inf_debug_inst/*
 add wave -group "Main" /$top/dut/main/*
 add wave -group "Main FSM" /$top/dut/main/fsm/*
-add wave -group "OBI Memory" /$top/dut/obi_mem/*
+add wave -group "MSE" /$top/dut/main/mse/*
+add wave -group "SqDfAcc 1" /$top/dut/main/mse/channel_1/*
+add wave -group "SqDfAcc 2" /$top/dut/main/mse/channel_2/*
+add wave -group "MSE Comp" /$top/dut/main/mse_comp/*
+add wave -group "FIFO Cap" /$top/dut/main/fifo_captured/*
+add wave -group "FIFO Ref" /$top/dut/main/fifo_ref/*
+
 
 
 view cover

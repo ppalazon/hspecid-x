@@ -7,6 +7,7 @@ filesets:
     files:
       - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_sva.sv
       - hw/src/hsid_x_registers/tb/hsid_x_registers_sva.sv
+      - hw/src/hsid_x_top/tb/hsid_x_top_fsm_sva.sv
     file_type: systemVerilogSource
     depend:
       - "uclm:hspecidx:hsid_pkg"
