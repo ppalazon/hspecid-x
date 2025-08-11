@@ -12,7 +12,7 @@ module hsid_x_top_tb #(
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
-    parameter TEST_MEM_MASK = 32'h0000FFFF  // Mask to return least significant 14 bits of the address
+    parameter TEST_MEM_MASK = 32'h00003FFF  // Mask to return least significant 14 bits of the address
   ) ();
 
   localparam MAX_WORD = {WORD_WIDTH{1'b1}};  // Maximum value for a word
@@ -326,7 +326,8 @@ module hsid_x_top_tb #(
 
     end
 
-    //TODO :Finish this line
+    // This case is only for ModelSim, because it provokes a fatal error in Vivado
+    `ifdef MODEL_TECH
     $display("Case 4: Modify registers during processing with random values...");
     for (int i = 0; i < 10; i++) begin
       if(!hsid_x_top_gen.randomize()) $fatal(0, "Randomization failed");
@@ -397,6 +398,7 @@ module hsid_x_top_tb #(
       #20;
 
     end
+    `endif
 
 
     $finish;
@@ -439,6 +441,7 @@ module hsid_x_top_tb #(
 
     // Get expected mse values for the library pixels
     expected_mse = new[hsid_x_top_gen.library_size];
+    expected_mse_of = new[hsid_x_top_gen.library_size];
     for (int j = 0; j < hsid_x_top_gen.library_size; j++) begin
       da_addr = hsid_x_top_gen.library_pixel_addr_w + (j * 4 * hsid_x_top_gen.hsp_bands_packs); // Address for each band
       expected_pixel_mem(da_addr, hsid_x_top_gen.hsp_bands, reference_hsp);
