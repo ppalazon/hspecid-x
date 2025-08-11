@@ -101,6 +101,15 @@ module hsid_x_registers_tb #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsid_x_ctrl_reg_random = new();
 
+  `ifdef MODEL_TECH
+  // Bind the SVA properties to the DUT
+  bind hsid_x_registers hsid_x_registers_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) dut_sva (.*);
+  `endif
+
   // Covergroup for register interface
   covergroup hsid_x_ctrl_reg_cg @(posedge clk);
     coverpoint idle iff (reg_req.addr == HSID_X_CTRL_STATUS_OFFSET && reg_req.write == 0);
