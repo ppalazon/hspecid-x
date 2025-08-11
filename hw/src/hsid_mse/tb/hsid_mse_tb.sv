@@ -126,6 +126,7 @@ module hsid_mse_tb #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsp_mse_complete_gen = new();
 
+  `ifdef MODEL_TECH
   // Binding SVA assertions to the MSE module
   bind hsid_mse hsid_mse_sva #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -141,6 +142,7 @@ module hsid_mse_tb #(
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
   ) hsid_sq_df_acc_sva_inst (.*);
+  `endif
 
   // Test vectors
   int mse_order = 0;
@@ -192,57 +194,54 @@ module hsid_mse_tb #(
     $display("Case 1: Testing with random values...");
     for (int i=0; i<TEST_LIBRARY_SIZE; i++) begin
       // Generate random vectors
-      if (hsp_mse_gen.randomize()) begin
-        hsp_mse_gen.band_packer(hsp_mse_gen.vctr1, vctr1);
-        hsp_mse_gen.band_packer(hsp_mse_gen.vctr2, vctr2);
-        hsp_mse_gen.sq_df_acc_vctr(hsp_mse_gen.vctr1, hsp_mse_gen.vctr2, acc_inter[i]);
-        hsp_mse_gen.mse(acc_inter[i], exp_mse[i], exp_acc_of[i]); // exp_mse_of[i]
-        exp_id[i] = hsp_mse_gen.vctr_ref;
+      if (!hsp_mse_gen.randomize()) $fatal(0, "Failed to randomize vectors");
+      hsp_mse_gen.band_packer(hsp_mse_gen.vctr1, vctr1);
+      hsp_mse_gen.band_packer(hsp_mse_gen.vctr2, vctr2);
+      hsp_mse_gen.sq_df_acc_vctr(hsp_mse_gen.vctr1, hsp_mse_gen.vctr2, acc_inter[i]);
+      hsp_mse_gen.mse(acc_inter[i], exp_mse[i], exp_acc_of[i]); // exp_mse_of[i]
+      exp_id[i] = hsp_mse_gen.vctr_ref;
 
-        hsp_band_packs = (hsp_mse_gen.hsp_bands + 1) / 2; // Number of HSP band packs, each pack contains two bands
+      hsp_band_packs = (hsp_mse_gen.hsp_bands + 1) / 2; // Number of HSP band packs, each pack contains two bands
 
-        $display("Test %0d: Id: %0d, Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d", i, hsp_mse_gen.vctr_ref, hsp_mse_gen.hsp_bands, exp_mse[i], exp_acc_of[i]);
-        // $display("Test %0d: Vctr1: %p", i, hsp_mse_gen.vctr1);
-        // $display("Test %0d: Vctr2: %p", i, hsp_mse_gen.vctr2);
-        // $display("Test %0d: Intermediate Accumulated: %p", i, acc_inter[i]);
+      $display("Test %0d: Id: %0d, Bands: %0d, Expected MSE: %0d, Expected acc_of: %0d", i, hsp_mse_gen.vctr_ref, hsp_mse_gen.hsp_bands, exp_mse[i], exp_acc_of[i]);
+      // $display("Test %0d: Vctr1: %p", i, hsp_mse_gen.vctr1);
+      // $display("Test %0d: Vctr2: %p", i, hsp_mse_gen.vctr2);
+      // $display("Test %0d: Intermediate Accumulated: %p", i, acc_inter[i]);
 
-        // Start processing the vectors
-        hsp_bands = hsp_mse_gen.hsp_bands; // Set the number of HSP bands to process
-        vctr_ref = hsp_mse_gen.vctr_ref; // Set the reference vector for MSE
+      // Start processing the vectors
+      hsp_bands = hsp_mse_gen.hsp_bands; // Set the number of HSP bands to process
+      vctr_ref = hsp_mse_gen.vctr_ref; // Set the reference vector for MSE
 
-        // Assert initial accumulator value is zero
-        a_init_acc: assert (hsp_mse_gen.initial_acc == 0) else $fatal(0, "Initial accumulator value is not zero");
+      // Assert initial accumulator value is zero
+      a_init_acc: assert (hsp_mse_gen.initial_acc == 0) else $error(0, "Initial accumulator value is not zero");
 
-        count_insert = 0;
+      count_insert = 0;
 
-        while (count_insert < hsp_band_packs) begin
-          band_pack_valid = TEST_RND_INSERT ? $urandom % 2: 1; // Randomly enable or disable element processing
-          if (count_insert == 0) begin
-            band_pack_start = 1; // Start the vector processing
-          end else begin
-            band_pack_start = 0;
-          end
-          if (count_insert == hsp_band_packs - 1) begin
-            band_pack_last = 1;
-          end else begin
-            band_pack_last = 0;
-          end
-          band_pack_a = vctr1[count_insert];
-          band_pack_b = vctr2[count_insert];
-          #10; // Wait for a clock cycle
-
-          if(mse_valid) begin
-            check_mse(); // Check the MSE values
-          end
-
-          if (band_pack_valid) begin
-            count_insert++;
-          end
+      while (count_insert < hsp_band_packs) begin
+        band_pack_valid = TEST_RND_INSERT ? $urandom % 2: 1; // Randomly enable or disable element processing
+        if (count_insert == 0) begin
+          band_pack_start = 1; // Start the vector processing
+        end else begin
+          band_pack_start = 0;
         end
-        band_pack_valid = 0;
-      end else begin
-        $display("Failed to randomize vectors");
+        if (count_insert == hsp_band_packs - 1) begin
+          band_pack_last = 1;
+        end else begin
+          band_pack_last = 0;
+        end
+        band_pack_a = vctr1[count_insert];
+        band_pack_b = vctr2[count_insert];
+        #10; // Wait for a clock cycle
+
+        if(mse_valid) begin
+          check_mse(); // Check the MSE values
+        end
+
+        if (band_pack_valid) begin
+          count_insert++;
+        end
       end
+      band_pack_valid = 0;
     end
 
     #(10*(mse_pipeline)); // Wait for the last MSE calculation to complete

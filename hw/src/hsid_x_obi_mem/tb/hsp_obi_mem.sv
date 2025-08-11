@@ -14,6 +14,7 @@ module hsp_obi_mem #(
     input wire hsid_x_obi_inf_pkg::obi_req_t obi_req,
     output var hsid_x_obi_inf_pkg::obi_resp_t obi_rsp,
 
+    input logic def_gnt,
     input logic random_gnt // Random grant signal
   );
 
@@ -43,6 +44,8 @@ module hsp_obi_mem #(
         end else begin : is_fixed_grant
           obi_rsp.gnt <= 1'b1;
         end
+      end else begin
+        obi_rsp.gnt <= def_gnt; // No request, no grant
       end
       if(obi_req.req && obi_rsp.gnt) begin : after_grant
         obi_rsp.rvalid <= 1'b1;

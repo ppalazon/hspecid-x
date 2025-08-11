@@ -25,7 +25,9 @@ module hsid_x_top_tb #(
   hsid_x_obi_inf_pkg::obi_req_t obi_req;
   wire hsid_x_int_o;
 
+  // HSP OBI memory interface
   reg random_gnt; // Random grant signal
+  reg def_gnt; // Default grant signal for the OBI bus when there is no request
 
   // Compute expected mse values for each pixel in the library
   logic [DATA_WIDTH-1:0] captured_hsp [];
@@ -82,7 +84,8 @@ module hsid_x_top_tb #(
     .rst_n(rst_n),
     .obi_req(obi_req),
     .obi_rsp(obi_rsp),
-    .random_gnt(random_gnt)
+    .random_gnt(random_gnt),
+    .def_gnt(def_gnt)
   );
 
   logic [WORD_WIDTH-1:0] library_size_w;
@@ -121,6 +124,7 @@ module hsid_x_top_tb #(
     rst_n = 1;
     reg_req = hsid_x_reg_pkg::reg_req_t'(0);
     random_gnt = 0;
+    def_gnt = 0;
 
     #3 rst_n = 0; // Reset the DUT
     #5 rst_n = 1; // Release reset

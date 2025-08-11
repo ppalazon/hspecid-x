@@ -1,0 +1,20 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_verif
+description: Verification files with SVA for HSpecID accelerator
+
+filesets:
+  sva:
+    files:
+      - hw/src/hsid_fifo/tb/hsid_fifo_sva.sv
+      - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_sva.sv
+      - hw/src/hsid_mse/tb/hsid_mse_sva.sv
+      - hw/src/hsid_mse_comp/tb/hsid_mse_comp_sva.sv
+      - hw/src/hsid_main/tb/hsid_main_fsm_sva.sv
+    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_pkg"
+
+targets:
+  default: &default
+    filesets:
+      - sva

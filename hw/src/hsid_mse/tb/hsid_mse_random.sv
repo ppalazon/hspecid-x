@@ -16,13 +16,14 @@ class HsidHSPixelMseGen#(
 
   function void pre_randomize();
     super.pre_randomize();
-    initial_acc.rand_mode(0);
+    initial_acc.rand_mode(0); // This operand doesn't seem to work with xsim, so I repeat it after post_randomize
     initial_acc = 0; // Set initial accumulator value to zero
   endfunction
 
   function void post_randomize();
     super.post_randomize();
     hsp_bands_packs = (hsp_bands + 1) / 2;
+    initial_acc = 0;
   endfunction
 
   constraint c_vctr_ref {

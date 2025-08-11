@@ -107,6 +107,7 @@ module hsid_main_tb #(
 
   hsid_main_cg hsid_main_cov = new();
 
+  `ifdef MODEL_TECH
   // Binding SVA assertions to the DUT
   bind hsid_main_fsm hsid_main_fsm_sva #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -138,11 +139,7 @@ module hsid_main_tb #(
     .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) hsid_fifo_sva_inst (.*);
-
-  // bind hsid_fifo hsid_fifo_sva #(
-  //   .DATA_WIDTH(WORD_WIDTH),
-  //   .FIFO_ADDR_WIDTH(HSP_BANDS_WIDTH)
-  // ) hsid_fifo_sva_inst (.*);
+  `endif
 
   // Test vectors
   logic [DATA_WIDTH-1:0] captured_hsp [];
@@ -364,7 +361,7 @@ module hsid_main_tb #(
       if (will_raised_error)
         a_error: assert (error == 1) else $error("DUT did not raise error on invalid configuration");
       else
-        a_non_error: assert (error == 0) else $error("DUT did raise error on valid configuration");
+        a_non_error: assert (error == 0) else $error("DUT did raise error on valid configuration, hsp_bands_in: %0d, hsp_library_size_in: %0d", hsp_bands_in, hsp_library_size_in);
       #30;
     end
     $finish;

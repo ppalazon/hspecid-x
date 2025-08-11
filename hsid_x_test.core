@@ -13,6 +13,7 @@ filesets:
       - hw/src/hsid_x_obi_mem/tb/obi_bus_debug.sv
       - hw/src/hsid_x_obi_mem/tb/hsp_obi_mem.sv
       - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_random.sv
+      - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_sva.sv
       - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_tb.sv
 
       - hw/src/hsid_x_top/tb/hsid_x_top_random.sv

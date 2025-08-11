@@ -19,6 +19,10 @@ filesets:
     depend:
       - "uclm:hspecidx:hsid_test"
 
+  sva:
+    depend:
+      - "uclm:hspecidx:hsid_verif"
+
   tcl_modelsim:
     files:
       - hw/tcl/modelsim-do/hsid_main_debug.do
@@ -46,6 +50,7 @@ targets:
     default_tool: xsim
     filesets_append:
       - tb
+      - tool_modelsim? (sva)
       - tool_modelsim? (tcl_modelsim)
     toplevel: hsid_main_tb
     tools:

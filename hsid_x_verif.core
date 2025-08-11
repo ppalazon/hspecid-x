@@ -1,0 +1,20 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_x_verif
+description: Verification files with SVA for HSpecID-x accelerator
+
+filesets:
+  sva:
+    files:
+      - hw/src/hsid_x_obi_mem/tb/hsid_x_obi_mem_sva.sv
+    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_pkg"
+      - "uclm:hspecidx:hsid_x_ctrl_reg"
+      - "uclm:hspecidx:hsid_test"
+      - "pulp-platform.org::common_cells" # common_cells.core from deps
+      - "uclm:hspecidx:register_interface" # register_interface.core in root
+
+targets:
+  default: &default
+    filesets:
+      - sva

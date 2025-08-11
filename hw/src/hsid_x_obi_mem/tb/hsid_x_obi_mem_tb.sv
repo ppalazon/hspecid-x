@@ -7,8 +7,7 @@ module hsid_x_obi_mem_tb #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for the pixel memory
     parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH, // Address width for HSI library size
-    parameter VALUE_MASK = 32'h0000FFFF, // Mask to return least significant 16 bits of the address
-    parameter TESTS = 30 // Number of tests to run
+    parameter VALUE_MASK = 32'h0000FFFF // Mask to return least significant 16 bits of the address
   ) ();
 
   reg clk;
@@ -19,6 +18,7 @@ module hsid_x_obi_mem_tb #(
   wire data_out_valid;
   wire [WORD_WIDTH-1:0] data_out;
   reg [MEM_ACCESS_WIDTH-1:0] limit; // Limit for the number of requests
+  reg def_gnt; // Default grant signal for the OBI bus when there is no request
   reg random_gnt; // Random grant signal
   reg clear;
   reg start;
@@ -26,6 +26,7 @@ module hsid_x_obi_mem_tb #(
   wire ready;
   wire done;
 
+  // Device Under Test (DUT)
   hsid_x_obi_mem #(
     .WORD_WIDTH(WORD_WIDTH),
     .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
@@ -54,9 +55,9 @@ module hsid_x_obi_mem_tb #(
     .rst_n(rst_n),
     .obi_req(obi_req),
     .obi_rsp(obi_rsp),
-    .random_gnt(random_gnt)
+    .random_gnt(random_gnt),
+    .def_gnt(def_gnt) // Default grant signal, can be set to 1'b1 for fixed grant
   );
-
 
   // Module to debug the OBI bus
   obi_bus_debug obi_bus_debug (
@@ -72,12 +73,20 @@ module hsid_x_obi_mem_tb #(
     .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
   ) hsid_x_obi_mem_random = new();
 
+  `ifdef MODEL_TECH
+  // Binding SVA modules
+  bind hsid_x_obi_mem hsid_x_obi_mem_sva #(
+    .WORD_WIDTH(WORD_WIDTH),
+    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
+  ) hsid_x_obi_mem_sva_inst (.*);
+  `endif
+
   logic[MEM_ACCESS_WIDTH-1:0] requests;
   int read_addr;
   int reads;
 
 
-  // Waveform generation for debugging
+// Waveform generation for debugging
   initial begin
     $dumpfile("wave.vcd");
     $dumpvars(0, hsid_x_obi_mem_tb);
@@ -92,6 +101,7 @@ module hsid_x_obi_mem_tb #(
     limit = 0;
     clear = 0;
     random_gnt = 0;
+    def_gnt = 0;
 
     #3 rst_n = 0; // Set reset
     #5 rst_n = 1; // Release reset
@@ -156,15 +166,40 @@ module hsid_x_obi_mem_tb #(
     #10;
     assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
 
+    $display("Case 6: Set start and clear at the same time in IDLE state");
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+    start = 1; clear = 1;
+    #10;
+    assert_dut_state(1, 0, 0); // Assert DUT is still idle, not ready, and not done
+    start = 0; clear = 0;
+
+    $display("Case 7: Set limit to 0 and start reading, and then clear");
+    if (!hsid_x_obi_mem_random.randomize()) $fatal(0, "Randomization failed");
+    initial_addr = hsid_x_obi_mem_random.initial_addr;
+    limit = 0; // Set limit to 0
+    random_gnt = 1; // Enable random grant signal
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+    start = 1; clear = 0;
+    #20; // Wait for two clock cycle (init and reading)
+    assert_dut_state(0, 1, 0); // Assert DUT is not idle, ready, and not done
+    #100;
+    start = 0; clear = 1; // Clear the DUT
+    #20; // Wait for two clock cycles (clean and idle)
+    assert_dut_state(1, 0, 0); // Assert DUT is idle, not ready, and not done
+    start = 0; clear = 0; // Reset start and clear
+
+
+    #20; // Wait before finishing the simulation
+
     $finish;
   end
 
   always
     #5 clk = ! clk;
 
-  // initial begin
-  //   #2000000; $finish; // End simulation after a long time to avoid hanging;
-  // end
+// initial begin
+//   #2000000; $finish; // End simulation after a long time to avoid hanging;
+// end
 
   task assert_dut_state(
       input logic expected_idle,

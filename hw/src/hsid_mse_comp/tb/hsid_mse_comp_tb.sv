@@ -105,11 +105,13 @@ module hsid_mse_comp_tb #(
 
   cg_mse_comp cg_mse_comp_inst = new();
 
+  `ifdef MODEL_TECH
   // Bind SVA assertions
   bind hsid_mse_comp hsid_mse_comp_sva #(
     .WORD_WIDTH(WORD_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsid_mse_comp_sva_inst (.*);
+  `endif
 
   // Waveform generation for debugging
   initial begin

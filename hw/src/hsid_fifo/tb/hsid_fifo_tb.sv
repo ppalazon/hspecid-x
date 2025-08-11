@@ -44,11 +44,13 @@ module hsid_fifo_tb #(
     .clear(clear)
   );
 
+  `ifdef MODEL_TECH
   // bind verification to the DUT instance
   bind hsid_fifo hsid_fifo_sva #(
     .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) dut_sva (.*);
+  `endif
 
   // covergroup for FIFO
   covergroup fifo_cg @(posedge clk);

@@ -17,8 +17,14 @@ package hsid_pkg;
     HM_COMPUTE_MSE, HM_WAIT_MSE, HM_COMPARE_MSE, HM_DONE
   } hsid_main_state_t;
 
+  // HSID X Top state machine states
   typedef enum logic [3:0] {
     HXT_IDLE, HXT_CLEAR, HXT_ERROR, HXT_CONFIG, HXT_START_READ_CAPTURED, HXT_READ_CAPTURED, HXT_START_READ_LIBRARY, HXT_READ_LIBRARY
   } hsid_x_top_t;
+
+  // HSI OBI memory controller state machine states
+  typedef enum logic [2:0] {
+    HXOM_IDLE, HXOM_INIT, HXOM_READING, HXOM_DONE, HXOM_CLEAR
+  } hsid_x_obi_mem_state_t;
 
 endpackage

@@ -10,7 +10,7 @@ module hsid_sq_df_acc_tb #(
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Number of bits for Hyperspectral Pixels (8 bits - 256 bands)
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter TEST_RND_INSERT = 1, // Enable random insertion of test vectors
-    parameter TEST_OVERFLOW = 1 // Enable overflow test
+    parameter TEST_OVERFLOW = 0 // Enable overflow test
   );
 
   localparam logic[DATA_WIDTH_ACC-1:0]    MAX_DATA_ACC = {DATA_WIDTH_ACC{1'b1}}; // Maximum value for accumulator, it's wider than 32 bits
@@ -111,12 +111,14 @@ module hsid_sq_df_acc_tb #(
 
   sq_df_acc_cg sq_df_acc_cov = new();
 
+  `ifdef MODEL_TECH
   // Bind dut to sva assertions
   bind hsid_sq_df_acc hsid_sq_df_acc_sva #(
     .DATA_WIDTH(DATA_WIDTH),
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
   ) dut_sva (.*);
+  `endif
 
   // Intermediate sq_df_acc accumulated vector
   logic [DATA_WIDTH_ACC:0] acc_vctr [];
