@@ -71,12 +71,13 @@ module hsid_x_registers #(
   assign hw2reg.status.ready.de = 1'b1;
   assign hw2reg.status.idle.d = idle;
   assign hw2reg.status.idle.de = 1'b1;
+
   assign hw2reg.status.done.d = done;
-  assign hw2reg.status.done.de = 1'b1;
+  assign hw2reg.status.done.de = interruption;
   assign hw2reg.status.error.d = error;
-  assign hw2reg.status.error.de = 1'b1;
+  assign hw2reg.status.error.de = interruption;
   assign hw2reg.status.cancelled.d = cancelled;
-  assign hw2reg.status.cancelled.de = 1'b1;
+  assign hw2reg.status.cancelled.de = interruption;
 
   assign hw2reg.mse_min_ref.d = {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, mse_min_ref}; // Zero-extend to match width
   assign hw2reg.mse_min_ref.de = interruption;

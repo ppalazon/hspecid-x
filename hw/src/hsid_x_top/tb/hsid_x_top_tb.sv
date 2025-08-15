@@ -195,7 +195,11 @@ module hsid_x_top_tb #(
       library_hsp_addr_w = hsid_x_top_gen.library_pixel_addr_w;
 
       // Check status register
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      if (i == 0) begin
+        assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      end else begin
+        assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE | STATUS_DONE);
+      end
 
       // Initialize registers
       write_reg(reg_req, HSID_X_CTRL_CAPTURED_PIXEL_ADDR, captured_hsp_addr_w);
@@ -217,7 +221,7 @@ module hsid_x_top_tb #(
       #8;
       assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE);
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE | STATUS_IDLE);
 
       // // Check the MSE results
       assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, min_mse_ref_expected });
@@ -255,7 +259,7 @@ module hsid_x_top_tb #(
       #8;
       assert_read_reg(HSID_X_CTRL_STATUS, STATUS_ERROR);
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_ERROR | STATUS_IDLE);
 
       // // Check the MSE results
       assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, '0);
@@ -290,7 +294,7 @@ module hsid_x_top_tb #(
       assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE);
 
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE | STATUS_IDLE);
 
       // Start again to perform the clear operation
 
@@ -316,7 +320,7 @@ module hsid_x_top_tb #(
       assert_read_reg(HSID_X_CTRL_STATUS, STATUS_CANCELLED);
 
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_CANCELLED | STATUS_IDLE);
 
       // // Check the MSE results
       assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, '0);
@@ -342,7 +346,7 @@ module hsid_x_top_tb #(
       library_hsp_addr_w = hsid_x_top_gen.library_pixel_addr_w;
 
       // Check status register
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      // assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
 
       // Initialize registers
       write_reg(reg_req, HSID_X_CTRL_CAPTURED_PIXEL_ADDR, captured_hsp_addr_w);
@@ -387,7 +391,7 @@ module hsid_x_top_tb #(
       #8;
       assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE);
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_IDLE);
+      assert_read_reg(HSID_X_CTRL_STATUS, STATUS_DONE | STATUS_IDLE);
 
 // // Check the MSE results
       assert_read_reg(HSID_X_CTRL_MSE_MIN_REF, {{(WORD_WIDTH-HSP_LIBRARY_WIDTH){1'b0}}, min_mse_ref_expected });

@@ -45,6 +45,9 @@ module hsid_x_registers_tb #(
   logic [WORD_WIDTH-1:0] clear_w;
   logic [WORD_WIDTH-1:0] mse_max_ref_w;
   logic [WORD_WIDTH-1:0] mse_min_ref_w;
+  logic done_int;
+  logic error_int;
+  logic cancelled_int;
 
   assign library_size_w = {{(32-HSP_LIBRARY_WIDTH){1'b0}}, library_size};
   assign pixel_bands_w = {{(32-HSP_BANDS_WIDTH){1'b0}}, pixel_bands};
@@ -309,6 +312,7 @@ module hsid_x_registers_tb #(
     assert_read_reg(HSID_X_CTRL_MSE_MIN_VALUE, mse_min_value);
 
     $display("Case 6: Randomized test");
+    cancelled_int = 0; done_int = 0; error_int = 0;
     for (int i = 0; i< 100; i++) begin
       if(!hsid_x_ctrl_reg_random.randomize()) $fatal(0, "Randomization failed");
 
@@ -318,8 +322,13 @@ module hsid_x_registers_tb #(
       error = hsid_x_ctrl_reg_random.error;
       cancelled = hsid_x_ctrl_reg_random.cancelled;
       interruption = hsid_x_ctrl_reg_random.interrupt;
+      if (interruption) begin
+        done_int = hsid_x_ctrl_reg_random.done;
+        error_int = hsid_x_ctrl_reg_random.error;
+        cancelled_int = hsid_x_ctrl_reg_random.cancelled;
+      end
       #10;
-      assert_read_reg(HSID_X_CTRL_STATUS, {{25'b0},{cancelled,error,1'b0,done,ready,idle, 1'b0}});
+      assert_read_reg(HSID_X_CTRL_STATUS, {{25'b0},{cancelled_int,error_int,1'b0,done_int,ready,idle, 1'b0}});
 
       // Set start and clear again
       data_in = {{25'b0},{1'b0,1'b0,hsid_x_ctrl_reg_random.clear,1'b0, 1'b0, 1'b0, hsid_x_ctrl_reg_random.start}};
