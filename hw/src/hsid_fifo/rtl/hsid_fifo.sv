@@ -3,8 +3,8 @@
 import hsid_pkg::*;
 
 module hsid_fifo #(
-    parameter WORD_WIDTH = HSID_WORD_WIDTH,  // 16 bits by default
-    parameter FIFO_ADDR_WIDTH = HSID_FIFO_ADDR_WIDTH // Address width for FIFO depth
+    parameter WORD_WIDTH = HSID_WORD_WIDTH,
+    parameter FIFO_ADDR_WIDTH = HSID_FIFO_ADDR_WIDTH
   ) (
     input logic clk,
     input logic rst_n,
@@ -12,7 +12,7 @@ module hsid_fifo #(
     input logic wr_en,
     input logic rd_en,
     input logic [WORD_WIDTH-1:0] data_in,
-    input logic [FIFO_ADDR_WIDTH-1:0] almost_full_threshold, // Element to process
+    input logic [FIFO_ADDR_WIDTH-1:0] almost_full_threshold,
     output logic [WORD_WIDTH-1:0] data_out,
     output logic full,
     output logic almost_full,
@@ -32,11 +32,9 @@ module hsid_fifo #(
   logic [1:0] fifo_request;
 
   // FIFO status signals
-  assign full  = (fifo_count == FIFO_DEPTH); // FIFO is full when count reaches depth - 1
+  assign full  = (fifo_count == FIFO_DEPTH); // FIFO is full when count reaches depth
   assign empty = (fifo_count == 0);
   assign almost_full = (fifo_count >= almost_full_threshold); // Optional signal for almost full
-  // FIFO request: loop has maximum priority (in case it's empty do nothing), then read, write or read and write
-  // assign fifo_request = {loop_en && !empty, rd_en && !empty && !loop_en, wr_en && !full && !loop_en}; // 3 bits for read and write enable
   assign fifo_request = {rd_en && !empty, wr_en && !full}; // 2 bits for read and write enable
 
   // FIFO count update sequentially
@@ -87,14 +85,13 @@ module hsid_fifo #(
   endtask
 
   task clear_fifo();
-    // Task to clear the FIFO memory and reset pointers
     wr_ptr <= 0;
     rd_ptr <= 0;
     fifo_count <= 0;
-    foreach (fifo_mem[i]) begin
-      fifo_mem[i] <= '0; // Reset FIFO memory using a for loop
+    foreach (fifo_mem[i]) begin : fifo_mem_rst
+      fifo_mem[i] <= '0;
     end
-    data_out <= '0; // Reset output data
+    data_out <= '0;
   endtask
 
 endmodule
