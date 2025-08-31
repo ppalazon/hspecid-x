@@ -26,3 +26,6 @@ hw/deps/
 # Exclude vsim files
 etch*
 transcript
+
+#Exclude reports
+reports/

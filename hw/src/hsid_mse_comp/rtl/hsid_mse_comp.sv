@@ -2,6 +2,26 @@
 
 import hsid_pkg::*;
 
+/*
+ @WAVEDROM_START
+ { signal: [
+ { name: "clk",             wave: "p..........." },
+ { name: "rst_n",           wave: "l..........." },
+ { name: "clear",           wave: "l..........." },
+ { name: "mse_in_valid",    wave: "lhl.hl..h.l." },
+ { name: "mse_in_of",       wave: "l..........." },
+ { name: "mse_in_value",    wave: "x3x.3x..33x.", data: ['7', '5', '1', '9'] },
+ { name: "mse_in_ref",      wave: "x4x.4x..44x.", data: ['1', '2', '3', '4'] },
+ { name: "mse_out_valid",   wave: "l.hl.hl..h.l" },
+ { name: "mse_min_value",   wave: "x.3x.3x..3.x", data: ['7', '5', '1'] },
+ { name: "mse_min_ref",     wave: "x.4x.4x..4.x", data: ['1', '2', '3'] },
+ { name: "mse_min_changed", wave: "l.hl.hl..hl." },
+ { name: "mse_max_value",   wave: "x.3x.3x...3x", data: ['7', '7', '9'] },
+ { name: "mse_max_ref",     wave: "x.4x.4x...4x", data: ['1', '1', '4'] },
+ { name: "mse_max_changed", wave: "l.hl......hl" },
+ ]}
+ @WAVEDROM_END
+ */
 module hsid_mse_comp #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH  // Number of bits for HSI library size
