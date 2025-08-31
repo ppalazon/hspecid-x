@@ -9,7 +9,6 @@ filesets:
       - hw/src/hsid_x_top/rtl/hsid_x_top.sv
     file_type: systemVerilogSource
     depend:
-      - "uclm:hspecidx:hsid_x_ctrl_reg"
       - "uclm:hspecidx:hsid_x_obi_mem"
       - "uclm:hspecidx:hsid_x_registers"
       - "uclm:hspecidx:hsid_main"
@@ -58,13 +57,13 @@ targets:
     # - HSI_BANDS=10
     # - HSI_LIBRARY_SIZE=255
 
-  # synth:
-  #   <<: *default
-  #   description: Synthesize hsid for Nexys A7-100T
-  #   default_tool: vivado
-  #   filesets_append:
-  #     - nexys_a7_100t
-  #   toplevel: hsid
-  #   tools:
-  #     vivado:
-  #       part: xc7a100tcsg324-1
+  synth:
+    <<: *default
+    description: Synthesize HSpecID-X for Nexys A7-100T
+    default_tool: vivado
+    filesets_append:
+      - nexys_a7_100t
+    toplevel: hsid
+    tools:
+      vivado:
+        part: xc7a100tcsg324-1

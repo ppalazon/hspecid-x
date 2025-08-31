@@ -23,8 +23,8 @@ filesets:
       - "uclm:hspecidx:hsid_pkg"
       - "uclm:hspecidx:hsid_x_ctrl_reg"
       - "uclm:hspecidx:hsid_test"
-      - "pulp-platform.org::common_cells" # common_cells.core from deps
-      - "uclm:hspecidx:register_interface" # register_interface.core in root
+      - "pulp-platform.org::common_cells"
+      - "uclm:hspecidx:register_interface"
 
 targets:
   default: &default
