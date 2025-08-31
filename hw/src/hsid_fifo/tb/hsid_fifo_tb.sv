@@ -137,8 +137,8 @@ module hsid_fifo_tb #(
         if (fifo_value_check_read) begin
           if (fifo_values.size() == 0) $fatal(0, "Error: FIFO values queue is empty when it should not be");
           fifo_value_expected = fifo_values.pop_front();
-          assert (fifo_data_out == fifo_value_expected) else begin
-            $error("Error: Read data does not match expected data. Read data: %h, Expected: %h", fifo_data_out, fifo_value_expected);
+          a_fifo_data_out: assert (fifo_data_out == fifo_value_expected) else begin
+            $error("Error: FIFO data does not match expected data. Read data: %h, Expected: %h", fifo_data_out, fifo_value_expected);
           end
         end
         if (fifo_value_check_loop) begin
