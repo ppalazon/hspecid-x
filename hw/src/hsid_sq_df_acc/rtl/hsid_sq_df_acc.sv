@@ -2,10 +2,29 @@
 
 import hsid_pkg::*;
 
+/*
+ @WAVEDROM_START
+ { signal: [
+ { name: "clk",            wave: "p............." },
+ { name: "rst_n",          wave: "l............." },
+ { name: "clear",          wave: "l............." },
+ { name: "initial_acc_en", wave: "lhl....hl....." },
+ { name: "initial_acc",    wave: "x2x....2x.....", data: ['0', '10'] },
+ { name: "data_in_valid",  wave: "lh.........l.." },
+ { name: "data_in_a",      wave: "x3333336666x..", data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
+ { name: "data_in_b",      wave: "x7777779999x..", data: ['7', '2', '2', '6', '1', '7', '5', '7', '3', '9'] },
+ { name: "data_in_last",   wave: "l.....hl..hl.." },
+ { name: "acc_valid",      wave: "l..h.........l" },
+ { name: "acc_value",      wave: "x..4444445555x", data: ['49', '50', '50', '59', '68', '72', '11', '11', '36', '36'] },
+ { name: "acc_last",       wave: "l.......hl..hl" },
+ { name: "acc_of",         wave: "l............." },
+ ]}
+ @WAVEDROM_END
+ */
 module hsid_sq_df_acc #(
-    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default
-    parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // Data width for multiplication, larger than DATA_WIDTH
-    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC // Data width for accumulator, larger than DATA_WIDTH
+    parameter DATA_WIDTH = HSID_DATA_WIDTH,  // HSP Data width
+    parameter DATA_WIDTH_MUL = HSID_DATA_WIDTH_MUL, // HSP Data width for multiplication, larger than DATA_WIDTH
+    parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC // HSP Data width for accumulator, larger than DATA_WIDTH
   ) (
     input logic clk,
     input logic rst_n,

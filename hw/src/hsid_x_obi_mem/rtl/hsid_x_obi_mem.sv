@@ -2,6 +2,29 @@
 
 import hsid_pkg::*;
 
+/*
+ @WAVEDROM_START
+ { signal: [
+ { name: "clk",            wave: "p................." },
+ { name: "initial_addr",   wave: "x.3x..............", data: ['0x20'] },
+ { name: "limit",          wave: "x.4x..............", data: ['4'] },
+ { name: "data_out_valid", wave: "l................." },
+ { name: "data_out",       wave: "l................." },
+ { name: "start",          wave: "lhl..............." },
+ { name: "idle",           wave: "hl...............h" },
+ { name: "ready",          wave: "l..h............l." },
+ { name: "done",           wave: "l...............hl" },
+ { name: "obi_req.req",    wave: "l..h........l....." },
+ { name: "obi_req.we",     wave: "l................." },
+ { name: "obi_req.be",     wave: "8.................", data: ['0xF'] },
+ { name: "obi_req.addr",   wave: "x..3.33....3.x....", data: ['0x20', '0x24', '0x28', '0x2C'] },
+ { name: "obi_req.wdata",  wave: "9.................", data: ['0x0'] },
+ { name: "obi_rsp.gnt",    wave: "l...h.l...hlhl...." },
+ { name: "obi_rsp.rvalid", wave: "l...h.l....hl..hl." },
+ { name: "obi_rsp.rdata",  wave: "x...44x....4x..4x.", data: ['0x1', '0x2', '0x3', '0x4'] }
+ ]}
+ @WAVEDROM_END
+ */
 module hsid_x_obi_mem #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH  // Address width for HSI library size
