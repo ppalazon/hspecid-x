@@ -41,7 +41,7 @@ def main():
 
     module4ltx = latex_escape(module)
 
-    # Extraer resumen de assertion_successes
+    # Extraer resumen (lo dejamos por si quieres mostrarlo al final)
     summary = asrt_report.find("assertion_successes")
     summary_text = ""
     if summary is not None:
@@ -54,10 +54,16 @@ def main():
         f.write("\\begin{table}[H]\n")
         f.write("\\centering\n")
         f.write("\\begin{tabular}{l|l|rr}\n")
-        f.write("\\textbf{File} & \\textbf{Name} & \\textbf{Failures} & \\textbf{Passes} \\\\\n")
+        f.write("\\textbf{Fichero} & \\textbf{Propiedad} & \\textbf{Fallos} & \\textbf{Pases} \\\\\n")
         f.write("\\hline\n")
 
         for a in asrt_report.findall("asrt"):
+            passes = int(a.findtext("passcount", "0"))
+
+            # 👇 Filtramos: solo incluir si passes == 0
+            if passes != 0:
+                continue
+
             full_name = a.findtext("asrtname", "")
             name = full_name.split("/")[-1] if full_name else "?"
 
@@ -67,23 +73,21 @@ def main():
             name = latex_escape(name)
             name = f"\\texttt{{{name}}}"
 
-            failures  = a.findtext("failcount", "0")
-            passes    = a.findtext("passcount", "0")
+            failures = a.findtext("failcount", "0")
 
-            source    = a.findtext("source", "")
-            filename  = os.path.basename(source.split("(")[0]) if source else "?"
-            filename  = latex_escape(filename)
-            filename  = f"\\texttt{{{filename}}}"
+            source   = a.findtext("source", "")
+            filename = os.path.basename(source.split("(")[0]) if source else "?"
+            filename = latex_escape(filename)
+            filename = f"\\texttt{{{filename}}}"
 
             f.write(f"{filename} & {name} & {failures} & {passes} \\\\\n")
 
-        # Agregar resumen en la última fila
         if summary_text:
             f.write("\\hline\n")
             f.write(summary_text + "\n")
 
         f.write("\\end{tabular}\n")
-        f.write(f"\\caption{{Cobertura SVA e immediatas para \\texttt{{{module4ltx}}}}}\n")
+        f.write(f"\\caption{{Cobertura SVA no activadas y resumen para \\texttt{{{module4ltx}}}}}\n")
         f.write(f"\\label{{tab:{module}_sva_details}}\n")
         f.write("\\end{table}\n")
 

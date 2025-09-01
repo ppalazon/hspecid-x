@@ -62,5 +62,4 @@ targets:
           - -onfinish stop
           - -coverage
           - -assertdebug
-          - -sv_seed random
           - -do ../../../hw/tcl/modelsim-do/hsid_fifo_coverage.tcl

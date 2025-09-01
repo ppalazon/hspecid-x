@@ -102,7 +102,15 @@ module hsid_main_tb #(
       bins max = {MAX_HSP_LIBRARY};
       bins mid = {[1:MAX_HSP_LIBRARY-1]};
     }
-    coverpoint clear;
+    coverpoint clear {bins active = {1'b1};}
+    coverpoint start {bins active = {1'b1};}
+    coverpoint done {bins active = {1'b1};}
+    coverpoint ready {bins active = {1'b1};}
+    coverpoint idle {bins active = {1'b1};}
+    coverpoint cancelled {bins active = {1'b1};}
+    coverpoint error {bins active = {1'b1};}
+
+    clear_and_start: cross clear, start;
   endgroup
 
   hsid_main_cg hsid_main_cov = new();
@@ -351,15 +359,15 @@ module hsid_main_tb #(
       #10;
       // Start
       start = 1;
-      #10;
-      start = 0;
       // Configure
       hsp_bands_in = i % 3 == 0 ? '0 : hsid_main_random.hsp_bands_in; // Invalid HSP bands
       hsp_library_size_in = i % 2 ==0 ? '0: hsid_main_random.hsp_library_size_in; // Invalid HSP bands
       will_raised_error = hsp_bands_in == 0 || hsp_library_size_in == 0;
       #10;
+      start = 0;
+      #10;
       if (will_raised_error)
-        a_error: assert (error == 1) else $error("DUT did not raise error on invalid configuration");
+        a_error: assert (error == 1) else $error("DUT did not raise error on invalid configuration, hsp_bands_in: %0d, hsp_library_size_in: %0d", hsp_bands_in, hsp_library_size_in);
       else
         a_non_error: assert (error == 0) else $error("DUT did raise error on valid configuration, hsp_bands_in: %0d, hsp_library_size_in: %0d", hsp_bands_in, hsp_library_size_in);
       #30;

@@ -18,4 +18,4 @@ cp -r $FUSESOC_COVERAGE_DIR/report/* reports/$MODULE_NAME
 
 ./bin/hsid-report-sva2tex.py $MODULE_NAME
 ./bin/hsid-report-code2tex.py $MODULE_NAME
-./bin/hsid-report-cvgtex.py $MODULE_NAME
+./bin/hsid-report-cvg2tex.py $MODULE_NAME

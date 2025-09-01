@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Mon Sep  1 10:36:08 2025
+[*] Mon Sep  1 15:53:30 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_x_top_0/sim-simple-xsim/cleaned.vcd"
-[dumpfile_mtime] "Mon Sep  1 10:19:42 2025"
-[dumpfile_size] 64533
+[dumpfile_mtime] "Mon Sep  1 15:52:49 2025"
+[dumpfile_size] 61941
 [savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_x_top-simple.gtkw"
 [timestart] 0
-[size] 2554 1366
+[size] 2554 2765
 [pos] 1276 687
-*-15.832743 102400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.949104 102400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_x_top_simple_tb.
 [treeopen] hsid_x_top_simple_tb.dut.
 [sst_width] 317
@@ -53,12 +53,12 @@ hsid_x_top_simple_tb.dut.hsid_x_int_o
 -HSpecID-X FSM
 @22
 hsid_x_top_simple_tb.dut.fsm.current_state[3:0]
-@29
-hsid_x_top_simple_tb.dut.fsm.obi_start
-@28
-hsid_x_top_simple_tb.dut.fsm.obi_done
 @200
 -OBI Mem
+@28
+hsid_x_top_simple_tb.dut.fsm.obi_start
+@29
+hsid_x_top_simple_tb.dut.fsm.obi_done
 @28
 hsid_x_top_simple_tb.dut.obi_mem.current_state[2:0]
 @24

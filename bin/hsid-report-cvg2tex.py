@@ -15,6 +15,20 @@ def fmt_percent(value):
     except:
         return value
 
+def get_activations(node):
+    """Suma <metric> de los bins dentro de <bins> (ignora el bin de cabecera)."""
+    total = 0
+    bins_node = node.find("bins")
+    if bins_node is not None:
+        for b in bins_node.findall("bin"):
+            m = b.findtext("metric")
+            if m is not None:
+                try:
+                    total += int(float(m))
+                except:
+                    pass
+    return total
+
 def main():
     if len(sys.argv) != 2:
         print(f"Uso: {sys.argv[0]} <nombre_modulo>")
@@ -31,7 +45,7 @@ def main():
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    cvg = root.find(".//functional_coverage_report/cvgreport/covertype")
+    cvg = root.find(".//functional_coverage_report/cvgreport/covertype/coverinstance")
     if cvg is None:
         print("Error: no se encontró sección <functional_coverage_report>")
         sys.exit(1)
@@ -41,8 +55,9 @@ def main():
         f.write("\\centering\n")
 
         # ---------------- Tabla Coverpoints ----------------
-        f.write("\\begin{tabular}{lrrr}\n")
-        f.write("\\textbf{Coverpoint} & \\textbf{Covered} & \\textbf{Missing} & \\textbf{Percent} \\\\\n")
+        f.write("\\begin{tabular}{lrrrr}\n")
+        f.write("\\textbf{Coverpoint} & \\textbf{Activaciones} & "
+                "\\textbf{Cubiertos} & \\textbf{Perdidos} & \\textbf{Porcentaje} \\\\\n")
         f.write("\\hline\n")
 
         for cp in cvg.findall("coverpoint"):
@@ -50,15 +65,17 @@ def main():
             covered = cp.findtext("coveredbins", "0")
             missing = cp.findtext("missingbins", "0")
             percent = fmt_percent(cp.findtext("percenthit", "0.00"))
-            f.write(f"{texify(name)} & {covered} & {missing} & {percent} \\\\\n")
+            activations = get_activations(cp)
+
+            f.write(f"{texify(name)} & {activations} & {covered} & {missing} & {percent} \\\\\n")
 
         f.write("\\end{tabular}\n")
         f.write("\\vspace{0.5cm}\n")
 
         # ---------------- Tabla Crosses ----------------
-        f.write("\\begin{tabular}{l l r r r}\n")
+        f.write("\\begin{tabular}{l l r r r r}\n")
         f.write("\\textbf{Cross} & \\textbf{Coverpoints} & "
-                "\\textbf{Covered} & \\textbf{Missing} & \\textbf{Percent} \\\\\n")
+                "\\textbf{Activaciones} & \\textbf{Covered} & \\textbf{Missing} & \\textbf{Percent} \\\\\n")
         f.write("\\hline\n")
 
         for cross in cvg.findall("cross"):
@@ -66,11 +83,12 @@ def main():
             covered = cross.findtext("coveredbins", "0")
             missing = cross.findtext("missingbins", "0")
             percent = fmt_percent(cross.findtext("percenthit", "0.00"))
+            activations = get_activations(cross)
 
             cps = [texify(cp.text) for cp in cross.findall("cross_coverpoints/cross_coverpoint")]
             cps_str = ", ".join(cps)
 
-            f.write(f"{texify(name)} & {cps_str} & {covered} & {missing} & {percent} \\\\\n")
+            f.write(f"{texify(name)} & {cps_str} & {activations} & {covered} & {missing} & {percent} \\\\\n")
 
         f.write("\\end{tabular}\n")
 

@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 import sys
 import os
+import re
 import xml.etree.ElementTree as ET
+
+def clean_xml(xml_file):
+    """Crea una versión corregida del XML quitando las líneas mal formadas."""
+    cleaned_file = xml_file + ".cleaned"
+    with open(xml_file, "r") as fin, open(cleaned_file, "w") as fout:
+        for line in fin:
+            # Si detecta un <togenum ...<tog .../> lo elimina
+            if re.search(r"<togenum[^>]*<tog", line):
+                continue
+            fout.write(line)
+    return cleaned_file
 
 def get_metric(element, name):
     """Extrae active, hits y percent de un nodo y devuelve fila de tabla."""
@@ -25,7 +37,11 @@ def main():
         print(f"Error: no existe el fichero {xml_file}")
         sys.exit(1)
 
-    tree = ET.parse(xml_file)
+    # Preprocesar XML para quitar líneas rotas
+    cleaned_xml = clean_xml(xml_file)
+
+    # Parsear el XML ya limpio
+    tree = ET.parse(cleaned_xml)
     root = tree.getroot()
     inst = root.find(".//instanceData")
     if inst is None:
@@ -34,19 +50,14 @@ def main():
 
     rows = []
 
-    # Orden fijo para las métricas
+    # Orden fijo para las métricas (sin if/if-else)
     rows.append(get_metric(inst.find("branches"), "Branch coverage"))
-    for ifnode in inst.findall("if"):
-        hasElse = ifnode.get("hasElse")
-        if hasElse == "1":
-            rows.append(get_metric(ifnode, "If-Else coverage"))
-        elif hasElse == "0":
-            rows.append(get_metric(ifnode, "If coverage (sin else)"))
     rows.append(get_metric(inst.find("case"), "Case coverage"))
     rows.append(get_metric(inst.find("fec_conditions"), "Condition coverage"))
     rows.append(get_metric(inst.find("fec_expressions"), "Expression coverage"))
     rows.append(get_metric(inst.find("statements"), "Statement coverage"))
     rows.append(get_metric(inst.find("toggleSummary"), "Toggle coverage"))
+    rows.append(get_metric(inst.find("transitions"), "Transition coverage"))
 
     rows = [r for r in rows if r is not None]
 
@@ -58,7 +69,7 @@ def main():
         f.write("\\begin{table}[H]\n")
         f.write("\\centering\n")
         f.write("\\begin{tabular}{lrrr}\n")
-        f.write("\\textbf{Metric} & \\textbf{Active} & \\textbf{Hits} & \\textbf{Percent} \\\\\n")
+        f.write("\\textbf{Métrica} & \\textbf{Activos} & \\textbf{Aciertos} & \\textbf{Porcentaje} \\\\\n")
         f.write("\\hline\n")
         for name, active, hits, percent in rows:
             f.write(f"{name} & {active} & {hits} & {percent} \\\\\n")

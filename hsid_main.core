@@ -70,6 +70,26 @@ targets:
       xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
         compilation_mode: common
 
+  coverage:
+    <<: *default
+    description: Run coverage
+    default_tool: modelsim
+    filesets_append:
+      - tb
+      - sva
+    toplevel: hsid_main_tb
+    tools:
+      modelsim:
+        compilation_mode: common
+        vlog_options:
+          - +cover=bcestf
+          - +acc
+        vsim_options:
+          - -onfinish stop
+          - -coverage
+          - -assertdebug
+          - -do ../../../hw/tcl/modelsim-do/hsid_main_coverage.tcl
+
   # synth:
   #   <<: *default
   #   description: Synthesize hsid for Nexys A7-100T

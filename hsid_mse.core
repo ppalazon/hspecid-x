@@ -46,3 +46,23 @@ targets:
         #xsim_options:
       modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
+
+  coverage:
+    <<: *default
+    description: Run coverage
+    default_tool: modelsim
+    filesets_append:
+      - tb
+      - sva
+    toplevel: hsid_mse_tb
+    tools:
+      modelsim:
+        compilation_mode: common
+        vlog_options:
+          - +cover=bcestf
+          - +acc
+        vsim_options:
+          - -onfinish stop
+          - -coverage
+          - -assertdebug
+          - -do ../../../hw/tcl/modelsim-do/hsid_mse_coverage.tcl
