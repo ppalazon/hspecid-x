@@ -1,0 +1,96 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Sep  1 10:36:08 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_x_top_0/sim-simple-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Sep  1 10:19:42 2025"
+[dumpfile_size] 64533
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_x_top-simple.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] 1276 687
+*-15.832743 102400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_x_top_simple_tb.
+[treeopen] hsid_x_top_simple_tb.dut.
+[sst_width] 317
+[signals_width] 330
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsid_x_top_simple_tb.clk
+hsid_x_top_simple_tb.rst_n
+@200
+-Register Interface
+@22
+hsid_x_top_simple_tb.reg_inf_debug_inst.addr[31:0]
+hsid_x_top_simple_tb.reg_inf_debug_inst.wdata[31:0]
+hsid_x_top_simple_tb.reg_inf_debug_inst.wstrb[3:0]
+@28
+hsid_x_top_simple_tb.reg_inf_debug_inst.write
+@22
+hsid_x_top_simple_tb.reg_inf_debug_inst.rdata[31:0]
+@28
+hsid_x_top_simple_tb.reg_inf_debug_inst.valid
+@200
+-OBI Bus
+@28
+hsid_x_top_simple_tb.obi_bus_debug_inst.req
+@22
+hsid_x_top_simple_tb.obi_bus_debug_inst.addr[31:0]
+hsid_x_top_simple_tb.obi_bus_debug_inst.be[3:0]
+hsid_x_top_simple_tb.obi_bus_debug_inst.wdata[31:0]
+@28
+hsid_x_top_simple_tb.obi_bus_debug_inst.we
+hsid_x_top_simple_tb.obi_bus_debug_inst.gnt
+hsid_x_top_simple_tb.obi_bus_debug_inst.rvalid
+@22
+hsid_x_top_simple_tb.obi_bus_debug_inst.rdata[31:0]
+@200
+-Interruption
+@28
+hsid_x_top_simple_tb.dut.hsid_x_int_o
+@200
+-HSpecID-X FSM
+@22
+hsid_x_top_simple_tb.dut.fsm.current_state[3:0]
+@29
+hsid_x_top_simple_tb.dut.fsm.obi_start
+@28
+hsid_x_top_simple_tb.dut.fsm.obi_done
+@200
+-OBI Mem
+@28
+hsid_x_top_simple_tb.dut.obi_mem.current_state[2:0]
+@24
+hsid_x_top_simple_tb.dut.obi_mem.current_limit[12:0]
+@22
+hsid_x_top_simple_tb.dut.obi_mem.initial_addr[31:0]
+hsid_x_top_simple_tb.dut.obi_mem.limit[12:0]
+@28
+hsid_x_top_simple_tb.dut.obi_mem.finish_requesting
+hsid_x_top_simple_tb.dut.obi_mem.finish_reading
+@24
+hsid_x_top_simple_tb.dut.obi_mem.requests[13:0]
+hsid_x_top_simple_tb.dut.obi_mem.reads[13:0]
+@200
+-Control Register
+@28
+hsid_x_top_simple_tb.dut.ctrl_reg.idle
+hsid_x_top_simple_tb.dut.ctrl_reg.start
+hsid_x_top_simple_tb.dut.ctrl_reg.clear
+hsid_x_top_simple_tb.dut.ctrl_reg.done
+hsid_x_top_simple_tb.dut.ctrl_reg.error
+hsid_x_top_simple_tb.dut.ctrl_reg.cancelled
+@24
+hsid_x_top_simple_tb.dut.ctrl_reg.pixel_bands[6:0]
+hsid_x_top_simple_tb.dut.ctrl_reg.library_size[5:0]
+@22
+hsid_x_top_simple_tb.dut.ctrl_reg.captured_pixel_addr[31:0]
+hsid_x_top_simple_tb.dut.ctrl_reg.library_pixel_addr[31:0]
+@24
+hsid_x_top_simple_tb.dut.ctrl_reg.mse_max_ref[5:0]
+hsid_x_top_simple_tb.dut.ctrl_reg.mse_max_value[31:0]
+hsid_x_top_simple_tb.dut.ctrl_reg.mse_min_ref[5:0]
+hsid_x_top_simple_tb.dut.ctrl_reg.mse_min_value[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

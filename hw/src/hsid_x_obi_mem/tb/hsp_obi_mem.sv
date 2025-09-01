@@ -5,7 +5,9 @@ import hsid_pkg::*;
 module hsp_obi_mem #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Pixel data width
-    parameter VALUE_MASK = 32'h00003FFF // Mask to return least significant 14 bits of the address
+    parameter VALUE_MASK = 32'h0000FFFF, // Mask to return least significant 14 bits of the address
+    parameter VALUE_MODULE_LSB = 13, // Apply the mask and then modulo to get the value
+    parameter VALUE_MODULE_MSB = 17 // Apply the mask and then modulo to get the value
   ) (
     input logic clk,
     input logic rst_n,
@@ -23,8 +25,9 @@ module hsp_obi_mem #(
   // logic [DATA_WIDTH-1:0] da_pixel_value;
 
 
-  assign msb_pixel_value = (obi_req.addr[WORD_WIDTH-1:DATA_WIDTH] & VALUE_MASK);
-  assign lsb_pixel_value = (obi_req.addr[DATA_WIDTH-1:0] & VALUE_MASK);
+  // assign msb_pixel_value = (obi_req.addr[WORD_WIDTH-1:DATA_WIDTH] & VALUE_MASK) % VALUE_MODULE;
+  assign msb_pixel_value = (obi_req.addr[DATA_WIDTH-1:0] & VALUE_MASK) % VALUE_MODULE_MSB;
+  assign lsb_pixel_value = (obi_req.addr[DATA_WIDTH-1:0] & VALUE_MASK) % VALUE_MODULE_LSB;
   // assign da_pixel_value = (da_addr[DATA_WIDTH-1:0] & VALUE_MASK);
   // assign da_data = RANDOM_VALUE ? $random() : {da_pixel_value, da_pixel_value}; // Return random data or masked address
 
@@ -49,7 +52,7 @@ module hsp_obi_mem #(
       end
       if(obi_req.req && obi_rsp.gnt) begin : after_grant
         obi_rsp.rvalid <= 1'b1;
-        obi_rsp.rdata <= {lsb_pixel_value, msb_pixel_value}; // Return least significant 14 bits of the address
+        obi_rsp.rdata <= {msb_pixel_value, lsb_pixel_value}; // Return least significant 14 bits of the address
       end else begin
         obi_rsp.rvalid <= 1'b0;
       end

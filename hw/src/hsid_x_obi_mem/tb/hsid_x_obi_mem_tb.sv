@@ -7,7 +7,9 @@ module hsid_x_obi_mem_tb #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH, // Data width for the pixel memory
     parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH, // Address width for HSI library size
-    parameter VALUE_MASK = 32'h00003FFF // Mask to return least significant 16 bits of the address
+    parameter VALUE_MASK = 32'h0000FFFF, // Mask to return least significant 16 bits of the address
+    parameter VALUE_MODULE_LSB = 13,
+    parameter VALUE_MODULE_MSB = 17
   ) ();
 
   localparam MAX_MEM_ACCESS = {MEM_ACCESS_WIDTH{1'b1}};
@@ -51,7 +53,9 @@ module hsid_x_obi_mem_tb #(
   // Instantiate a memory OBI subordinate for testing
   hsp_obi_mem #(
     .DATA_WIDTH(DATA_WIDTH), // Data width for the pixel memory
-    .VALUE_MASK(VALUE_MASK) // Mask to return least significant 14 bits of the address
+    .VALUE_MASK(VALUE_MASK), // Mask to return least significant 14 bits of the address
+    .VALUE_MODULE_LSB(VALUE_MODULE_LSB), // Apply the mask and then modulo to get the value
+    .VALUE_MODULE_MSB(VALUE_MODULE_MSB)
   ) hsp_obi_mem_inst (
     .clk(clk),
     .rst_n(rst_n),
@@ -278,9 +282,10 @@ module hsid_x_obi_mem_tb #(
   function logic [31:0] addr_value(logic [WORD_WIDTH-1:0] addr);
     logic [DATA_WIDTH-1:0] msb_masked_addr;
     logic [DATA_WIDTH-1:0] lsb_masked_addr;
-    lsb_masked_addr = addr[DATA_WIDTH-1:0] & VALUE_MASK; // Mask to return least significant 14 bits of the address
-    msb_masked_addr = addr[WORD_WIDTH-1:DATA_WIDTH] & VALUE_MASK; // Mask to return least significant 14 bits of the address
-    return {lsb_masked_addr, msb_masked_addr}; // Return least significant 14 bits of the address
+    lsb_masked_addr = (addr[DATA_WIDTH-1:0] & VALUE_MASK) % VALUE_MODULE_LSB; // Mask to return least significant 14 bits of the address
+    msb_masked_addr = (addr[DATA_WIDTH-1:0] & VALUE_MASK) % VALUE_MODULE_MSB; // Mask to return least significant 14 bits of the address
+    // msb_masked_addr = (addr[WORD_WIDTH-1:DATA_WIDTH] & VALUE_MASK) % VALUE_MODULE_LSB; // Mask to return least significant 14 bits of the address
+    return {msb_masked_addr, lsb_masked_addr}; // Return least significant 14 bits of the address
   endfunction
 
 endmodule

@@ -1,6 +1,6 @@
 CAPI=2:
 name: uclm:hspecidx:hsid_main
-description: Hyperspectral pixel identification for HSpecID-x accelerator
+description: Hyperspectral pixel Identificator for HSpecID-X accelerator
 
 filesets:
   rtl:
@@ -58,11 +58,17 @@ targets:
         compilation_mode: common
       modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
-        #xelab_options:
-        #xsim_options:
-    # parameters:
-    # - HSI_BANDS=10
-    # - HSI_LIBRARY_SIZE=255
+
+  sim-simple:
+    <<: *default
+    description: Simulate a simple testbench for hsid_main
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: hsid_main_simple_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
 
   # synth:
   #   <<: *default

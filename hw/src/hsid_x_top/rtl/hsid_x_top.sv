@@ -9,8 +9,7 @@ module hsid_x_top #(
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC,  // Data width for accumulator
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Number of entries in the FIFO buffer
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
-    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
-    parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH
   ) (
     input logic clk,
     input logic rst_n,
@@ -26,6 +25,8 @@ module hsid_x_top #(
     // Interrupt interface
     output logic hsid_x_int_o
   );
+
+  localparam int MEM_ACCESS_WIDTH = HSP_BANDS_WIDTH + HSP_LIBRARY_WIDTH; // Number of bits for addressable memory with pixels
 
   wire start;
   wire clear;
@@ -55,8 +56,7 @@ module hsid_x_top #(
   hsid_x_top_fsm #(
     .WORD_WIDTH(WORD_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH),
-    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
-    .MEM_ACCESS_WIDTH(MEM_ACCESS_WIDTH)
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) fsm (
     .clk(clk),
     .rst_n(rst_n),

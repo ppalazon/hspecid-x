@@ -12,8 +12,11 @@ module hsid_x_top_tb #(
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
-    parameter TEST_MEM_MASK = 32'h00003FFF  // Mask to return least significant 14 bits of the address
+    parameter TEST_MEM_MASK = 32'h0000FFFF,  // Mask to return least significant 14 bits of the address
+    parameter TEST_VALUE_MODULE_LSB = 13, // Apply the mask and then modulo to get the value
+    parameter TEST_VALUE_MODULE_MSB = 17 // Apply the mask and then modulo to get the value
   ) ();
+
 
   localparam MAX_WORD = {WORD_WIDTH{1'b1}};  // Maximum value for a word
 
@@ -79,7 +82,9 @@ module hsid_x_top_tb #(
   // Connect test memory on the OBI bus
   hsp_obi_mem #(
     .DATA_WIDTH(DATA_WIDTH),
-    .VALUE_MASK(TEST_MEM_MASK)
+    .VALUE_MASK(TEST_MEM_MASK),
+    .VALUE_MODULE_LSB(13),
+    .VALUE_MODULE_MSB(17)
   ) hsp_obi_mem_inst (
     .clk(clk),
     .rst_n(rst_n),
@@ -93,8 +98,7 @@ module hsid_x_top_tb #(
   bind hsid_x_top_fsm hsid_x_top_fsm_sva #(
     .HSP_BANDS_WIDTH (HSP_BANDS_WIDTH),
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
-    .WORD_WIDTH(WORD_WIDTH),
-    .MEM_ACCESS_WIDTH(HSID_MEM_ACCESS_WIDTH)
+    .WORD_WIDTH(WORD_WIDTH)
   ) dut_sva (.*);
 
   bind hsid_x_obi_mem hsid_x_obi_mem_sva #(
@@ -171,7 +175,6 @@ module hsid_x_top_tb #(
 
   // Compute expected MSE values for each pixel in the library
   initial begin
-
     clk = 1;
     rst_n = 1;
     reg_req = hsid_x_reg_pkg::reg_req_t'(0);
@@ -426,11 +429,12 @@ module hsid_x_top_tb #(
     logic [DATA_WIDTH-1:0] lsb_pixel_value;
     hsp = new[bands];
     for (int i = 0; i < bands; i=i+2) begin
-      msb_pixel_value = addr[WORD_WIDTH-1:DATA_WIDTH] & TEST_MEM_MASK;
-      lsb_pixel_value = addr[DATA_WIDTH-1:0] & TEST_MEM_MASK;
+      // msb_pixel_value = addr[WORD_WIDTH-1:DATA_WIDTH] & TEST_MEM_MASK;
+      msb_pixel_value = (addr[DATA_WIDTH-1:0] & TEST_MEM_MASK) % TEST_VALUE_MODULE_MSB;
+      lsb_pixel_value = (addr[DATA_WIDTH-1:0] & TEST_MEM_MASK) % TEST_VALUE_MODULE_LSB;
       // $display("Reading pixel data from address: 0x%0h: 0x%0h", addr, masked_data);
-      hsp[i] = lsb_pixel_value;
-      hsp[i+1] = msb_pixel_value;
+      hsp[i] = msb_pixel_value;
+      hsp[i+1] = lsb_pixel_value;
       addr = addr + 4;
     end
   endtask

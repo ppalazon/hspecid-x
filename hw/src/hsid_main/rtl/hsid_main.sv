@@ -2,6 +2,25 @@
 
 import hsid_pkg::*;  // Import the package for HSI MSE
 
+/*
+ @WAVEDROM_START
+ { "signal": [
+ { "name": "clk",                 "wave": "p.........................." },
+ { "name": "band_data_in_valid",  "wave": "l..h...............l........" },
+ { "name": "band_data_in",        "wave": "x..33333x7777799999x........", "data": ["0/1","2/3","4/5","6/7","8/9","7/2", "2/6","1/7","5/7", "3/9","6/1","6/8", "2/5", "4/2", "3/0"] },
+ { "name": "hap_library_size_in", "wave": "x.5x........................", "data":["2"] },
+ { "name": "hap_bands_in",        "wave": "x.4x........................" , "data":["10"] },
+ { "name": "mse_min_ref",         "wave": "x...................6x...6x." , "data":["0","0"] },
+ { "name": "mse_max_ref",         "wave": "x...................8x...8x." , "data":["0","1"] },
+ { "name": "mse_min_value",       "wave": "x...................6x...6x." , "data":["9","9"] },
+ { "name": "mse_max_value",       "wave": "x...................8x...8x." , "data":["9","21"] },
+ { "name": "start",               "wave": "lhl........................." },
+ { "name": "done",                "wave": "l.........................hl" },
+ { "name": "idle",                "wave": "hl.........................h" },
+ { "name": "ready",               "wave": "l..h................l......." }
+ ]}
+ @WAVEDROM_END
+ */
 module hsid_main #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter DATA_WIDTH = HSID_DATA_WIDTH,  // 16 bits by default

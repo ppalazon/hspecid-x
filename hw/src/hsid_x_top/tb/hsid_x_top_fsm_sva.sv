@@ -6,7 +6,7 @@ module hsid_x_top_fsm_sva #(
     parameter WORD_WIDTH = HSID_WORD_WIDTH,  // Width of the word in bits
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,  // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
-    parameter MEM_ACCESS_WIDTH = HSID_MEM_ACCESS_WIDTH
+    localparam MEM_ACCESS_WIDTH = HSP_BANDS_WIDTH + HSP_LIBRARY_WIDTH
   ) (
     input logic clk,
     input logic rst_n,

@@ -18,6 +18,7 @@ filesets:
 
       - hw/src/hsid_x_top/tb/hsid_x_top_random.sv
       - hw/src/hsid_x_top/tb/hsid_x_top_tb.sv
+      - hw/src/hsid_x_top/tb/hsid_x_top_simple_tb.sv
     file_type: systemVerilogSource
     depend:
       - "uclm:hspecidx:hsid_pkg"

@@ -1,0 +1,145 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Sun Aug 31 21:34:48 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_main_0/sim-simple-xsim/cleaned.vcd"
+[dumpfile_mtime] "Sun Aug 31 21:24:44 2025"
+[dumpfile_size] 15985
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_main-simple.gtkw"
+[timestart] 127310
+[size] 2554 2765
+[pos] -1 -1
+*-13.944882 201970 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_main_simple_tb.
+[treeopen] hsid_main_simple_tb.dut.
+[treeopen] hsid_main_simple_tb.dut.fifo_captured.
+[treeopen] hsid_main_simple_tb.dut.fifo_ref.
+[treeopen] hsid_main_simple_tb.dut.mse.
+[sst_width] 317
+[signals_width] 342
+[sst_expanded] 1
+[sst_vpaned_height] 1003
+@28
+hsid_main_simple_tb.clk
+hsid_main_simple_tb.rst_n
+@200
+-DUT
+@22
+hsid_main_simple_tb.dut.band_data_in[31:0]
+@28
+hsid_main_simple_tb.dut.band_data_in_valid
+@24
+hsid_main_simple_tb.dut.hsp_bands_in[6:0]
+hsid_main_simple_tb.dut.hsp_library_size_in[5:0]
+@28
+hsid_main_simple_tb.dut.start
+hsid_main_simple_tb.dut.clear
+hsid_main_simple_tb.dut.done
+hsid_main_simple_tb.dut.idle
+hsid_main_simple_tb.dut.ready
+@22
+hsid_main_simple_tb.dut.mse_min_ref[5:0]
+@24
+hsid_main_simple_tb.dut.mse_min_value[31:0]
+@22
+hsid_main_simple_tb.dut.mse_max_ref[5:0]
+@24
+hsid_main_simple_tb.dut.mse_max_value[31:0]
+@200
+-FSM
+@28
+hsid_main_simple_tb.dut.fsm.cfg_fail
+@24
+hsid_main_simple_tb.dut.fsm.cfg_hsp_bands[6:0]
+hsid_main_simple_tb.dut.fsm.cfg_hsp_library_size[5:0]
+@22
+hsid_main_simple_tb.dut.fsm.current_state[3:0]
+@200
+-FIFO Captured
+@24
+hsid_main_simple_tb.dut.fifo_captured.almost_full_threshold[6:0]
+@28
+hsid_main_simple_tb.dut.fifo_captured.almost_full
+@22
+hsid_main_simple_tb.dut.fifo_captured.data_in[31:0]
+hsid_main_simple_tb.dut.fifo_captured.data_out[31:0]
+@28
+hsid_main_simple_tb.dut.fifo_captured.empty
+hsid_main_simple_tb.dut.fifo_captured.loop_en
+hsid_main_simple_tb.dut.fifo_captured.wr_en
+@200
+-FIFO Ref
+@28
+hsid_main_simple_tb.dut.fifo_ref.wr_en
+hsid_main_simple_tb.dut.fifo_ref.empty
+@22
+hsid_main_simple_tb.dut.fifo_ref.data_in[31:0]
+@28
+hsid_main_simple_tb.dut.fifo_ref.rd_en
+@200
+-MSE Comp
+@25
+hsid_main_simple_tb.dut.mse_comp.mse_in_value[31:0]
+@28
+hsid_main_simple_tb.dut.mse_comp.mse_in_valid
+hsid_main_simple_tb.dut.mse_comp.mse_min_changed
+@24
+hsid_main_simple_tb.dut.mse_comp.mse_min_value[31:0]
+@28
+hsid_main_simple_tb.dut.mse_comp.mse_max_changed
+@24
+hsid_main_simple_tb.dut.mse_comp.mse_max_value[31:0]
+@28
+hsid_main_simple_tb.dut.mse_comp.mse_out_valid
+@200
+-MSE
+@22
+hsid_main_simple_tb.dut.mse.band_pack_a[31:0]
+hsid_main_simple_tb.dut.mse.band_pack_b[31:0]
+@28
+hsid_main_simple_tb.dut.mse.band_pack_valid
+hsid_main_simple_tb.dut.mse.band_pack_start
+hsid_main_simple_tb.dut.mse.band_pack_last
+hsid_main_simple_tb.dut.mse.compute_acc_sum_en
+@24
+hsid_main_simple_tb.dut.mse.acc_value[40:0]
+@28
+hsid_main_simple_tb.dut.mse.compute_mse_en
+hsid_main_simple_tb.dut.mse.mse_valid
+@24
+hsid_main_simple_tb.dut.mse.mse_value[31:0]
+hsid_main_simple_tb.dut.mse.mse_ref[5:0]
+@200
+-SqDfAcc1
+@24
+hsid_main_simple_tb.dut.mse.channel_1.data_in_a[15:0]
+hsid_main_simple_tb.dut.mse.channel_1.data_in_b[15:0]
+@28
+hsid_main_simple_tb.dut.mse.channel_1.data_in_valid
+hsid_main_simple_tb.dut.mse.channel_1.data_in_last
+@420
+hsid_main_simple_tb.dut.mse.channel_1.diff[16:0]
+@24
+hsid_main_simple_tb.dut.mse.channel_1.mult[31:0]
+hsid_main_simple_tb.dut.mse.channel_1.acc_value[39:0]
+@28
+hsid_main_simple_tb.dut.mse.channel_1.acc_valid
+hsid_main_simple_tb.dut.mse.channel_1.acc_last
+@200
+-SqDfAcc2
+@24
+hsid_main_simple_tb.dut.mse.channel_2.data_in_a[31:16]
+hsid_main_simple_tb.dut.mse.channel_2.data_in_b[31:16]
+@28
+hsid_main_simple_tb.dut.mse.channel_2.data_in_valid
+hsid_main_simple_tb.dut.mse.channel_2.data_in_last
+@420
+hsid_main_simple_tb.dut.mse.channel_2.diff[16:0]
+@24
+hsid_main_simple_tb.dut.mse.channel_2.mult[31:0]
+hsid_main_simple_tb.dut.mse.channel_2.acc_value[39:0]
+@28
+hsid_main_simple_tb.dut.mse.channel_2.acc_valid
+hsid_main_simple_tb.dut.mse.channel_2.acc_last
+[pattern_trace] 1
+[pattern_trace] 0

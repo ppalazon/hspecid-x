@@ -68,7 +68,7 @@ module hsid_mse_comp_sva #(
 
   // If input is smaller than max, max should not change
   property max_not_changed_on_smaller_input;
-    @(posedge clk) disable iff (!rst_n || clear) mse_in_valid && !mse_in_of && mse_in_value < mse_max_value |-> ##1
+    @(posedge clk) disable iff (!rst_n || clear) !clear && mse_in_valid && !mse_in_of && mse_in_value < mse_max_value |-> ##1
       !mse_max_changed && $stable(mse_max_ref) && $stable(mse_max_value);
   endproperty
 

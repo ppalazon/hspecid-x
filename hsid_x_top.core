@@ -51,11 +51,6 @@ targets:
         compilation_mode: common
       modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
-        #xelab_options:
-        #xsim_options:
-    # parameters:
-    # - HSI_BANDS=10
-    # - HSI_LIBRARY_SIZE=255
 
   synth:
     <<: *default
@@ -67,3 +62,84 @@ targets:
     tools:
       vivado:
         part: xc7a100tcsg324-1
+
+  sim-simple:
+    <<: *default
+    description: Simulate a simple testbench for hsid_x_top
+    default_tool: xsim
+    filesets_append:
+      - tb
+    toplevel: hsid_x_top_simple_tb
+    parameters:
+      - DATA_WIDTH_MUL
+      - DATA_WIDTH_ACC
+      - HSP_BANDS_WIDTH
+      - HSP_LIBRARY_WIDTH
+      - TEST_HSP_BANDS
+      - TEST_HSP_LIBRARY_SIZE
+      - TEST_HSP_CAPTURED_PIXEL_ADDR
+      - TEST_HSP_LIBRARY_PIXEL_ADDR
+      - TEST_MEM_MASK
+      - TEST_RND_GNT
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+
+parameters:
+  WORD_WIDTH:
+    datatype: int
+    description: Width of the word in bits
+    paramtype: vlogparam
+  DATA_WIDTH:
+    datatype: int
+    description: Width of the data bands in bits
+    paramtype: vlogparam
+  DATA_WIDTH_MUL:
+    datatype: int
+    description: Data width for multiplication
+    paramtype: vlogparam
+  DATA_WIDTH_ACC:
+    datatype: int
+    description: Data width for accumulator
+    paramtype: vlogparam
+  BUFFER_WIDTH:
+    datatype: int
+    description: Bits to address the FIFO buffer
+    paramtype: vlogparam
+  HSP_BANDS_WIDTH:
+    datatype: int
+    description: Bits to address the number of bands per HSP (Remember change Register Interface if modified)
+    paramtype: vlogparam
+  HSP_LIBRARY_WIDTH:
+    datatype: int
+    description: Bits to address the number of pixels in the HSP library (Remember change Register Interface if modified)
+    paramtype: vlogparam
+  MEM_ACCESS_WIDTH:
+    datatype: int
+    description: Bits to address the memory access width (sum of HSP_BANDS_WIDTH and HSP_LIBRARY_WIDTH)
+    paramtype: vlogparam
+
+  TEST_HSP_BANDS:
+    datatype: int
+    description: Number of bands per HSP to test
+    paramtype: vlogparam
+  TEST_HSP_LIBRARY_SIZE:
+    datatype: int
+    description: Number of pixels in the HSP library to test
+    paramtype: vlogparam
+  TEST_HSP_CAPTURED_PIXEL_ADDR:
+    datatype: int
+    description: Address of the captured pixel in memory to test
+    paramtype: vlogparam
+  TEST_HSP_LIBRARY_PIXEL_ADDR:
+    datatype: int
+    description: Address of the HSP library in memory to test
+    paramtype: vlogparam
+  TEST_MEM_MASK:
+    datatype: int
+    description: Mask to return data from address
+    paramtype: vlogparam
+  TEST_RND_GNT:
+    datatype: int
+    description: Random grant signal for the OBI bus to test
+    paramtype: vlogparam

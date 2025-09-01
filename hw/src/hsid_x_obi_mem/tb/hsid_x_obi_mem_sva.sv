@@ -132,7 +132,7 @@ module hsid_x_obi_mem_sva #(
   property p_idle_signal;
     @(posedge clk) disable iff (!rst_n || clear) current_state == HXOM_IDLE |-> idle && !ready && !done;
   endproperty
-  assert property (p_idle_signal) else $error("Enable idle signal when in IDLE state");
+  assert property (p_idle_signal) else $error("Enable idle signal when in IDLE state, idle: %0b, ready: %0b, done: %0b", idle, ready, done);
   cover property (p_idle_signal); //$display("Coverage: IDLE state signal");
 
 endmodule
