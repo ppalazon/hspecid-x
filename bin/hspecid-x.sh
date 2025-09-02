@@ -2,12 +2,25 @@
 set -e # Exit on error
 #set -x # Enable verbose command output
 
+usage="$(basename "$0") [-h] [-b n] [-l m] [-w] [-r] -- Simulate HSpecID-X with xsim
+
+where:
+    -h  show this help text
+    -b  set HSP Bands number (default: 10)
+    -l  set HSP Library Size (default: 2)
+    -w  show waveform (default: no)
+    -r  randomize GNT from test OBI Memory Device (default: no)
+"
+
 SHOW_WAVEFORM=""
 HSP_BANDS=10
 HSP_LIBRARY_SIZE=2
 RND_GNT=0
-while getopts "wrb:l:" opt; do
+while getopts "hwrb:l:" opt; do
   case $opt in
+    h) echo "$usage"
+       exit
+       ;;
     w) SHOW_WAVEFORM="-w";;
     r) RND_GNT=1;;
     b) HSP_BANDS=$OPTARG;;
