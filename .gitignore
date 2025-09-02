@@ -28,4 +28,5 @@ etch*
 transcript
 
 #Exclude reports
-reports/
+reports/*/*
+!reports/index.html
