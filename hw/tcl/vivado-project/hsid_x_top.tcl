@@ -78,18 +78,6 @@ add_files {
   ./hw/deps/common_cells/src/stream_arbiter.sv 
   ./hw/deps/common_cells/src/stream_omega_net.sv 
   ./hw/deps/common_cells/src/mem_to_banks.sv 
-  ./hw/deps/common_cells/src/deprecated/clock_divider_counter.sv 
-  ./hw/deps/common_cells/src/deprecated/clk_div.sv 
-  ./hw/deps/common_cells/src/deprecated/find_first_one.sv 
-  ./hw/deps/common_cells/src/deprecated/generic_LFSR_8bit.sv 
-  ./hw/deps/common_cells/src/deprecated/generic_fifo.sv 
-  ./hw/deps/common_cells/src/deprecated/prioarbiter.sv 
-  ./hw/deps/common_cells/src/deprecated/pulp_sync.sv 
-  ./hw/deps/common_cells/src/deprecated/pulp_sync_wedge.sv 
-  ./hw/deps/common_cells/src/deprecated/rrarbiter.sv 
-  ./hw/deps/common_cells/src/deprecated/clock_divider.sv 
-  ./hw/deps/common_cells/src/deprecated/fifo_v2.sv 
-  ./hw/deps/common_cells/src/deprecated/fifo_v1.sv 
   ./hw/deps/common_cells/src/edge_propagator_ack.sv 
   ./hw/deps/common_cells/src/edge_propagator.sv 
   ./hw/deps/common_cells/src/edge_propagator_rx.sv 
