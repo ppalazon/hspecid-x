@@ -46,7 +46,7 @@ module vctr_fifo_strm #(
   logic vctr_out_en, compute_en; // Pipeline control signals
   logic [HSP_BANDS_WIDTH-1:0] processed;
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= IDLE;  // Reset to IDLE state
       vctr_out_data <= 0;

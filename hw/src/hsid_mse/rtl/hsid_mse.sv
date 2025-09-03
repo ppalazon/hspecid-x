@@ -71,35 +71,37 @@ module hsid_mse #(
   logic [HSP_BANDS_WIDTH-1:0] acc_hsp_bands; // HSP bands to process
   logic acc_channel_of;
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       reset_values();
-    end if (clear) begin
-      reset_values();
     end else begin
-      // Pipeline stage for square difference accumulator between two channels
-      if (band_pack_valid && band_pack_last) begin: last_band_pack
-        acc_ref <= hsp_ref; // Set vector reference for sum
-        acc_hsp_bands <= hsp_bands; // Set HSP bands to process
-      end
-      if (compute_acc_sum_en) begin: compute_acc_sum
-        compute_mse_en <= 1;  // Enable mean square error accumulator
-        acc_channel_of <= channel_1_acc_of || channel_2_acc_of;  // Check if any channel has overflow
-        acc_value <= channel_1_acc_value + channel_2_acc_value;  // Sum the square differences
+      if (clear) begin
+        reset_values();
       end else begin
-        compute_mse_en <= 0;  // Disable mean square error accumulator
-      end
+        // Pipeline stage for square difference accumulator between two channels
+        if (band_pack_valid && band_pack_last) begin: last_band_pack
+          acc_ref <= hsp_ref; // Set vector reference for sum
+          acc_hsp_bands <= hsp_bands; // Set HSP bands to process
+        end
+        if (compute_acc_sum_en) begin: compute_acc_sum
+          compute_mse_en <= 1;  // Enable mean square error accumulator
+          acc_channel_of <= channel_1_acc_of || channel_2_acc_of;  // Check if any channel has overflow
+          acc_value <= channel_1_acc_value + channel_2_acc_value;  // Sum the square differences
+        end else begin
+          compute_mse_en <= 0;  // Disable mean square error accumulator
+        end
 
-      // Pipeline stage for mean square error division
-      if (compute_mse_en) begin: compute_mse
-        // Compute mean square error
-        mse_valid <=1;  // Enable output
-        // mse_of <= acc_value > (acc_hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of result
-        mse_value <= acc_value / acc_hsp_bands;  // Divide by the number of bands
-        acc_of <= acc_value[DATA_WIDTH_ACC] || acc_channel_of;  // Propagate overflow flag from square difference accumulator
-        mse_ref <= acc_ref;  // Set reference vector for mean square error
-      end else begin
-        mse_valid <= 0;  // Disable output when not valid
+        // Pipeline stage for mean square error division
+        if (compute_mse_en) begin: compute_mse
+          // Compute mean square error
+          mse_valid <=1;  // Enable output
+          // mse_of <= acc_value > (acc_hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of result
+          mse_value <= acc_value / acc_hsp_bands;  // Divide by the number of bands
+          acc_of <= acc_value[DATA_WIDTH_ACC] || acc_channel_of;  // Propagate overflow flag from square difference accumulator
+          mse_ref <= acc_ref;  // Set reference vector for mean square error
+        end else begin
+          mse_valid <= 0;  // Disable output when not valid
+        end
       end
     end
   end

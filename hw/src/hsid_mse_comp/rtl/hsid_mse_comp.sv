@@ -46,7 +46,7 @@ module hsid_mse_comp #(
     output logic mse_max_changed
   );
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       mse_clear();  // Clear all MSE values and flags
     end else begin

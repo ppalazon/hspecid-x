@@ -58,49 +58,51 @@ module hsid_sq_df_acc #(
   assign acc_of = acc_reg_of || acc_w_of[DATA_WIDTH_ACC]; // Overflow flag for the accumulator
   assign acc_value = acc_w_of[DATA_WIDTH_ACC-1:0]; // Output accumulated value
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       reset_values();
-    end if (clear) begin
-      reset_values();
     end else begin
-      if (data_in_valid) begin : diff_stage
-        stage_1_en <= 1;
-        acc_1_en <= initial_acc_en; // Enable initial accumulator value
-        acc_1 <= initial_acc; // Set initial accumulator value
-        last_1 <= data_in_last; // Capture last flag for stage 1
-        diff <= data_in_a - data_in_b; // Compute difference, with extra bit you don't have to worry about overflow
+      if (clear) begin
+        reset_values();
       end else begin
-        stage_1_en <= 0; // Disable stage 1
-        // acc_1_en <= 0; // Disable initial accumulator value
-        // last_1 <= 0;
-      end
-      if (stage_1_en) begin : square_diff_stage
-        stage_2_en <= 1;
-        acc_2_en <= acc_1_en; // Propagate enable signal for accumulator
-        acc_2 <= acc_1; // Propagate accumulator value
-        last_2 <= last_1; // Propagate last flag for stage 2
-        mult <= diff * diff; // Compute squared difference and accumulate
-      end else begin
-        stage_2_en <= 0; // Disable stage 2
-        // acc_2_en <= 0; // Disable accumulator
-        // last_2 <= 0;
-      end
-      if (stage_2_en) begin : accumulate_stage
-        acc_valid <= 1; // Enable output when valid
-        acc_last <= last_2; // Propagate band counter for output
-        if(acc_2_en) begin
-          acc_reg_of <= 0;
-          acc_w_of <= acc_2 + mult; // Add to initial accumulator value
+        if (data_in_valid) begin : diff_stage
+          stage_1_en <= 1;
+          acc_1_en <= initial_acc_en; // Enable initial accumulator value
+          acc_1 <= initial_acc; // Set initial accumulator value
+          last_1 <= data_in_last; // Capture last flag for stage 1
+          diff <= data_in_a - data_in_b; // Compute difference, with extra bit you don't have to worry about overflow
         end else begin
-          if (acc_w_of[DATA_WIDTH_ACC]) begin
-            acc_reg_of <= 1; // Register overflow flag
-          end
-          acc_w_of <= acc_w_of + mult; // Add to initial accumulator value
+          stage_1_en <= 0; // Disable stage 1
+          // acc_1_en <= 0; // Disable initial accumulator value
+          // last_1 <= 0;
         end
-      end else begin
-        acc_valid <= 0; // Disable output when not valid
-        acc_last <= 0; // Reset band counter for output
+        if (stage_1_en) begin : square_diff_stage
+          stage_2_en <= 1;
+          acc_2_en <= acc_1_en; // Propagate enable signal for accumulator
+          acc_2 <= acc_1; // Propagate accumulator value
+          last_2 <= last_1; // Propagate last flag for stage 2
+          mult <= diff * diff; // Compute squared difference and accumulate
+        end else begin
+          stage_2_en <= 0; // Disable stage 2
+          // acc_2_en <= 0; // Disable accumulator
+          // last_2 <= 0;
+        end
+        if (stage_2_en) begin : accumulate_stage
+          acc_valid <= 1; // Enable output when valid
+          acc_last <= last_2; // Propagate band counter for output
+          if(acc_2_en) begin
+            acc_reg_of <= 0;
+            acc_w_of <= acc_2 + mult; // Add to initial accumulator value
+          end else begin
+            if (acc_w_of[DATA_WIDTH_ACC]) begin
+              acc_reg_of <= 1; // Register overflow flag
+            end
+            acc_w_of <= acc_w_of + mult; // Add to initial accumulator value
+          end
+        end else begin
+          acc_valid <= 0; // Disable output when not valid
+          acc_last <= 0; // Reset band counter for output
+        end
       end
     end
   end

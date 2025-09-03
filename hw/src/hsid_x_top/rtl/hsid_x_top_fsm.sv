@@ -45,7 +45,7 @@ module hsid_x_top_fsm #(
 
   hsid_x_top_t current_state = HXT_IDLE, next_state = HXT_START_READ_CAPTURED;
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= HXT_IDLE;
       reset_values();

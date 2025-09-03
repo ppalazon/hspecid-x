@@ -64,7 +64,7 @@ module hsid_x_obi_mem #(
   assign finish_reading = (reads >= current_limit);
 
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= HXOM_IDLE;
       reset_values();

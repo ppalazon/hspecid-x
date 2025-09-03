@@ -31,7 +31,7 @@ module hsp_obi_mem #(
   // assign da_pixel_value = (da_addr[DATA_WIDTH-1:0] & VALUE_MASK);
   // assign da_data = RANDOM_VALUE ? $random() : {da_pixel_value, da_pixel_value}; // Return random data or masked address
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       obi_rsp.rvalid <= 1'b0;
       obi_rsp.rdata <= '0;

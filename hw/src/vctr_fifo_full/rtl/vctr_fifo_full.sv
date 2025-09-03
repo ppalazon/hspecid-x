@@ -37,7 +37,7 @@ module vctr_fifo_full #(
   logic [WORD_WIDTH-1:0] vctr_in_1_data, vctr_in_2_data, vctr_out_data;
   logic vctr_out_en, compute_en; // Pipeline control signals
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= IDLE;  // Reset to IDLE state
       vctr_out_data <= 0;

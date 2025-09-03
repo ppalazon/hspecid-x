@@ -38,7 +38,7 @@ module hsid_fifo #(
   assign fifo_request = {rd_en && !empty, wr_en && !full}; // 2 bits for read and write enable
 
   // FIFO count update sequentially
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       clear_fifo();
     end else begin

@@ -83,7 +83,7 @@ module hsid_main_fsm #(
 
   // Check measure vector FIFO status
 
-  always_ff @(posedge clk or negedge rst_n) begin
+  always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       current_state <= HM_IDLE;  // Reset to IDLE state
       reset_values();
