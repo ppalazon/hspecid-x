@@ -4,20 +4,21 @@ import hsid_pkg::*;
 
 /*
  @WAVEDROM_START
- { signal: [
- { name: "clk",                 wave: "p..........................." },
- { name: "band_data_in_valid",  wave: "l..h....lh.........l........" },
- { name: "band_data_in",        wave: "x..33333x7777799999x........", data: ['0 / 1', '2 / 3', '4 / 5', '6 / 7', '8 / 9', '7 / 2', '2 / 6', '1 / 7', '5 / 7', '3 / 9', '6 / 1', '6 / 8', '2 / 5', '4 / 2', '3 / 0'] },
- { name: "hsp_library_size_in", wave: "xx5x........................", data: ['2'] },
- { name: "hsp_bands_in",        wave: "xx4x........................", data:['10'] },
- { name: "mse_min_ref",         wave: "x..................6x....6x.", data: ['0', '0'] },
- { name: "mse_max_ref",         wave: "x..................8x....8x.", data: ['0', '1'] },
- { name: "mse_min_value",       wave: "x..................6x....6x.", data: ['9', '9'] },
- { name: "mse_max_value",       wave: "x..................8x....8x.", data: ['9', '21'] },
- { name: "start",               wave: "lhl........................." },
- { name: "done",                wave: "l.........................hl" },
- { name: "idle",                wave: "hl.........................h" },
- { name: "ready",               wave: "l..h...............l........" },
+ { "signal": [
+ { "name": "clk",            "wave": "p................" },
+ { "name": "rst_n",          "wave": "h................" },
+ { "name": "clear",          "wave": "l................" },
+ { "name": "band_pack_start","wave": "lhl...hl........." },
+ { "name": "band_pack_last", "wave": "l....hl...hl....." },
+ { "name": "hsp_ref",        "wave": "x....4x...4x.....", "data": ["3", "4"] },
+ { "name": "band_pack_a",    "wave": "x3333333333x.....", "data": ["0/1","2/3","4/5","6/7","8/9","0/1","2/3","4/5","6/7","8/9"] },
+ { "name": "band_pack_b",    "wave": "x7777799999x.....", "data": ["7/2","2/6","1/7","5/7","3/9","6/1","6/8","2/5","4/2","3/0"] },
+ { "name": "band_pack_valid","wave": "lh.........l....." },
+ { "name": "hsp_bands",      "wave": "x....2x...2x.....", "data": ["10","10"] },
+ { "name": "mse_value",      "wave": "x.........5x...5x", "data": ["9","21"] },
+ { "name": "mse_ref",        "wave": "x.........4x...4x", "data": ["3","4"] },
+ { "name": "mse_valid",      "wave": "l.........hl...hl" },
+ { "name": "acc_of",         "wave": "l................" }
  ]}
  @WAVEDROM_END
  */
