@@ -21,6 +21,19 @@ export VIVADO_SETTINGS=/tools/Xilinx/Vivado/2024.2/settings64.sh
 source $VIVADO_SETTINGS
 ```
 
-## Vendor
+## License
 
-https://github.com/esl-epfl/x-heep/tree/main/hw/vendor
+This project is licensed under the **CERN-OHL-P v2** (Permissive).  
+You are free to use, modify, and distribute this design, provided that the copyright
+notice and license text are retained.  
+
+See the [LICENSE](./LICENSE) file for details.  
+More information about CERN-OHL-P v2 can be found at the [CERN OHL website](https://cern-ohl.web.cern.ch/).
+
+## Third-Party Components
+
+- **common_cells** – licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+- **register_interface** – licensed under [Solderpad Hardware License v0.51](http://solderpad.org/licenses/SHL-0.51/).
+- **obi** – [Solderpad Hardware License v0.51](http://solderpad.org/licenses/SHL-0.51/).
+
+Original licenses and attributions are retained in their respective files and headers.
