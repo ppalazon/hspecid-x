@@ -1,0 +1,46 @@
+[*]
+[*] GTKWave Analyzer v3.3.125 (w)1999-2025 BSI
+[*] Mon Sep 22 16:27:13 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_divider_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Mon Sep 22 16:25:24 2025"
+[dumpfile_size] 4230
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_divider.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-15.206416 133400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_divider_tb.
+[sst_width] 317
+[signals_width] 386
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsid_divider_tb.dut.clk
+hsid_divider_tb.dut.rst_n
+hsid_divider_tb.dut.clear
+hsid_divider_tb.dut.start
+@24
+hsid_divider_tb.dut.dividend[7:0]
+hsid_divider_tb.dut.divisor[3:0]
+hsid_divider_tb.dut.quotient[3:0]
+hsid_divider_tb.dut.remainder[3:0]
+@22
+hsid_divider_tb.dut.divisor_ext[4:0]
+@28
+hsid_divider_tb.dut.done
+hsid_divider_tb.dut.idle
+hsid_divider_tb.dut.overflow
+@22
+hsid_divider_tb.dut.q_reg[3:0]
+@28
+hsid_divider_tb.dut.qbit_next
+@22
+hsid_divider_tb.dut.rem_final[4:0]
+hsid_divider_tb.dut.rem_next[4:0]
+hsid_divider_tb.dut.rem_reg[4:0]
+hsid_divider_tb.dut.rem_shift[4:0]
+@25
+hsid_divider_tb.dut.step[1:0]
+[pattern_trace] 1
+[pattern_trace] 0

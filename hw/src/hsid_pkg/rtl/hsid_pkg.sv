@@ -27,4 +27,9 @@ package hsid_pkg;
     HXOM_IDLE, HXOM_INIT, HXOM_READING, HXOM_DONE, HXOM_CLEAR
   } hsid_x_obi_mem_state_t;
 
+  // Iterative divider state machine states
+  typedef enum logic [2:0] {
+    HID_IDLE, HID_COMPUTE, HID_CHECK, HID_DONE, HID_CLEAR
+  } hsid_ite_div_state_t;
+
 endpackage

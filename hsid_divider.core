@@ -1,0 +1,65 @@
+CAPI=2:
+name: uclm:hspecidx:hsid_divider
+description: Unsigned integer divider for HSpecID-x accelerator
+
+filesets:
+  rtl:
+    files:
+      - hw/src/hsid_divider/rtl/hsid_divider.sv
+    file_type: systemVerilogSource
+    depend:
+      - "uclm:hspecidx:hsid_pkg"
+
+  tb:
+    depend:
+      - "uclm:hspecidx:hsid_test"
+
+  sva:
+    depend:
+      - "uclm:hspecidx:hsid_verif"
+
+  tcl_modelsim:
+    files:
+      - hw/tcl/modelsim-do/hsid_divider_debug.do
+    file_type: tclSource
+
+targets:
+  default: &default
+    filesets:
+      - rtl
+    toplevel: hsid_fifo
+
+  sim:
+    <<: *default
+    description: Simulate hsid with some random data
+    default_tool: xsim
+    filesets_append:
+      - tb
+      - tool_modelsim? (sva)
+      - tool_modelsim? (tcl_modelsim)
+    toplevel: hsid_divider_tb
+    tools:
+      xsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#xsim-backend
+        compilation_mode: common
+      modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
+        compilation_mode: common
+
+  coverage:
+    <<: *default
+    description: Run coverage
+    default_tool: modelsim
+    filesets_append:
+      - tb
+      - sva
+    toplevel: hsid_divider_tb
+    tools:
+      modelsim:
+        compilation_mode: common
+        vlog_options:
+          - +cover=bcestf
+          - +acc
+        vsim_options:
+          - -onfinish stop
+          - -coverage
+          - -assertdebug
+          - -do ../../../hw/tcl/modelsim-do/hsid_divider_coverage.tcl

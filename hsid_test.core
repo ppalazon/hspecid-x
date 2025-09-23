@@ -8,6 +8,9 @@ filesets:
       - hw/src/hsid_fifo/tb/hsid_fifo_random.sv
       - hw/src/hsid_fifo/tb/hsid_fifo_tb.sv
 
+      - hw/src/hsid_divider/tb/hsid_divider_random.sv
+      - hw/src/hsid_divider/tb/hsid_divider_tb.sv
+
       - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_random.sv
       - hw/src/hsid_sq_df_acc/tb/hsid_sq_df_acc_tb.sv
 
