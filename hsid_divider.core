@@ -27,7 +27,9 @@ targets:
   default: &default
     filesets:
       - rtl
-    toplevel: hsid_fifo
+    toplevel: hsid_divider
+    parameters:
+      - K
 
   sim:
     <<: *default
@@ -43,6 +45,8 @@ targets:
         compilation_mode: common
       modelsim: # https://edalize.readthedocs.io/en/latest/edam/api.html#modelsim-backend
         compilation_mode: common
+    parameters:
+      - K
 
   coverage:
     <<: *default
@@ -63,3 +67,11 @@ targets:
           - -coverage
           - -assertdebug
           - -do ../../../hw/tcl/modelsim-do/hsid_divider_coverage.tcl
+    parameters:
+     - K
+
+parameters:
+  K:
+    datatype: int
+    description: Word width for divisor. Dividend will be 2K width
+    paramtype: vlogparam
