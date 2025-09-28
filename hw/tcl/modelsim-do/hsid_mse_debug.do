@@ -13,6 +13,9 @@ set WildcardFilter "Variable Constant Generic Parameter SpecParam Memory Asserti
 
 vsim -assertdebug -coverage -cvgperinstance +nowarnTFMPC $top_opt -msgmode both
 add wave -group "DUT" /$top/dut/*
+add wave -group "Channel 1" /$top/dut/channel_1/*
+add wave -group "Channel 2" /$top/dut/channel_2/*
+add wave -group "Divider" /$top/dut/divider/*
 
 view cover
 view assertion

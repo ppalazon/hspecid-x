@@ -9,7 +9,7 @@ module hsid_mse_tb #(
     parameter DATA_WIDTH_ACC = HSID_DATA_WIDTH_ACC, // Data width for accumulator, larger than WORD_WIDTH
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH, // Address width for HSP bands
     parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
-    parameter TEST_LIBRARY_SIZE = 10, // Size of the HSI library to test
+    parameter TEST_LIBRARY_SIZE = 50, // Size of the HSI library to test
     parameter TEST_RND_INSERT = 1, // Enable random insertion of test vectors
     parameter TEST_OVERFLOW = 0 // Enable overflow test
   );
@@ -20,6 +20,15 @@ module hsid_mse_tb #(
   localparam logic[HSP_BANDS_WIDTH-1:0]   MAX_HSP_BANDS = {HSP_BANDS_WIDTH{1'b1}}; // Maximum value for HSP bands
   localparam logic[HSP_LIBRARY_WIDTH-1:0] MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}}; // Maximum value for HSI library
   localparam logic[WORD_WIDTH-1:0]        MAX_WORD = {WORD_WIDTH{1'b1}}; // Maximum value for word width
+
+  // Divider parameters
+  localparam K = WORD_WIDTH;
+  localparam DK = 2*K;
+  localparam DIVIDER_LATENCY = K + 2; // Latency of the divider module
+
+  // Minimum HSP bands to avoid problems with the latest steps of mse (3 of sq_df_acc + 1 of first mse pipeline + K+2 of divider latency)
+  // As we have 2 bands per word, we need at least double the number of bands
+  localparam MIN_HSP_BANDS = 2 * (3 + (WORD_WIDTH + 2));
 
   reg clk;
   reg rst_n;
@@ -91,9 +100,9 @@ module hsid_mse_tb #(
       bins middle = {[1:MAX_HSP_LIBRARY-1]};
     }
     coverpoint hsp_bands iff(band_pack_valid) {
-      bins min = {7};
+      bins min = {MIN_HSP_BANDS};
       bins max = {MAX_HSP_BANDS};
-      bins middle = {[1:MAX_HSP_BANDS-1]};
+      bins middle = {[MIN_HSP_BANDS+1:MAX_HSP_BANDS-1]};
     }
     coverpoint mse_valid;
     coverpoint mse_value iff(mse_valid) {
@@ -142,12 +151,17 @@ module hsid_mse_tb #(
     .DATA_WIDTH_MUL(DATA_WIDTH_MUL),
     .DATA_WIDTH_ACC(DATA_WIDTH_ACC)
   ) hsid_sq_df_acc_sva_inst (.*);
+
+  bind hsid_divider hsid_divider_sva #(
+    .K(K),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_divider_sva_inst (.*);
   `endif
 
   // Test vectors
   int mse_order = 0;
   int hsp_band_packs = 0;
-  int mse_pipeline = 4; // Number of clock cycles to wait for MSE calculation
+  int mse_pipeline = 3 + DIVIDER_LATENCY; // Number of clock cycles to wait for MSE calculation
   int overflow_sends; // Count of overflow occurrences
   logic [WORD_WIDTH-1:0] vctr1 [];
   logic [WORD_WIDTH-1:0] vctr2 [];
@@ -314,14 +328,14 @@ module hsid_mse_tb #(
     a_max_acc_value: assert (mse_value == exp_mse[0]) else $error("Accumulator value is not as we expected after overflow test, got %0h", mse_value);
 
     $display("Case 5: Send completely random values to mse module without check results...");
-    for (int i =0; i<100; i++) begin
+    for (int i =0; i<1000; i++) begin
       if(!hsp_mse_complete_gen.randomize()) $fatal(0, "Failed to randomize values");
       band_pack_valid = hsp_mse_complete_gen.band_pack_valid;
       //hsp_mse_complete_gen.band_pack_start; // Enable initial accumulator value on first element
-      band_pack_last = ((i-1) % 5 ==0); //hsp_mse_complete_gen.band_pack_last; // Set last flag for the last element
+      band_pack_last = ((i-1) % mse_pipeline ==0); //hsp_mse_complete_gen.band_pack_last; // Set last flag for the last element
       band_pack_a = hsp_mse_complete_gen.band_pack_a; // Use maximum value for the word
       band_pack_b = hsp_mse_complete_gen.band_pack_b; // Use zero for the second word to get maximum difference
-      if (i % 5 == 0) begin
+      if (i % mse_pipeline == 0) begin
         band_pack_start = 1;
         hsp_bands = hsp_mse_complete_gen.hsp_bands;
         vctr_ref = hsp_mse_complete_gen.vctr_ref;

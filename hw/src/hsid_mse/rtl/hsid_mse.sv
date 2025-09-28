@@ -49,8 +49,10 @@ module hsid_mse #(
   );
 
   localparam HALF_WORD_WIDTH = WORD_WIDTH / 2; // Half of the word width
-
-  // Number of data elements per word
+  localparam K = WORD_WIDTH;
+  localparam DK = 2*K;
+  localparam DIVIDEND_ZERO_FILL = {(DK - DATA_WIDTH_ACC){1'b0}}; // Suffix width for dividend
+  localparam DIVISOR_ZERO_FILL = {(K - HSP_BANDS_WIDTH){1'b0}}; // Prefix width for divisor
 
   // Square difference accumulator outputs
   logic channel_1_acc_valid, channel_2_acc_valid;
@@ -93,16 +95,16 @@ module hsid_mse #(
         end
 
         // Pipeline stage for mean square error division
-        if (compute_mse_en) begin: compute_mse
-          // Compute mean square error
-          mse_valid <=1;  // Enable output
-          // mse_of <= acc_value > (acc_hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of result
-          mse_value <= acc_value / acc_hsp_bands;  // Divide by the number of bands
-          acc_of <= acc_value[DATA_WIDTH_ACC] || acc_channel_of;  // Propagate overflow flag from square difference accumulator
-          mse_ref <= acc_ref;  // Set reference vector for mean square error
-        end else begin
-          mse_valid <= 0;  // Disable output when not valid
-        end
+        // if (compute_mse_en) begin: compute_mse
+        //   // Compute mean square error
+        //   mse_valid <=1;  // Enable output
+        //   // mse_of <= acc_value > (acc_hsp_bands * {WORD_WIDTH{1'b1}}); // Dividend is larger than the divisor * Max value of result
+        //   mse_value <= acc_value / acc_hsp_bands;  // Divide by the number of bands
+        //   acc_of <= acc_value[DATA_WIDTH_ACC] || acc_channel_of;  // Propagate overflow flag from square difference accumulator
+        //   mse_ref <= acc_ref;  // Set reference vector for mean square error
+        // end else begin
+        //   mse_valid <= 0;  // Disable output when not valid
+        // end
       end
     end
   end
@@ -147,18 +149,39 @@ module hsid_mse #(
     .acc_of(channel_2_acc_of)  // Overflow flag for the accumulated vector
   );
 
+  hsid_divider #(
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
+    .K(WORD_WIDTH)
+  ) divider (
+    .clk(clk),
+    .rst_n(rst_n),
+    .dividend({DIVIDEND_ZERO_FILL, acc_value}),  // Use only the lower bits of the accumulator
+    .divisor({DIVISOR_ZERO_FILL, acc_hsp_bands}),
+    .quotient(mse_value),
+    .remainder(),
+    .of_in(acc_value[DATA_WIDTH_ACC] || acc_channel_of), // Check if dividend is overflowed
+    .hsp_ref_in(acc_ref),
+    .overflow(acc_of),
+    .start(compute_mse_en),
+    .clear(clear),
+    .ready(),
+    .done(mse_valid),
+    .hsp_ref_out(mse_ref),
+    .idle()
+  );
+
   task reset_values();
     begin
-      mse_ref <= 0;  // Reset reference vector
-      mse_value <= 0;  // Reset mean square error
-      mse_valid <= 0;  // Disable output
+      // mse_ref <= 0;  // Reset reference vector
+      // mse_value <= 0;  // Reset mean square error
+      // mse_valid <= 0;  // Disable output
       // mse_of <= 0;  // Reset overflow flag for mean square error
       acc_channel_of <= 0;  // Reset overflow flag for the accumulated vector
       acc_hsp_bands <= 0; // Reset HSP bands to process
       compute_mse_en <= 0;  // Disable mean square error accumulator
       acc_value <= 0;  // Reset mean square error accumulator
       acc_ref <= 0;  // Reset reference vector for mean square error
-      acc_of <= 0;  // Reset overflow flag for mean square error accumulator
+      // acc_of <= 0;  // Reset overflow flag for mean square error accumulator
     end
   endtask
 

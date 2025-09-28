@@ -9,7 +9,8 @@ filesets:
     file_type: systemVerilogSource
     depend:
       - "uclm:hspecidx:hsid_pkg"
-      - "uclm:hspecidx:hsid_sq_df_acc" # sq_df_acc.core
+      - "uclm:hspecidx:hsid_sq_df_acc"
+      - "uclm:hspecidx:hsid_divider"
 
   tb:
     depend:

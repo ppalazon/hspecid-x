@@ -2,11 +2,15 @@
 
 import hsid_pkg::*;
 
-module hsid_divider_tb #(parameter int K = 4); // You can change K to test different widths
+module hsid_divider_tb #(
+    parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
+    parameter int K = 4 // You can change K to test different widths
+  );
 
   localparam DK = 2*K;
   localparam MAX_DIVIDEND = {DK{1'b1}};
   localparam MAX_DIVISOR = {K{1'b1}};
+  localparam MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}};
 
   reg clk;
   reg rst_n;
@@ -14,18 +18,22 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
   reg start;
   reg [DK-1:0] dividend;
   reg [K-1:0] divisor;
+  reg of_in;
+  reg [HSP_LIBRARY_WIDTH-1:0] hsp_ref_in;
   wire idle;
   wire done;
   wire ready;
   wire [K-1:0] quotient;
   wire [K-1:0] remainder;
   wire overflow;
+  wire [HSP_LIBRARY_WIDTH-1:0] hsp_ref_out;
 
   logic [K-1:0] expected_quotient;
   logic [K-1:0] expected_remainder;
   logic expected_overflow;
 
   hsid_divider #(
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
     .K(K)
   ) dut (
     .clk(clk),
@@ -34,15 +42,21 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
     .start(start),
     .dividend(dividend),
     .divisor(divisor),
+    .of_in(of_in),
+    .hsp_ref_in(hsp_ref_in),
     .idle(idle),
     .done(done),
     .ready(ready),
     .quotient(quotient),
     .remainder(remainder),
-    .overflow(overflow)
+    .overflow(overflow),
+    .hsp_ref_out(hsp_ref_out)
   );
 
-  HsidDividerRnd #(K) divider_rnd_gen = new();
+  HsidDividerRnd #(
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
+    .K(K)
+  ) divider_rnd_gen = new();
 
   // Covergroup to track coverage of different scenarios
   covergroup cg_divider @(posedge clk);
@@ -58,6 +72,12 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
       bins mid = {[2: MAX_DIVISOR-1]};
       bins max = {MAX_DIVISOR};
     }
+    coverpoint of_in iff (ready);
+    coverpoint hsp_ref_in iff (ready) {
+      bins zero = {0};
+      bins mid = {[1: MAX_HSP_LIBRARY-1]};
+      bins max = {MAX_HSP_LIBRARY};
+    }
     coverpoint overflow;
     coverpoint quotient iff (done) {
       bins zero = {0};
@@ -70,6 +90,11 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
       bins min = {1};
       bins mid = {[2: MAX_DIVISOR-1]};
     }
+    coverpoint hsp_ref_out iff (done) {
+      bins zero = {0};
+      bins mid = {[1: MAX_HSP_LIBRARY-1]};
+      bins max = {MAX_HSP_LIBRARY};
+    }
     coverpoint ready;
     coverpoint idle;
     coverpoint done;
@@ -81,6 +106,7 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
   `ifdef MODEL_TECH
   // Binding SVA assertions to the DUT
   bind hsid_divider hsid_divider_sva #(
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH),
     .K(K)
   ) dut_sva (.*);
   `endif
@@ -107,13 +133,15 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
       if (divider_rnd_gen.randomize()) begin
         dividend = divider_rnd_gen.dividend;
         divisor = divider_rnd_gen.divisor;
+        of_in = divider_rnd_gen.of_in;
+        hsp_ref_in = divider_rnd_gen.hsp_ref_in;
 
         expected_quotient = divider_rnd_gen.expected_quotient;
         expected_remainder = divider_rnd_gen.expected_remainder;
         expected_overflow = divider_rnd_gen.expected_overflow;
 
-        $display("Test %0d: %0d / %0d = %0d, remainder = %0d, overflow = %b", i, dividend, divisor,
-          expected_quotient, expected_remainder, expected_overflow);
+        $display("Test %0d: %0d / %0d = %0d, remainder = %0d, overflow = %b, of_in = %b, hsp_ref = %d", i, dividend, divisor,
+          expected_quotient, expected_remainder, expected_overflow, of_in, hsp_ref_in);
 
         a_idle_bf_start: assert(idle) else $error("Test failed: Not idle before start.");
         a_ready_af_start: assert(ready) else $error("Test failed: Not ready on idle.");
@@ -132,12 +160,15 @@ module hsid_divider_tb #(parameter int K = 4); // You can change K to test diffe
           a_quotient: assert(quotient == divider_rnd_gen.expected_quotient) else $error("Test failed: Quotient mismatch. Expected %0d, got %0d", divider_rnd_gen.expected_quotient, quotient);
           a_remainder: assert(remainder == divider_rnd_gen.expected_remainder) else $error("Test failed: Remainder mismatch. Expected %0d, got %0d", divider_rnd_gen.expected_remainder, remainder);
           a_overflow: assert(!overflow) else $error("Test failed: Overflow flag mismatch. Expected %b, got %b", divider_rnd_gen.expected_overflow, overflow);
+          a_hsp_ref: assert(hsp_ref_out == hsp_ref_in) else $error("Test failed: HSP reference mismatch. Expected %0d, got %0d", hsp_ref_in, hsp_ref_out);
         end
         #10; // Small delay before next test
         a_idle_af_op: assert(idle) else $error("Test failed: Not idle after operation.");
         a_ready_af_op: assert(ready) else $error("Test failed: Not ready after operation.");
       end
     end
+
+    of_in = 0; // Reset overflow input for next tests
 
     $display("Case 2: Testing clear after configure");
     dividend = 15;

@@ -11,6 +11,10 @@ class HsidHSPixelMseGen#(
     parameter int HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH // Address width for HSI library
   ) extends HsidHSPixelGen #(DATA_WIDTH, DATA_WIDTH_MUL, DATA_WIDTH_ACC, HSP_BANDS_WIDTH, HSP_LIBRARY_WIDTH);
 
+  // Minimum HSP bands to avoid problems with the latest steps of mse (3 of sq_df_acc + 1 of first mse pipeline + K+2 of divider latency)
+  // As we have 2 bands per word, we need at least double the number of bands
+  localparam MIN_HSP_BANDS = 2 * (3 + (WORD_WIDTH + 2));
+
   logic [HSP_BANDS_WIDTH-1:0] hsp_bands_packs;
   rand logic [HSP_LIBRARY_WIDTH-1:0] vctr_ref; // Reference vector
 
@@ -33,8 +37,8 @@ class HsidHSPixelMseGen#(
   // Ensure HSP bands are at least 8, to avoid problems with the latest steps of mse (3 of sq_df_acc + 1 of first mse pipeline)
   // I need 8 pixel because it will be packed in 2 pixels per word, so I need 6 (3x2 sq_df_acc) + 1 (mse of first mse pipelin) = 7
   constraint c_hsp_bands_bigger_than_six {
-    hsp_bands >= 7;
-    hsp_bands dist {7:=15, MAX_HSP_BANDS:=15, [6:MAX_HSP_BANDS-1]:/70};
+    hsp_bands >= MIN_HSP_BANDS; // Add WORD_WIDTH to account for the pipeline delay of the divider
+    hsp_bands dist {MIN_HSP_BANDS:=15, MAX_HSP_BANDS:=15, [MIN_HSP_BANDS+1:MAX_HSP_BANDS-1]:/70};
   }
 
   function automatic void band_packer(

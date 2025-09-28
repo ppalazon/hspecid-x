@@ -37,12 +37,16 @@ module hsid_mse_sva #(
     input logic [HSP_BANDS_WIDTH-1:0] acc_hsp_bands
   );
 
+  localparam K = WORD_WIDTH;
+  localparam DK = 2*K;
+  localparam DIVIDER_LATENCY = K + 2; // Latency of the divider module
+
   // Assert mse_valid after 5 (3 of sq_df_acc + 2 of mse) clock cycles when band_pack_valid and band_pack_last are high
   property mse_valid_after_band_pack_last;
     @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |->
       ##3 compute_acc_sum_en
       ##1 compute_mse_en
-      ##1 mse_valid && mse_ref == $past(hsp_ref, 5)
+      ##(DIVIDER_LATENCY) mse_valid && mse_ref == $past(hsp_ref, DIVIDER_LATENCY + 5) // Divider latency K + 1 cycles
       ##1 !mse_valid
   endproperty
 
@@ -60,7 +64,7 @@ module hsid_mse_sva #(
 
   // If hsp_bands is odd, LSB of band_pack_a and band_pack_b are zeros
   property odd_hsp_bands_lsb_zero;
-    @(posedge clk) disable iff (!rst_n) band_pack_last && band_pack_valid && hsp_bands[0] |->
+    @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid && hsp_bands[0] |->
       !$isunknown(band_pack_a[DATA_WIDTH-1:0]) && !$isunknown(band_pack_b[DATA_WIDTH-1:0]);
   endproperty
 

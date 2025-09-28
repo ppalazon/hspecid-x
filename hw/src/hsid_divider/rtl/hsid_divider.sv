@@ -3,6 +3,7 @@
 import hsid_pkg::*;
 
 module hsid_divider #(
+    parameter HSP_LIBRARY_WIDTH = HSID_HSP_LIBRARY_WIDTH,
     parameter K = 32, // Number of bits for quotient and remainder
     localparam DK = 2*K // Number of bits for dividend
   ) (
@@ -12,12 +13,15 @@ module hsid_divider #(
     input logic start,
     input logic [DK-1:0] dividend,
     input logic [K-1:0] divisor,
+    input logic of_in, // Dividend or divisor is overflowed
+    input logic [HSP_LIBRARY_WIDTH-1:0] hsp_ref_in,
     output logic idle,
     output logic done,
     output logic ready,
     output logic [K-1:0] quotient,
     output logic [K-1:0] remainder,
-    output logic overflow
+    output logic overflow,
+    output logic [HSP_LIBRARY_WIDTH-1:0] hsp_ref_out
   );
 
   localparam STEP_COUNT_WIDTH = $clog2(K);
@@ -48,13 +52,16 @@ module hsid_divider #(
           reset_dut();
         end
         HID_IDLE: begin
-          if (start) begin
+          if (clear) begin
+            reset_dut();
+          end else if (start) begin
             // In this point we're always computing step 0
             divisor_ext <= {1'b0, divisor}; // Align divisor with dividend
             rem_reg <= {1'b0, dividend[DK-1:K]}; // MSB part of dividend
             q_reg <= dividend[K-1:0];            // LSB part of dividend
             step <= K - 1;
-            overflow <= (dividend >= {{K{1'b0}}, divisor} << K); // Check for overflow condition, we don't have to check for divisor == 0 here
+            overflow <= of_in || (dividend >= {{K{1'b0}}, divisor} << K); // Check for overflow condition, we don't have to check for divisor == 0 here
+            hsp_ref_out <= hsp_ref_in; // Pass through HSP reference
           end
         end
         HID_COMPUTE: begin
@@ -107,6 +114,7 @@ module hsid_divider #(
     overflow <= 0;
     quotient <= 0;
     remainder <= 0;
+    hsp_ref_out <= 0;
   endtask
 
 endmodule
