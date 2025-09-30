@@ -23,6 +23,7 @@ add wave -group "Main FSM" /$top/dut/main/fsm/*
 add wave -group "MSE" /$top/dut/main/mse/*
 add wave -group "SqDfAcc 1" /$top/dut/main/mse/channel_1/*
 add wave -group "SqDfAcc 2" /$top/dut/main/mse/channel_2/*
+add wave -group "Divider" /$top/dut/main/mse/divider/*
 add wave -group "MSE Comp" /$top/dut/main/mse_comp/*
 add wave -group "FIFO Cap" /$top/dut/main/fifo_captured/*
 add wave -group "FIFO Ref" /$top/dut/main/fifo_ref/*

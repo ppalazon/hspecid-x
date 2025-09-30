@@ -81,7 +81,7 @@ module hsid_mse_sva #(
 
   // On clear signal, all outputs should be zero
   property clear_outputs;
-    @(posedge clk) disable iff (!rst_n) clear |-> ##1
+    @(posedge clk) disable iff (!rst_n) clear |-> ##2
       mse_value == '0 && mse_ref == '0 && mse_valid == 0 && acc_of == 0; // && mse_of == 0
   endproperty
 

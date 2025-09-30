@@ -17,7 +17,7 @@ module hsid_x_top_tb #(
     parameter TEST_VALUE_MODULE_MSB = 17 // Apply the mask and then modulo to get the value
   ) ();
 
-
+  localparam K = WORD_WIDTH;
   localparam MAX_WORD = {WORD_WIDTH{1'b1}};  // Maximum value for a word
 
   reg clk;
@@ -142,6 +142,11 @@ module hsid_x_top_tb #(
     .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) hsid_fifo_sva_inst (.*);
+
+  bind hsid_divider hsid_divider_sva #(
+    .K(K),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_divider_sva_inst (.*);
   `endif
 
   logic [WORD_WIDTH-1:0] library_size_w;
