@@ -24,11 +24,11 @@ module hsid_mse_tb #(
   // Divider parameters
   localparam K = WORD_WIDTH;
   localparam DK = 2*K;
-  localparam DIVIDER_LATENCY = K + 2; // Latency of the divider module
+  localparam DIVIDER_LATENCY = K + 1; // Latency of the divider module
 
   // Minimum HSP bands to avoid problems with the latest steps of mse (3 of sq_df_acc + 1 of first mse pipeline + K+2 of divider latency)
   // As we have 2 bands per word, we need at least double the number of bands
-  localparam MIN_HSP_BANDS = 2 * (3 + (WORD_WIDTH + 2));
+  localparam MIN_HSP_BANDS = 2 * (4 + DIVIDER_LATENCY);
 
   reg clk;
   reg rst_n;
@@ -161,7 +161,7 @@ module hsid_mse_tb #(
   // Test vectors
   int mse_order = 0;
   int hsp_band_packs = 0;
-  int mse_pipeline = 3 + DIVIDER_LATENCY; // Number of clock cycles to wait for MSE calculation
+  int mse_pipeline = 4 + DIVIDER_LATENCY; // Number of clock cycles to wait for MSE calculation
   int overflow_sends; // Count of overflow occurrences
   logic [WORD_WIDTH-1:0] vctr1 [];
   logic [WORD_WIDTH-1:0] vctr2 [];

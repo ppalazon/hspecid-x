@@ -8,6 +8,9 @@ module hsid_divider_tb #(
   );
 
   localparam DK = 2*K;
+  localparam DIVIDER_LATENCY = K + 1; // Latency of the divider module
+
+  // Maximum values for randomization
   localparam MAX_DIVIDEND = {DK{1'b1}};
   localparam MAX_DIVISOR = {K{1'b1}};
   localparam MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}};
@@ -155,7 +158,7 @@ module hsid_divider_tb #(
           #10;
           a_done_af_of: assert (done) else $error("Test failed: Expected done but did not get it.");
         end else begin
-          #((K+1)*10); // Wait for operation to complete
+          #(DIVIDER_LATENCY*10); // Wait for operation to complete
           a_done: assert(done) else $error("Test failed: Operation did not complete as expected.");
           a_quotient: assert(quotient == divider_rnd_gen.expected_quotient) else $error("Test failed: Quotient mismatch. Expected %0d, got %0d", divider_rnd_gen.expected_quotient, quotient);
           a_remainder: assert(remainder == divider_rnd_gen.expected_remainder) else $error("Test failed: Remainder mismatch. Expected %0d, got %0d", divider_rnd_gen.expected_remainder, remainder);
@@ -193,7 +196,7 @@ module hsid_divider_tb #(
     #10 start = 0; // Clear start signal
     dividend = 10; // Change inputs while computing
     divisor = 10;
-    #((K+1)*10); // Wait for operation to complete
+    #(DIVIDER_LATENCY*10); // Wait for operation to complete
     assert(done) else $error("Test failed: Operation did not complete as expected.");
     assert(quotient == 5) else $error("Test failed: Quotient mismatch after input change. Expected 5, got %0d", quotient);
     assert(remainder == 0) else $error("Test failed: Remainder mismatch after input change. Expected 0, got %0d", remainder);

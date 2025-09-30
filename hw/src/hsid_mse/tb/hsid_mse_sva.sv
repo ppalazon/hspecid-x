@@ -39,14 +39,14 @@ module hsid_mse_sva #(
 
   localparam K = WORD_WIDTH;
   localparam DK = 2*K;
-  localparam DIVIDER_LATENCY = K + 2; // Latency of the divider module
+  localparam DIVIDER_LATENCY = K + 1; // Latency of the divider module
 
   // Assert mse_valid after 5 (3 of sq_df_acc + 2 of mse) clock cycles when band_pack_valid and band_pack_last are high
   property mse_valid_after_band_pack_last;
     @(posedge clk) disable iff (!rst_n || clear) band_pack_last && band_pack_valid |->
       ##3 compute_acc_sum_en
       ##1 compute_mse_en
-      ##(DIVIDER_LATENCY) mse_valid && mse_ref == $past(hsp_ref, DIVIDER_LATENCY + 5) // Divider latency K + 1 cycles
+      ##(DIVIDER_LATENCY + 1) mse_valid && mse_ref == $past(hsp_ref, DIVIDER_LATENCY + 6) // Divider latency K + 1 cycles
       ##1 !mse_valid
   endproperty
 

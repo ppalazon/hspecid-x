@@ -12,9 +12,18 @@ module hsid_main_tb #(
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH  // Length of the buffer
   ) ();
 
+  // Maximum values for randomization
   localparam MAX_WORD = {WORD_WIDTH{1'b1}};
   localparam MAX_HSP_BANDS = {HSP_BANDS_WIDTH{1'b1}};
   localparam MAX_HSP_LIBRARY = {HSP_LIBRARY_WIDTH{1'b1}};
+
+  // Divider parameters
+  localparam K = WORD_WIDTH;
+  localparam DK = 2*K;
+  localparam DIVIDER_LATENCY = K + 1; // Latency of the divider module
+
+  // Minimum number of hsp bands
+  localparam MIN_HSP_BANDS = 2 * (4 + DIVIDER_LATENCY);
 
   reg clk;
   reg rst_n;
@@ -93,9 +102,9 @@ module hsid_main_tb #(
       bins mid = {[1:MAX_WORD-1]};
     }
     coverpoint hsp_bands_in {
-      bins min = {7};
+      bins min = {MIN_HSP_BANDS};
       bins max = {MAX_HSP_BANDS};
-      bins mid = {[1:MAX_HSP_BANDS-1]};
+      bins mid = {[MIN_HSP_BANDS+1:MAX_HSP_BANDS-1]};
     }
     coverpoint hsp_library_size_in{
       bins min = {1};
@@ -147,6 +156,11 @@ module hsid_main_tb #(
     .WORD_WIDTH(WORD_WIDTH),
     .FIFO_ADDR_WIDTH(FIFO_ADDR_WIDTH)
   ) hsid_fifo_sva_inst (.*);
+
+  bind hsid_divider hsid_divider_sva #(
+    .K(K),
+    .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
+  ) hsid_divider_sva_inst (.*);
   `endif
 
   // Test vectors
@@ -292,8 +306,8 @@ module hsid_main_tb #(
       band_data_in_valid = 0;  // Disable input vector valid signal
       band_data_in = 0;  // Reset input vector
 
-      $display(" - Waiting 8 cycles to finish processing (2 to write and read fifo, 5 mse, 1 change state)...");
-      #80;
+      $display(" - Waiting 8 + Divider cycles to finish processing (2 to write and read fifo, 4 (diff, mult, acc, sum) + 1 Start Divider + K+1 Divider Latency, 1 change state)...");
+      #(80 + (DIVIDER_LATENCY * 10)); // Wait for processing to complete
 
       a_finish_done: assert (done == 1) else $error("DUT is not done after processing, you should check waiting cycles");
       a_finish_idle: assert (idle == 0) else $error("DUT is idle after processing");
@@ -342,7 +356,7 @@ module hsid_main_tb #(
       rst_n = hsid_main_random.rst_n;
       band_data_in = hsid_main_random.band_data_in;
       band_data_in_valid = '1;
-      hsp_bands_in = 7; // Minimum HSP bands to avoid errors
+      hsp_bands_in = MIN_HSP_BANDS; // Minimum HSP bands to avoid errors
       hsp_library_size_in = 1; // Minimal library size to avoid errors
 
       #10; // Wait for the DUT to process the input

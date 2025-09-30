@@ -54,6 +54,10 @@ module hsid_main_fsm_sva #(
     input logic hsp_ref_last
   );
 
+  localparam K = WORD_WIDTH;
+  localparam DK = 2*K;
+  localparam DIVIDER_LATENCY = K + 1; // Latency of the divider module
+
   // Increment of hsp_ref_count after band_pack_last
   property inc_hsp_ref_count;
     @(posedge clk) disable iff (!rst_n) band_pack_last |-> ##1 (hsp_ref_count == $past(hsp_ref_count) + 1);
@@ -210,7 +214,7 @@ module hsid_main_fsm_sva #(
   property finish_mse_after_last_lib_band;
     @(posedge clk) disable iff (!rst_n || clear) band_pack_last && hsp_ref_last |->
       ##1 current_state == HM_WAIT_MSE
-      ##4 mse_valid
+      ##(4 + DIVIDER_LATENCY) mse_valid
       ##1 !mse_valid && mse_comparison_valid && current_state == HM_COMPARE_MSE
       ##1 !mse_valid && !mse_comparison_valid && current_state == HM_DONE;
   endproperty
@@ -219,7 +223,7 @@ module hsid_main_fsm_sva #(
 
   // Valid mse signal after last band of any HSP
   property mse_valid_after_last_band;
-    @(posedge clk) disable iff (!rst_n || clear) band_pack_last |-> ##5 mse_valid ##1 mse_comparison_valid;
+    @(posedge clk) disable iff (!rst_n || clear) band_pack_last |-> ##(5 + DIVIDER_LATENCY) mse_valid ##1 mse_comparison_valid;
   endproperty
   assert property (mse_valid_after_last_band) else $error("MSE valid signal is not high after last band of any HSP");
   cover property (mse_valid_after_last_band); // $display("Checked: MSE valid signal is high after last band of any HSP");
