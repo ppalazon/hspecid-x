@@ -30,10 +30,10 @@ module hsid_divider #(
   hsid_ite_div_state_t state = HID_IDLE, next_state = HID_IDLE;
 
   logic [K:0] divisor_ext;
-  logic signed [K:0] rem_reg; // One bit wider to handle MSB flag
+  logic [K:0] rem_reg; // One bit wider to handle MSB flag
   logic [K-1:0] q_reg; // Shift dividend register from LSB to MSB
   logic qbit_next;
-  logic signed [K:0] rem_shift, rem_next, rem_final;
+  logic [K:0] rem_shift, rem_next, rem_final;
   logic [STEP_COUNT_WIDTH-1:0] step; // Step counter
 
   assign rem_shift = {rem_reg[K-1:0], q_reg[K-1]}; // Shift left remainder and bring in next bit of dividend
