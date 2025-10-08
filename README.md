@@ -1,34 +1,32 @@
-# HSpecID-X: A Hyperspectral Pixel Classifier Accelerator for X-HEEP Platforms
+# HSpecID-X
 
-## Working environment
+This project is a RTL hardware Domain-Specific Accelerator (DSA) to classify hyperspectral pixels (HSPs) using reference signatures from spectral libraries for X-HEEP. 
 
-To work with this project you can configure your bash environment with `direnv`
-application. You can read more about this tool on [direnv – unclutter your
-.profile | direnv](https://direnv.net/)
+## Features
 
-By default, the configuration file `.envrc` is not on git repository because it
-depends on your own computer. You can create your own `.envrc` file using the
-following template:
-
-```bash
-layout python3
-
-# Add scripts directory to PATH
-export PATH=./bin:$PATH
-
-# Set Vivado settings
-export VIVADO_SETTINGS=/tools/Xilinx/Vivado/2024.2/settings64.sh
-source $VIVADO_SETTINGS
-```
+- Modular RTL hardware accelerator for hyperspectral pixel classification
+- Computes mean squared error (MSE) between pixels and reference spectral signatures
+- Designed for integration with X-HEEP (RISC-V, low-power) platforms
+- Pipeline and dataflow architecture in SystemVerilog
+- Supports embedded/on-board systems with strict resource and power constraints
+- Interfaces for X-HEEP platform and spectral library access
+- Verification with testbenches, SVA assertions, coverage analysis, and constrained-random stimulus
+- Highly parametrizable to adapt to multiples hardware conditions
+- Configurable by software through Register Interface of XAIF interface
+- Achieves high functional coverage (87% in main module)
+- Results validated against golden model in testbenches
+- Includes build, simulation, and reporting scripts for developer workflows
+- Licensed under CERN-OHL-P v2, with third-party modules under Apache/Solderpad licenses
 
 ## License
 
 This project is licensed under the **CERN-OHL-P v2** (Permissive).  
-You are free to use, modify, and distribute this design, provided that the copyright
-notice and license text are retained.  
+You are free to use, modify, and distribute this design, provided that the
+copyright notice and license text are retained.  
 
 See the [LICENSE](./LICENSE) file for details.  
-More information about CERN-OHL-P v2 can be found at the [CERN OHL website](https://cern-ohl.web.cern.ch/).
+More information about CERN-OHL-P v2 can be found at the [CERN OHL
+website](https://cern-ohl.web.cern.ch/).
 
 ## Third-Party Components
 

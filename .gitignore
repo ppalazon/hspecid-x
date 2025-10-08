@@ -30,3 +30,6 @@ transcript
 #Exclude reports
 reports/*/*
 !reports/index.html
+
+# Exclude copilot instructions
+.github/copilot-instructions.md

@@ -1,0 +1,36 @@
+site_name: HSpecID-X
+site_description: Modular hyperspectral pixel classifier accelerator for X-HEEP platforms
+site_author: ppalazon
+repo_url: https://github.com/ppalazon/hspecid-x
+repo_name: ppalazon/hspecid-x
+
+nav:
+  - Overview: index.md
+  - Architecture: architecture.md
+  - Development: development.md
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  palette:
+    primary: amber
+    accent: amber
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ppalazon/hspecid-x
+
+extra_css:
+  - stylesheets/extra.css
