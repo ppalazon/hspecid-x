@@ -1,6 +1,11 @@
 # HSpecID-X
 
+[![Documentation Status](https://readthedocs.org/projects/hspecid-x/badge/?version=latest)](https://hspecid-x.readthedocs.io/en/latest/)
+[![License: CERN-OHL-P v2](https://img.shields.io/badge/License-CERN--OHL--P--v2-blue.svg)](https://ohwr.org/cern_ohl_p_v2.txt)
+
 This project is a RTL hardware Domain-Specific Accelerator (DSA) to classify hyperspectral pixels (HSPs) using reference signatures from spectral libraries for X-HEEP. 
+
+Full docs are available at: [hspecid-x.readthedocs.io](https://hspecid-x.readthedocs.io).
 
 ## Features
 
