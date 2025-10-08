@@ -1,0 +1,24 @@
+[*]
+[*] GTKWave Analyzer v3.3.125 (w)1999-2025 BSI
+[*] Wed Oct  8 18:59:54 2025
+[*]
+[dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_rst_sync_0/sim-xsim/cleaned.vcd"
+[dumpfile_mtime] "Wed Oct  8 18:57:58 2025"
+[dumpfile_size] 1200
+[savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_rst_sync.gtkw"
+[timestart] 0
+[size] 2554 1366
+[pos] -1 -1
+*-14.462907 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] hsid_rst_sync_tb.
+[sst_width] 317
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 464
+@28
+hsid_rst_sync_tb.dut.clk
+hsid_rst_sync_tb.dut.rst_n_async
+hsid_rst_sync_tb.dut.rst_n_sync
+hsid_rst_sync_tb.dut.sync_ff[1:0]
+[pattern_trace] 1
+[pattern_trace] 0

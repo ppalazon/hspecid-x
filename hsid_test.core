@@ -5,6 +5,8 @@ description: Testbench files for HSpecID accelerator
 filesets:
   tb:
     files:
+      - hw/src/hsid_rst_sync/tb/hsid_rst_sync_tb.sv
+
       - hw/src/hsid_fifo/tb/hsid_fifo_random.sv
       - hw/src/hsid_fifo/tb/hsid_fifo_tb.sv
 
