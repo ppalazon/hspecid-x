@@ -128,11 +128,11 @@ module hsid_main_fsm_sva #(
 
   // After start, move to MAIN_CONFIG state
   property start_to_config;
-    @(posedge clk) disable iff (!rst_n || clear) current_state == HM_IDLE && start |->
+    @(posedge clk) disable iff (!rst_n || clear) $past(rst_n) && current_state == HM_IDLE && start |->
       ##1 (current_state == HM_CONFIG)
       ##1 (current_state == HM_READ_HSP_CAPTURED) || (current_state == HM_ERROR);
   endproperty
-  assert property (start_to_config) else $error("After start, state should change to MAIN_CONFIG state and then to READ_HSP_CAPTURED or ERROR state");
+  assert property (start_to_config) else $error("After start, state should change to HM_CONFIG state and then to READ_HSP_CAPTURED or ERROR state");
   cover property (start_to_config); // $display("Checked: After start, state should change to MAIN_CONFIG state and then to READ_HSP_CAPTURED or ERROR state");
 
   // Assert configuration parameters are only set in MAIN_CONFIG state

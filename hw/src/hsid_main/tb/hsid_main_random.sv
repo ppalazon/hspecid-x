@@ -58,7 +58,23 @@ class HsidHSPReferenceGen#(
     foreach (reference_hsp[i]) reference_hsp[i] dist {0:=15, MAX_DATA:=15, [1:MAX_DATA-1]:/70};
     // foreach (reference_hsp[i]) reference_hsp[i] inside {[0:10]};
   }
+endclass
 
+class HsidHSPSimpleGen#(
+    parameter int DATA_WIDTH = HSID_DATA_WIDTH,
+    parameter int HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH
+  );
+
+  localparam int MAX_DATA = 100; // Maximum value for data vectors
+
+  logic [HSP_BANDS_WIDTH-1:0] hsp_bands; // Number of HSP bands
+  rand logic [DATA_WIDTH-1:0] reference_hsp [];
+
+  constraint c_reference_hsp {
+    reference_hsp.size == hsp_bands;
+    foreach (reference_hsp[i]) reference_hsp[i] dist {0:=15, MAX_DATA:=15, [1:MAX_DATA-1]:/70};
+    // foreach (reference_hsp[i]) reference_hsp[i] inside {[0:10]};
+  }
 endclass
 
 class HsidMainRandom #(

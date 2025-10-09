@@ -26,7 +26,8 @@ module hsid_main_tb #(
   localparam MIN_HSP_BANDS = 2 * (4 + DIVIDER_LATENCY);
 
   reg clk;
-  reg rst_n;
+  reg rst_n_async;
+  wire rst_n_sync;
   reg band_data_in_valid;
   reg [WORD_WIDTH-1:0] band_data_in;
   reg [HSP_LIBRARY_WIDTH-1:0] hsp_library_size_in;
@@ -45,6 +46,13 @@ module hsid_main_tb #(
   wire error;
   wire cancelled;
 
+  // Reset synchroner
+  hsid_rst_sync rst_sync (
+    .clk(clk),
+    .rst_n_async(rst_n_async),
+    .rst_n_sync(rst_n_sync)
+  );
+
   // DUT instantiation
   hsid_main #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -54,7 +62,7 @@ module hsid_main_tb #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut (
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n_sync),
     .band_data_in_valid(band_data_in_valid),
     .band_data_in(band_data_in),
     .hsp_library_size_in(hsp_library_size_in),
@@ -190,8 +198,9 @@ module hsid_main_tb #(
   end
 
   initial begin : tb_hsid_main
+
     clk = 1;
-    rst_n = 1;
+    rst_n_async = 1;
     band_data_in_valid = 0;
     band_data_in = 0;
     hsp_bands_in = '0;
@@ -199,9 +208,13 @@ module hsid_main_tb #(
     start = 0;
     clear = 0;
 
+    // Wait for global reset release in post-synth/post-impl sims
+    #200;
+
     // Reset the DUT
-    #3 rst_n = 0;
-    #5 rst_n = 1;  // Release reset
+    #3 rst_n_async = 0;
+    #5 rst_n_async = 1;
+    #20; // Wait for sync reset deassertion
 
     $display("Case 1: Test normal operation with random vectors ...");
     for (int t = 0; t < 20; t++) begin : case_1
@@ -353,7 +366,7 @@ module hsid_main_tb #(
 
       start = hsid_main_random.start;
       clear = hsid_main_random.clear;
-      rst_n = hsid_main_random.rst_n;
+      rst_n_async = hsid_main_random.rst_n;
       band_data_in = hsid_main_random.band_data_in;
       band_data_in_valid = '1;
       hsp_bands_in = MIN_HSP_BANDS; // Minimum HSP bands to avoid errors

@@ -12,8 +12,18 @@ module hsid_main_simple_tb #(
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH  // Length of the buffer
   ) ();
 
+  // Divider parameters
+  localparam K = WORD_WIDTH;
+  localparam DK = 2*K;
+  localparam DIVIDER_LATENCY = K + 1; // Latency of the divider module
+
+  // Minimum number of hsp bands
+  localparam MIN_HSP_BANDS = 2 * (4 + DIVIDER_LATENCY);
+  localparam TEST_LIBRARY_SIZE = 2;
+
   reg clk;
-  reg rst_n;
+  reg rst_n_async;
+  wire rst_n_sync;
   reg band_data_in_valid;
   reg [WORD_WIDTH-1:0] band_data_in;
   reg [HSP_LIBRARY_WIDTH-1:0] hsp_library_size_in;
@@ -32,6 +42,13 @@ module hsid_main_simple_tb #(
   wire error;
   wire cancelled;
 
+  // Reset synchroner
+  hsid_rst_sync rst_sync (
+    .clk(clk),
+    .rst_n_async(rst_n_async),
+    .rst_n_sync(rst_n_sync)
+  );
+
   // DUT instantiation
   hsid_main #(
     .WORD_WIDTH(WORD_WIDTH),
@@ -41,7 +58,7 @@ module hsid_main_simple_tb #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) dut (
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n_sync),
     .band_data_in_valid(band_data_in_valid),
     .band_data_in(band_data_in),
     .hsp_library_size_in(hsp_library_size_in),
@@ -69,10 +86,10 @@ module hsid_main_simple_tb #(
     .HSP_LIBRARY_WIDTH(HSP_LIBRARY_WIDTH)
   ) hsid_main_gen = new();
 
-  HsidHSPReferenceGen #(
+  HsidHSPSimpleGen #(
     .DATA_WIDTH(DATA_WIDTH),
     .HSP_BANDS_WIDTH(HSP_BANDS_WIDTH)
-  ) hsid_hsp_ref_gen = new();
+  ) hsid_hsp_simple_gen = new();
 
   // Test vectors
   logic [DATA_WIDTH-1:0] captured_hsp [];
@@ -101,7 +118,7 @@ module hsid_main_simple_tb #(
 
   initial begin : tb_hsid_main
     clk = 1;
-    rst_n = 1;
+    rst_n_async = 1;
     band_data_in_valid = 0;
     band_data_in = 0;
     hsp_bands_in = '0;
@@ -109,32 +126,45 @@ module hsid_main_simple_tb #(
     start = 0;
     clear = 0;
 
+    // Wait for global reset release in post-synth/post-impl sims
+    #200;
+
     // Reset the DUT
-    #3 rst_n = 0;
-    #5 rst_n = 1;  // Release reset
+    #3 rst_n_async = 0;
+    #5 rst_n_async = 1;  // Release reset
+    #20; // Wait sync deassert reset
 
     $display("Case 1: Simple operation");
 
-    captured_hsp = '{0,1,2,3,4,5,6,7,8,9};  // Get the measure vector
-    library_hsp = new [2];
-    acc_int = new [2];
-    expected_mse = new [2];
-    expected_mse_of = new [2];
-    hsp_band_packs = (10 + 1) / 2;
+    library_hsp = new [TEST_LIBRARY_SIZE];
+    acc_int = new [TEST_LIBRARY_SIZE];
+    expected_mse = new [TEST_LIBRARY_SIZE];
+    expected_mse_of = new [TEST_LIBRARY_SIZE];
+    hsp_band_packs = (MIN_HSP_BANDS + 1) / 2;
 
-    library_hsp[0] = '{7,2,2,6,1,7,5,7,3,9};  // Library vector 0
-    library_hsp[1] = '{6,1,6,8,2,5,4,2,3,0};  // Library vector 1
+    // captured_hsp = '{0,1,2,3,4,5,6,7,8,9};  // Get the measure vector
+    // library_hsp[0] = '{7,2,2,6,1,7,5,7,3,9};  // Library vector 0
+    // library_hsp[1] = '{6,1,6,8,2,5,4,2,3,0};  // Library vector 1
+
+    hsid_hsp_simple_gen.hsp_bands = MIN_HSP_BANDS;
+    if (!hsid_hsp_simple_gen.randomize()) $fatal(0, "Failed to randomize hsp_bands");
+    captured_hsp = hsid_hsp_simple_gen.reference_hsp;
+
+    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
+      if (!hsid_hsp_simple_gen.randomize()) $fatal(0, "Failed to randomize library hsp %0d", i);
+      library_hsp[i] = hsid_hsp_simple_gen.reference_hsp;
+    end
 
     $display(" - Captured HSP: %p", captured_hsp);
     $display(" - Library HSP 0: %p", library_hsp[0]);
     $display(" - Library HSP 1: %p", library_hsp[1]);
 
     // Generate random library vectors
-    hsid_main_gen.hsp_bands = 10;
-    hsid_main_gen.library_size = 2;
+    hsid_main_gen.hsp_bands = MIN_HSP_BANDS;  // Set the number of HSP bands to process
+    hsid_main_gen.library_size = TEST_LIBRARY_SIZE;
     hsid_main_gen.initial_acc = 0;
     hsid_main_gen.test_rnd_insert = 0;
-    for (int i = 0; i < 2; i++) begin : generate_library
+    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin : generate_library
       hsid_main_gen.sq_df_acc_vctr(captured_hsp, library_hsp[i], acc_int[i]);
       $display(" - Accumulated int for library vector %0d: %p", i, acc_int[i]);
       hsid_main_gen.mse(acc_int[i], expected_mse[i], expected_mse_of[i]);
@@ -158,8 +188,8 @@ module hsid_main_simple_tb #(
 
     // Configure the DUT
     start = 0;
-    hsp_library_size_in = 2;
-    hsp_bands_in = 10;
+    hsp_library_size_in = TEST_LIBRARY_SIZE;
+    hsp_bands_in = MIN_HSP_BANDS;  // Set the number of HSP bands to process
 
     a_conf_idle: assert (idle == 0) else $error("DUT is idle on configuration");
     a_conf_done: assert (done == 0) else $error("DUT is done on configuration");
@@ -196,7 +226,7 @@ module hsid_main_simple_tb #(
 
     $display(" - Sending library vectors...");
     // Send the library vectors
-    for (int i = 0; i < 2; i++) begin
+    for (int i = 0; i < TEST_LIBRARY_SIZE; i++) begin
       hsid_main_gen.band_packer(library_hsp[i], hsp_packed);
       count_insert = 0;
       // $display("  - Sending library vector: %p", hsp_packed);
@@ -216,8 +246,8 @@ module hsid_main_simple_tb #(
     band_data_in_valid = 0;  // Disable input vector valid signal
     band_data_in = 0;  // Reset input vector
 
-    $display(" - Waiting 8 cycles to finish processing (2 to write and read fifo, 5 mse, 1 change state)...");
-    #80;
+    $display(" - Waiting 8 + Divider cycles to finish processing (2 to write and read fifo, 4 (diff, mult, acc, sum) + 1 Start Divider + K+1 Divider Latency, 1 change state)...");
+    #(80 + (DIVIDER_LATENCY * 10)); // Wait for processing to complete
 
     a_finish_done: assert (done == 1) else $error("DUT is not done after processing, you should check waiting cycles");
     a_finish_idle: assert (idle == 0) else $error("DUT is idle after processing");

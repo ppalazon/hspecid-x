@@ -17,6 +17,7 @@ filesets:
 
   tb:
     depend:
+      - "uclm:hspecidx:hsid_rst_sync"
       - "uclm:hspecidx:hsid_test"
 
   sva:
