@@ -1,6 +1,6 @@
-# HSpecID-X
-
-## Overview
+<figure>
+  <img src="figures/hspecid-x.png" alt="HSpecID-X module and dataflow diagram" width="75%">
+</figure>
 
 Identifying the composition of the observed material is a common task in any
 research laboratory, but this problem becomes more complex when we aim to
@@ -48,8 +48,6 @@ the requirements phase.
 
 This project is licensed under the **CERN-OHL-P v2** (Permissive).  
 You are free to use, modify, and distribute this design, provided that the
-copyright notice and license text are retained.  
-
-See the [LICENSE](./LICENSE) file for details.  
-More information about CERN-OHL-P v2 can be found at the [CERN OHL
+copyright notice and license text are retained. More information about
+CERN-OHL-P v2 can be found at the [CERN OHL
 website](https://cern-ohl.web.cern.ch/).
