@@ -1,5 +1,5 @@
 <figure>
-  <img src="figures/hspecid-x.png" alt="HSpecID-X module and dataflow diagram" width="75%">
+  <img src="figures/hspecid-x.png" alt="HSpecID-X logo" width="50%">
 </figure>
 
 Identifying the composition of the observed material is a common task in any
