@@ -3,6 +3,7 @@ site_description: Modular hyperspectral pixel classifier accelerator for X-HEEP 
 site_author: ppalazon
 repo_url: https://github.com/ppalazon/hspecid-x
 repo_name: ppalazon/hspecid-x
+use_directory_urls: false
 
 nav:
   - Overview: index.md
@@ -20,12 +21,39 @@ theme:
     accent: amber
 
 markdown_extensions:
+  - attr_list
+  - md_in_html
   - admonition
-  - codehilite
+  - footnotes
   - toc:
       permalink: true
-  - pymdownx.superfences
+  - pymdownx.arithmatex
+  - pymdownx.emoji
   - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.blocks.tab
+  - pymdownx.blocks.admonition
+  - pymdownx.keys
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.smartsymbols
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.extra
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.blocks.caption
+  # - pymdownx.blocks.figure
+  - pymdownx.magiclink
+  # - pymdownx.linkify
+  - pymdownx.progressbar
+  - pymdownx.pathconverter
+  - attr_list
 
 extra:
   social:
