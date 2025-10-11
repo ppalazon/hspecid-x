@@ -1,4 +1,4 @@
-# HSpecID-X
+# HSpecID-X: A Hyperspectral Pixel Classifier Accelerator for X-HEEP 
 
 [![Documentation Status](https://readthedocs.org/projects/hspecid-x/badge/?version=latest)](https://hspecid-x.readthedocs.io/en/latest/)
 [![License: CERN-OHL-P v2](https://img.shields.io/badge/License-CERN--OHL--P--v2-blue.svg)](https://ohwr.org/cern_ohl_p_v2.txt)
