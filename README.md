@@ -3,25 +3,40 @@
 [![Documentation Status](https://readthedocs.org/projects/hspecid-x/badge/?version=latest)](https://hspecid-x.readthedocs.io/en/latest/)
 [![License: CERN-OHL-P v2](https://img.shields.io/badge/License-CERN--OHL--P--v2-blue.svg)](https://ohwr.org/cern_ohl_p_v2.txt)
 
-This project is a RTL hardware Domain-Specific Accelerator (DSA) to classify hyperspectral pixels (HSPs) using reference signatures from spectral libraries for X-HEEP. 
+The main objective of this project is the design at the **RTL** level and the
+functional verification of a **domain-specific accelerator (DSA)** for the
+classification of **hyperspectral pixels (HSPs)** based on reference signatures
+contained in spectral libraries. 
 
-Full docs are available at: [hspecid-x.readthedocs.io](https://hspecid-x.readthedocs.io).
+This accelerator will be adapted for integration into a **System-on-Chip (SoC)**
+based on **X-HEEP**, targeting *on-edge* and *on-board* environments, where
+local data processing is critical.
 
-## Features
+The accelerator performs the computation of the **Mean Squared Error (MSE)**
+between the captured HSP and the signatures in the library in order to determine
+which spectral signature best matches the captured data.
 
-- Modular RTL hardware accelerator for hyperspectral pixel classification
-- Computes mean squared error (MSE) between pixels and reference spectral signatures
-- Designed for integration with X-HEEP (RISC-V, low-power) platforms
-- Pipeline and dataflow architecture in SystemVerilog
-- Supports embedded/on-board systems with strict resource and power constraints
-- Interfaces for X-HEEP platform and spectral library access
-- Verification with testbenches, SVA assertions, coverage analysis, and constrained-random stimulus
-- Highly parametrizable to adapt to multiples hardware conditions
-- Configurable by software through Register Interface of XAIF interface
-- Achieves high functional coverage (87% in main module)
-- Results validated against golden model in testbenches
-- Includes build, simulation, and reporting scripts for developer workflows
-- Licensed under CERN-OHL-P v2, with third-party modules under Apache/Solderpad licenses
+More specifically, the technical objectives are:
+
+- **Develop** a hardware accelerator in **SystemVerilog** that implements the
+  MSE algorithm for HSP processing, using *pipeline* and *dataflow*
+  architectures.
+- **Integrate** the accelerator into the **X-HEEP** platform, ensuring
+  connectivity with its standard interfaces.
+- **Evaluate** performance through functional simulation in **Vivado (xsim)**
+  and **Siemens QuestaSim (vsim)**, with signal timing analysis (*waveforms*)
+  using **GTKWave** and **QuestaSim**, and by determining the number of cycles
+  required to process each HSP.
+- **Verify and validate** the design through directed and random *testbenches*,
+  **SystemVerilog Assertions (SVA)**, and coverage checks.
+- **Optimize** the design to maximize configurability at both software and RTL
+  levels, promote code reuse, and enable future scalability, as well as
+  synthesis on **FPGA** or **ASIC**.
+- **Publish** the design as an **open-hardware** project so that the RTL code
+  can be reused by other projects through the **FuseSoC** and **Bender** tools.
+
+Full docs are available at:
+[hspecid-x.readthedocs.io](https://hspecid-x.readthedocs.io).
 
 ## License
 
