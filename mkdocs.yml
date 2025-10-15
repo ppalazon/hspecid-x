@@ -8,7 +8,6 @@ use_directory_urls: false
 nav:
   - Overview: index.md
   - Architecture: architecture.md
-  - Development: development.md
 
 docs_dir: docs
 site_dir: site
