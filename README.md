@@ -3,9 +3,9 @@
 [![Documentation Status](https://readthedocs.org/projects/hspecid-x/badge/?version=latest)](https://hspecid-x.readthedocs.io/en/latest/)
 [![License: CERN-OHL-P v2](https://img.shields.io/badge/License-CERN--OHL--P--v2-blue.svg)](https://ohwr.org/cern_ohl_p_v2.txt)
 
-<figure>
+<p align="center">
   <img src="https://raw.githubusercontent.com/ppalazon/hspecid-x/main/docs/figures/hspecid-x.png" alt="HSpecID-X logo" width="50%">
-</figure>
+</p>
 
 The main objective of this project is the design at the **RTL** level and the
 functional verification of a **domain-specific accelerator (DSA)** for the
