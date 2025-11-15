@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Sun Aug 31 21:34:48 2025
+[*] GTKWave Analyzer v3.3.125 (w)1999-2025 BSI
+[*] Thu Nov 13 19:10:52 2025
 [*]
 [dumpfile] "/home/ppalazon/workspace/hw/hspecid-x/build/uclm_hspecidx_hsid_main_0/sim-simple-xsim/cleaned.vcd"
-[dumpfile_mtime] "Sun Aug 31 21:24:44 2025"
-[dumpfile_size] 15985
+[dumpfile_mtime] "Thu Nov 13 19:08:35 2025"
+[dumpfile_size] 60784
 [savefile] "/home/ppalazon/workspace/hw/hspecid-x/hw/waves/hsid_main-simple.gtkw"
-[timestart] 127310
+[timestart] 0
 [size] 2554 2765
 [pos] -1 -1
-*-13.944882 201970 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.371859 201970 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] hsid_main_simple_tb.
 [treeopen] hsid_main_simple_tb.dut.
 [treeopen] hsid_main_simple_tb.dut.fifo_captured.
@@ -21,7 +21,6 @@
 [sst_vpaned_height] 1003
 @28
 hsid_main_simple_tb.clk
-hsid_main_simple_tb.rst_n
 @200
 -DUT
 @22
@@ -78,7 +77,7 @@ hsid_main_simple_tb.dut.fifo_ref.data_in[31:0]
 hsid_main_simple_tb.dut.fifo_ref.rd_en
 @200
 -MSE Comp
-@25
+@24
 hsid_main_simple_tb.dut.mse_comp.mse_in_value[31:0]
 @28
 hsid_main_simple_tb.dut.mse_comp.mse_in_valid
@@ -109,6 +108,20 @@ hsid_main_simple_tb.dut.mse.mse_valid
 @24
 hsid_main_simple_tb.dut.mse.mse_value[31:0]
 hsid_main_simple_tb.dut.mse.mse_ref[5:0]
+@200
+-Divider
+@24
+hsid_main_simple_tb.dut.mse.divider.dividend[63:0]
+hsid_main_simple_tb.dut.mse.divider.divisor[31:0]
+@28
+hsid_main_simple_tb.dut.mse.divider.ready
+@29
+hsid_main_simple_tb.dut.mse.divider.start
+@28
+hsid_main_simple_tb.dut.mse.divider.done
+@24
+hsid_main_simple_tb.dut.mse.divider.quotient[31:0]
+hsid_main_simple_tb.dut.mse.divider.remainder[31:0]
 @200
 -SqDfAcc1
 @24

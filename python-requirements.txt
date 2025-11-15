@@ -6,7 +6,7 @@ beautifulsoup4==4.14.2
 bracex==2.6
 certifi==2025.10.5
 charset-normalizer==3.4.3
-click==8.3.0
+click==8.2.1
 colorama==0.4.6
 csscompressor==0.9.5
 edalize==0.6.2

@@ -44,6 +44,7 @@ REGTOOL="$BASE_DIR/hw/deps/register_interface/vendor/lowrisc_opentitan/util/regt
 HJSON_FILE="$BASE_DIR/data/$NAME.hjson"
 RTL_DIR="$BASE_DIR/hw/src/${NAME}_reg/rtl"
 SW_DIR="$BASE_DIR/sw"
+DOCS_DIR="$BASE_DIR/docs"
 
 # Check that regtool exists
 if [ ! -f "$REGTOOL" ]; then
@@ -66,7 +67,7 @@ printf -- "Generating software header...\n"
 "$REGTOOL" --cdefines -o "$SW_DIR/${NAME}_reg.h" "$HJSON_FILE"
 
 printf -- "Generating Markdown documentation...\n"
-"$REGTOOL" -d "$HJSON_FILE" > "$SW_DIR/${NAME}_reg.md"
+"$REGTOOL" -d "$HJSON_FILE" > "$DOCS_DIR/design/${NAME}_reg.md"
 
 # Ensure header ends with newline
 echo "" >> "$SW_DIR/${NAME}_reg.h"

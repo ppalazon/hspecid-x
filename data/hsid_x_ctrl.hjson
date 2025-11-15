@@ -92,7 +92,7 @@
       "desc": "Number of bands in each pixel",
       "fields": [
         {
-          #"bits": "7:0", # Max bands is 255 (8 bits)  - Check hsid_pkg
+          # "bits": "7:0", # Max bands is 255 (8 bits)  - Check hsid_pkg
           "bits": "6:0",
           "name": "PIXEL_BANDS",
           "desc": "Number of bands in each pixel."

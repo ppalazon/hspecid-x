@@ -5,20 +5,27 @@ import hsid_pkg::*;  // Import the package for HSI MSE
 /*
  @WAVEDROM_START
  { "signal": [
- { "name": "clk",                 "wave": "p.........................." },
- { "name": "band_data_in_valid",  "wave": "l..h...............l........" },
- { "name": "band_data_in",        "wave": "x..33333x7777799999x........", "data": ["0/1","2/3","4/5","6/7","8/9","7/2", "2/6","1/7","5/7", "3/9","6/1","6/8", "2/5", "4/2", "3/0"] },
- { "name": "hap_library_size_in", "wave": "x.5x........................", "data":["2"] },
- { "name": "hap_bands_in",        "wave": "x.4x........................" , "data":["10"] },
- { "name": "mse_min_ref",         "wave": "x...................6x...6x." , "data":["0","0"] },
- { "name": "mse_max_ref",         "wave": "x...................8x...8x." , "data":["0","1"] },
- { "name": "mse_min_value",       "wave": "x...................6x...6x." , "data":["9","9"] },
- { "name": "mse_max_value",       "wave": "x...................8x...8x." , "data":["9","21"] },
- { "name": "start",               "wave": "lhl........................." },
- { "name": "done",                "wave": "l.........................hl" },
- { "name": "idle",                "wave": "hl.........................h" },
- { "name": "ready",               "wave": "l..h................l......." }
- ]}
+ { "name": "clk",                 "wave": "p..............|..|..............." },
+ { "name": "band_data_in_valid",  "wave": "l..h...........|..|.l............." },
+ {                                  node: '...A.........BC..D..E.............'},
+ { "name": "band_data_in",        "wave": "x..3333333333x7|79|9x.............", "data": ["0/1","2/3","4/5","6/7","8/9","9/8","7/6","5/4","3/2","1/0","7/2","3/0","8/3","2/5"] },
+ { "name": "hap_library_size_in", "wave": "x.5x...........|..|...............", "data":["2"] },
+ { "name": "hap_bands_in",        "wave": "x.4x...........|..|..............." , "data":["20"] },
+ { "name": "mse_min_ref",         "wave": "x..............|..|..6x.........6x" , "data":["0","0"] },
+ { "name": "mse_max_ref",         "wave": "x..............|..|..8x.........8x" , "data":["0","1"] },
+ { "name": "mse_min_value",       "wave": "x..............|..|..6x.........6x" , "data":["9","9"] },
+ { "name": "mse_max_value",       "wave": "x..............|..|..8x.........8x" , "data":["9","21"] },
+ {                                  node: '...................FGHIJKL.....MN.'},
+ { "name": "start",               "wave": "lhl............|..|..............." },
+ { "name": "done",                "wave": "l..............|..|.............hl" },
+ { "name": "idle",                "wave": "hl.............|..|..............h" },
+ { "name": "ready",               "wave": "l..h...........|..|l.............." }
+ ],
+ edge: [
+ 'A+B HSP', 'C+D Ref 0', 'D+E Ref 1',
+ 'F+G W/F', 'G+H R/F', 'H+I Diff', 'I+J Mult','J+K Acc','K+L Sum','L+M Divider', 'M+N Comp'
+ ]
+ }
  @WAVEDROM_END
  */
 module hsid_main #(

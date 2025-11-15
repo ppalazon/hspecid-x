@@ -17,7 +17,8 @@ This project aims at the **RTL-level** design and verification of a
 squared error (MSE) between a hyperspectral pixel (HSP) and multiple reference
 signatures stored in a spectral library, with the goal of identifying he
 composition of the observed object. This accelerator includes the interfaces
-required for integration with the X-HEEP platform, which is based on RISC-V
+required for integration with the [X-HEEP
+platform](https://x-heep.readthedocs.io/en/latest/), which is based on RISC-V
 processors and focused on low-power applications.
 
 The design has been developed in a modular way in SystemVerilog, using a

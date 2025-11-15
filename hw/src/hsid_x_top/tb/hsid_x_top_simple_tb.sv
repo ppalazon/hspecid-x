@@ -13,7 +13,7 @@ module hsid_x_top_simple_tb #(
     parameter HSP_BANDS_WIDTH = HSID_HSP_BANDS_WIDTH,
     parameter BUFFER_WIDTH = HSID_FIFO_ADDR_WIDTH,  // Length of the buffer
     parameter TEST_MEM_MASK = 32'h00003FFF,  // Mask to return least significant 14 bits of the address
-    parameter TEST_HSP_BANDS = 10, // Number of bands in the HSP
+    parameter TEST_HSP_BANDS = 74, // Number of bands in the HSP
     parameter TEST_HSP_LIBRARY_SIZE = 2, // Number of pixels in the HSP library
     parameter TEST_HSP_CAPTURED_PIXEL_ADDR = 32'h4321_8765, // Address of the captured pixel in memory
     parameter TEST_HSP_LIBRARY_PIXEL_ADDR = 32'h3242_2342, // Address of the HSP library in memory

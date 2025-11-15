@@ -56,7 +56,7 @@ module hsid_divider #(
             reset_dut();
           end else if (start) begin
             // In this point we're always computing step 0
-            divisor_ext <= {1'b0, divisor}; // Align divisor with dividend
+            divisor_ext <= {1'b0, divisor}; // Extend divisor with 0 MSB
             rem_reg <= {1'b0, dividend[DK-1:K]}; // MSB part of dividend
             q_reg <= dividend[K-1:0];            // LSB part of dividend
             step <= K - 1;

@@ -3,11 +3,34 @@ site_description: Modular hyperspectral pixel classifier accelerator for X-HEEP 
 site_author: ppalazon
 repo_url: https://github.com/ppalazon/hspecid-x
 repo_name: ppalazon/hspecid-x
-use_directory_urls: false
+# use_directory_urls: false
 
 nav:
   - Overview: index.md
+  - Introduction: intro.md
+  - Requirements: requirements.md
   - Architecture: architecture.md
+  - Development: development.md
+  - Hardware Configuration: configuration.md
+  - Design HSID:
+      - FIFO: design/hsid_fifo.md
+      - Squared Difference Accumulator: design/hsid_sq_df_acc.md
+      - Divider: design/hsid_divider.md
+      - MSE: design/hsid_mse.md
+      - Comparator: design/hsid_mse_comp.md
+      - Main: design/hsid_main.md
+  - Design HSpecID-X:
+      - Register Offset: design/hsid_x_ctrl_reg.md
+      - Register Control: design/hsid_x_registers.md
+      - OBI Memory Controller: design/hsid_x_obi_mem.md
+      - Top Module: design/hsid_x_top.md
+  - Simulation & Verification::
+      - Overview: simulation/overview.md
+      - Simulation: simulation/simulation.md
+      - Performance: simulation/performance.md
+      - Verification: simulation/verification.md
+      - Proof of Concept: simulation/poc.md
+  - X-HEEP Integration: integration_xheep.md
 
 docs_dir: docs
 site_dir: site
@@ -20,17 +43,21 @@ theme:
     accent: amber
 
 markdown_extensions:
+  - abbr
   - attr_list
   - md_in_html
   - admonition
   - footnotes
   - toc:
       permalink: true
-  - pymdownx.arithmatex
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.emoji
   - pymdownx.details
   - pymdownx.superfences
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      auto_append:
+        - docs/includes/abbreviations.md
   - pymdownx.blocks.tab
   - pymdownx.blocks.admonition
   - pymdownx.keys
@@ -53,6 +80,7 @@ markdown_extensions:
   - pymdownx.progressbar
   - pymdownx.pathconverter
   - attr_list
+  - markdown_wavedrom
 
 extra:
   social:
@@ -61,3 +89,9 @@ extra:
 
 extra_css:
   - stylesheets/extra.css
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/wavedrom.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/skins/default.js
+  - js/wavedrom_loader.js

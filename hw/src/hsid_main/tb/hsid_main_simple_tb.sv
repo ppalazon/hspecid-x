@@ -127,7 +127,7 @@ module hsid_main_simple_tb #(
     clear = 0;
 
     // Wait for global reset release in post-synth/post-impl sims
-    #200;
+    // #200;
 
     // Reset the DUT
     #3 rst_n_async = 0;
@@ -271,6 +271,8 @@ module hsid_main_simple_tb #(
     a_aft_finish_idle: assert (idle == 1) else $error("DUT is not idle after processing");
     a_aft_finish_done: assert (done == 0) else $error("DUT is done after processing");
     a_aft_finish_rdy: assert (ready == 0) else $error("DUT is ready after processing");
+
+    #10;
 
     $finish;
   end
