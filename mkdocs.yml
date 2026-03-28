@@ -1,6 +1,6 @@
 site_name: HSpecID-X
 site_description: Modular hyperspectral pixel classifier accelerator for X-HEEP platforms
-site_author: ppalazon
+site_author: Pablo Palazon
 repo_url: https://github.com/ppalazon/hspecid-x
 repo_name: ppalazon/hspecid-x
 # use_directory_urls: false
